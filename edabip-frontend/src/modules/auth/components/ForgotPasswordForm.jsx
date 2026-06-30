@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import backgroundImg from '../../../assets/login/background.png';
 import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
@@ -8,188 +8,590 @@ import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
 import './ForgotPasswordForm.css';
 
-// NOTE: Figma has two competing designs for this step —
-//   (A) this one: single email field -> "Send Reset Link"
-//   (B) Email/Mobile tabs -> "Send OTP"
-// Building (A) since it's the only one with a complete, consistent flow
-// (matching screen + "Email Sent Successfully" confirmation screen).
-// Swap this out if the design team confirms (B) instead.
-
 const FEATURES = [
-  { src: featureAnalytics, alt: 'Real-Time Analytics', label: 'Real-Time Analytics' },
-  { src: featureAi, alt: 'AI-Powered Insights', label: 'AI-Powered Insights' },
-  { src: featureSecurity, alt: 'Enterprise Security', label: 'Enterprise Security' },
-  { src: featureScalable, alt: 'Scalable Platform', label: 'Scalable Platform' },
+  {
+    src: featureAnalytics,
+    alt: 'Real-Time Analytics',
+    label: 'Real-Time Analytics',
+  },
+  {
+    src: featureAi,
+    alt: 'AI-Powered Insights',
+    label: 'AI-Powered Insights',
+  },
+  {
+    src: featureSecurity,
+    alt: 'Enterprise Security',
+    label: 'Enterprise Security',
+  },
+  {
+    src: featureScalable,
+    alt: 'Scalable Platform',
+    label: 'Scalable Platform',
+  },
 ];
+
+const INDIA_MOBILE_REGEX = /^[6-9]\d{9}$/;
+const RESEND_SECONDS = 30;
 
 function CardLogo() {
   return (
-    <div className="card-logo">
-      <img src={logoImgc} alt="" className="card-logo-icon" />
-      <span className="card-logo-text">EDABIP</span>
+    <div className="fp-card-logo">
+      <img src={logoImgc} alt="" className="fp-card-logo-icon" />
+      <span className="fp-card-logo-text">EDABIP</span>
     </div>
   );
 }
 
-function ForgotPasswordForm() {
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+function MailIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <rect
+        x="2"
+        y="4"
+        width="20"
+        height="16"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
 
-  const handleSubmit = (e) => {
+      <path
+        d="M2 6l10 7 10-7"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function PhoneIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M6.5 3h3l1.5 4-2 1.5a11 11 0 005.5 5.5l1.5-2 4 1.5v3a1.5 1.5 0 01-1.6 1.5A17.5 17.5 0 015 4.6 1.5 1.5 0 016.5 3z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ArrowLeftIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M19 12H5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M11 18l-6-6 6-6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CheckCircleIcon({ size = 14 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+
+      <path
+        d="M8 12.5l3 3 5-6"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M5 5l14 14M19 5L5 19"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function ForgotPasswordForm() {
+  const [method, setMethod] = useState('email');
+  const [step, setStep] = useState('request'); // 'request' | 'verify' | 'verified'
+
+  const [email, setEmail] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [mobileError, setMobileError] = useState('');
+
+  const [otp, setOtp] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [resendSeconds, setResendSeconds] = useState(0);
+
+  const [toast, setToast] = useState(null);
+
+  const destination = method === 'email' ? email : `+91 ${mobile}`;
+
+  useEffect(() => {
+    if (step !== 'verify' || resendSeconds <= 0) return undefined;
+
+    const timer = setTimeout(() => {
+      setResendSeconds((seconds) => seconds - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [step, resendSeconds]);
+
+  const selectMethod = (next) => {
+    setMethod(next);
+    setStep('request');
+    setOtp('');
+    setOtpError('');
+    setMobileError('');
+    setToast(null);
+  };
+
+  const handleMobileChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setMobile(digits);
+    if (mobileError) setMobileError('');
+  };
+
+  const handleOtpChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 4);
+    setOtp(digits);
+    if (otpError) setOtpError('');
+  };
+
+  const sendOtp = () => {
+    console.log('OTP requested via', method, destination);
+
+    setOtp('');
+    setOtpError('');
+    setStep('verify');
+    setResendSeconds(RESEND_SECONDS);
+    setToast({
+      title: 'OTP Send Successfully!',
+      message: `A 4-digit OTP has been sent to ${destination}`,
+    });
+  };
+
+  const handleSendOtp = (e) => {
     e.preventDefault();
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please enter a valid email address');
+    if (method === 'mobile' && !INDIA_MOBILE_REGEX.test(mobile)) {
+      setMobileError('Enter a valid 10-digit Indian mobile number');
       return;
     }
-    setError('');
-    setSubmitting(true);
 
-    // TODO: wire to real endpoint, e.g.
-    // api.post('/auth/forgot-password', { email })
-    //   .then(() => navigate('/email-sent', { state: { email } }))
-    //   .finally(() => setSubmitting(false));
-    console.log('Reset link requested for:', email);
-    setSubmitting(false);
+    sendOtp();
+  };
+
+  const handleResendOtp = () => {
+    if (resendSeconds > 0) return;
+
+    console.log('Resending OTP via', method, destination);
+
+    setOtp('');
+    setOtpError('');
+    setResendSeconds(RESEND_SECONDS);
+    setToast({
+      title: 'OTP Resent Successfully!',
+      message: `A new 4-digit OTP has been sent to ${destination}`,
+    });
+  };
+
+  const handleVerifyOtp = (e) => {
+    e.preventDefault();
+
+    if (otp.length !== 4) {
+      setOtpError('Enter the 4-digit OTP sent to you');
+      return;
+    }
+
+    console.log('Verifying OTP', otp, 'for', destination);
+
+    setToast(null);
+    setStep('verified');
+  };
+
+  const handleChangeDestination = () => {
+    setStep('request');
+    setOtp('');
+    setOtpError('');
+    setToast(null);
   };
 
   return (
-    <div className="forgot-password-container">
-      <div className="forgot-password-background">
-        <img src={backgroundImg} alt="" className="background-image" />
+    <div className="fp-container">
+
+      <div className="fp-background">
+        <img
+          src={backgroundImg}
+          alt=""
+          className="fp-background-image"
+        />
       </div>
 
-      <div className="forgot-password-content">
-        <div className="left-section">
-          <img src={logoImg} alt="EDABIP" className="brand-logo" />
+      <div className="fp-content">
 
-          <h1 className="welcome-heading">
+        <div className="fp-left-section">
+
+          <img
+            src={logoImg}
+            alt="EDABIP"
+            className="fp-brand-logo"
+          />
+
+          <h1 className="fp-welcome-heading">
             Welcome to your Analytics Dashboard
           </h1>
 
-          <p className="welcome-description">
+          <p className="fp-welcome-description">
             Track performance, analyze data, and make smarter business decisions in real-time.
           </p>
 
-          <div className="features-container">
+          <div className="fp-features-container">
+
             {FEATURES.map((feature) => (
-              <div key={feature.alt} className="feature-item">
+              <div
+                key={feature.alt}
+                className="fp-feature-item"
+              >
                 <img
                   src={feature.src}
                   alt={feature.alt}
-                  className="feature-badge"
+                  className="fp-feature-badge"
                 />
 
-                <span className="feature-label">
+                <span className="fp-feature-label">
                   {feature.label}
                 </span>
               </div>
             ))}
+
           </div>
         </div>
 
-        <div className="right-section">
-          <div className="forgot-password-card">
-            <CardLogo />
+        <div className="fp-right-section">
 
-            <h2 className="card-welcome">Reset Your Password</h2>
+          {toast && (
+            <div className="fp-toast" role="status">
 
-            <p className="card-subtitle">
-              Enter your registered email address and we&apos;ll send you a link to reset your
-              password.
-            </p>
+              <span className="fp-toast-icon">
+                <CheckCircleIcon />
+              </span>
 
-            <form onSubmit={handleSubmit} className="forgot-password-form">
-              <div className="form-group">
-                <label htmlFor="email">Email Address</label>
+              <div className="fp-toast-content">
+                <p className="fp-toast-title">
+                  {toast.title}
+                </p>
 
-                <div className="input-wrapper">
-                  <svg
-                    className="input-icon"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <rect
-                      x="2"
-                      y="4"
-                      width="20"
-                      height="16"
-                      rx="2"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    />
-                    <path
-                      d="M2 6l10 7 10-7"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-
-                  <input
-                    type="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your registered email"
-                    required
-                  />
-                </div>
-                {error && <p className="field-error">{error}</p>}
+                <p className="fp-toast-message">
+                  {toast.message}
+                </p>
               </div>
 
-              <button type="submit" className="reset-btn" disabled={submitting}>
-                <svg
-                  className="btn-icon"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M22 2L11 13"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M22 2l-7 20-4-9-9-4 20-7z"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                {submitting ? 'Sending…' : 'Send Reset Link'}
+              <button
+                type="button"
+                className="fp-toast-close"
+                aria-label="Dismiss notification"
+                onClick={() => setToast(null)}
+              >
+                <CloseIcon />
               </button>
-            </form>
 
-            <div className="divider">
-              <span>OR</span>
             </div>
+          )}
 
-            <button type="button" className="sso-btn google-btn">
-              <svg className="btn-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-              </svg>
-              Reset with Google
-            </button>
+          <div className="fp-card">
 
-            <p className="signin-text">
-              Remember your password?{' '}
-              <a href="/login" className="signin-link">
-                Sign In
-              </a>
-            </p>
+            <a href="/" className="fp-back-link">
+              <ArrowLeftIcon />
+              Back to Sign In
+            </a>
+
+            <CardLogo />
+
+            {step === 'request' && (
+              <>
+                <h2 className="fp-title">
+                  Forgot password
+                </h2>
+
+                <p className="fp-subtitle">
+                  Choose how you&apos;d like to receive your reset instructions
+                </p>
+
+                <div className="fp-method-toggle" role="tablist">
+
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={method === 'email'}
+                    className={`fp-method-btn ${method === 'email' ? 'active' : ''}`}
+                    onClick={() => selectMethod('email')}
+                  >
+                    <MailIcon />
+                    Reset via Email
+                  </button>
+
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={method === 'mobile'}
+                    className={`fp-method-btn ${method === 'mobile' ? 'active' : ''}`}
+                    onClick={() => selectMethod('mobile')}
+                  >
+                    <PhoneIcon />
+                    Reset via Mobile
+                  </button>
+
+                </div>
+
+                <form
+                  onSubmit={handleSendOtp}
+                  className="fp-form"
+                >
+
+                  {method === 'email' ? (
+                    <div className="fp-form-group">
+
+                      <label htmlFor="fp-email">
+                        Email
+                      </label>
+
+                      <div className="fp-input-wrapper">
+
+                        <span className="fp-input-icon">
+                          <MailIcon />
+                        </span>
+
+                        <input
+                          type="email"
+                          id="fp-email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="Enter your email address"
+                          required
+                        />
+
+                      </div>
+
+                      <p className="fp-helper-text">
+                        We&apos;ll send a secure 4-digit OTP to this address. It will expire in 30 minutes.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="fp-form-group">
+
+                      <label htmlFor="fp-mobile">
+                        Mobile Number
+                      </label>
+
+                      <div className="fp-input-wrapper fp-input-wrapper--phone">
+
+                        <span className="fp-input-icon">
+                          <PhoneIcon />
+                        </span>
+
+                        <span className="fp-mobile-prefix">
+                          +91
+                        </span>
+
+                        <input
+                          type="tel"
+                          inputMode="numeric"
+                          id="fp-mobile"
+                          value={mobile}
+                          onChange={handleMobileChange}
+                          placeholder="98765 43210"
+                          maxLength={10}
+                          aria-invalid={Boolean(mobileError)}
+                          required
+                        />
+
+                      </div>
+
+                      {mobileError ? (
+                        <p className="fp-field-error">
+                          {mobileError}
+                        </p>
+                      ) : (
+                        <p className="fp-helper-text">
+                          We&apos;ll send a secure 4-digit OTP to this Indian mobile number. It will expire in 30 minutes.
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="fp-submit-btn"
+                  >
+                    Send OTP
+                  </button>
+
+                </form>
+
+                <p className="fp-support-text">
+                  Need help?{' '}
+                  <span
+                    className="fp-support-link fp-support-link--disabled"
+                    aria-disabled="true"
+                    title="Coming soon"
+                  >
+                    Contact Support
+                  </span>
+                </p>
+              </>
+            )}
+
+            {step === 'verify' && (
+              <>
+                <h2 className="fp-title">
+                  Verify OTP
+                </h2>
+
+                <p className="fp-subtitle">
+                  Enter the 4-digit code sent to{' '}
+                  <strong>{destination}</strong>
+                </p>
+
+                <form
+                  onSubmit={handleVerifyOtp}
+                  className="fp-form"
+                >
+
+                  <div className="fp-form-group">
+
+                    <label htmlFor="fp-otp">
+                      OTP
+                    </label>
+
+                    <input
+                      type="tel"
+                      inputMode="numeric"
+                      id="fp-otp"
+                      className="fp-otp-input"
+                      value={otp}
+                      onChange={handleOtpChange}
+                      placeholder="••••"
+                      maxLength={4}
+                      aria-invalid={Boolean(otpError)}
+                      autoFocus
+                      required
+                    />
+
+                    {otpError && (
+                      <p className="fp-field-error fp-field-error--center">
+                        {otpError}
+                      </p>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="fp-submit-btn"
+                  >
+                    Verify OTP
+                  </button>
+
+                  <div className="fp-resend-row">
+                    <span>Didn&apos;t receive the code?</span>
+
+                    <button
+                      type="button"
+                      className="fp-resend-btn"
+                      onClick={handleResendOtp}
+                      disabled={resendSeconds > 0}
+                    >
+                      {resendSeconds > 0 ? `Resend in 0:${String(resendSeconds).padStart(2, '0')}` : 'Resend OTP'}
+                    </button>
+                  </div>
+
+                </form>
+
+                <button
+                  type="button"
+                  className="fp-change-link"
+                  onClick={handleChangeDestination}
+                >
+                  {method === 'email' ? 'Change email address' : 'Change mobile number'}
+                </button>
+              </>
+            )}
+
+            {step === 'verified' && (
+              <div className="fp-verified-panel">
+
+                <div className="fp-verified-icon">
+                  <CheckCircleIcon size={28} />
+                </div>
+
+                <h2 className="fp-verified-title">
+                  OTP Verified!
+                </h2>
+
+                <p className="fp-verified-message">
+                  Your identity has been verified successfully. You can continue to sign in once your password has been reset.
+                </p>
+
+                <a href="/" className="fp-submit-btn fp-verified-cta">
+                  Back to Sign In
+                </a>
+              </div>
+            )}
+
           </div>
         </div>
       </div>
