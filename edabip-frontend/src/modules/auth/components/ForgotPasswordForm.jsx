@@ -6,7 +6,14 @@ import featureAnalytics from '../../../assets/login/feature-analytics.png';
 import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
-import './LoginForm.css';
+import './ForgotPasswordForm.css';
+
+// NOTE: Figma has two competing designs for this step —
+//   (A) this one: single email field -> "Send Reset Link"
+//   (B) Email/Mobile tabs -> "Send OTP"
+// Building (A) since it's the only one with a complete, consistent flow
+// (matching screen + "Email Sent Successfully" confirmation screen).
+// Swap this out if the design team confirms (B) instead.
 
 const FEATURES = [
   { src: featureAnalytics, alt: 'Real-Time Analytics', label: 'Real-Time Analytics' },
@@ -24,23 +31,36 @@ function CardLogo() {
   );
 }
 
-function LoginForm() {
+function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Login submitted:', { email, password });
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+    setError('');
+    setSubmitting(true);
+
+    // TODO: wire to real endpoint, e.g.
+    // api.post('/auth/forgot-password', { email })
+    //   .then(() => navigate('/email-sent', { state: { email } }))
+    //   .finally(() => setSubmitting(false));
+    console.log('Reset link requested for:', email);
+    setSubmitting(false);
   };
 
   return (
-    <div className="login-container">
-      <div className="login-background">
+    <div className="forgot-password-container">
+      <div className="forgot-password-background">
         <img src={backgroundImg} alt="" className="background-image" />
       </div>
 
-      <div className="login-content">
+      <div className="forgot-password-content">
         <div className="left-section">
           <img src={logoImg} alt="EDABIP" className="brand-logo" />
 
@@ -70,21 +90,19 @@ function LoginForm() {
         </div>
 
         <div className="right-section">
-          <div className="login-card">
+          <div className="forgot-password-card">
             <CardLogo />
 
-            <h2 className="card-welcome">
-              Welcome <span className="card-welcome-accent">Back!</span>
-            </h2>
+            <h2 className="card-welcome">Reset Your Password</h2>
 
             <p className="card-subtitle">
-              Glad to see you again! Please login to continue your analytics journey.
+              Enter your registered email address and we&apos;ll send you a link to reset your
+              password.
             </p>
 
-            <form onSubmit={handleSubmit} className="login-form">
-
+            <form onSubmit={handleSubmit} className="forgot-password-form">
               <div className="form-group">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">Email Address</label>
 
                 <div className="input-wrapper">
                   <svg
@@ -104,7 +122,6 @@ function LoginForm() {
                       stroke="currentColor"
                       strokeWidth="1.5"
                     />
-
                     <path
                       d="M2 6l10 7 10-7"
                       stroke="currentColor"
@@ -118,92 +135,39 @@ function LoginForm() {
                     id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email address"
+                    placeholder="Enter your registered email"
                     required
                   />
                 </div>
+                {error && <p className="field-error">{error}</p>}
               </div>
 
-              <div className="form-group">
-                <label htmlFor="password">Password</label>
-
-                <div className="input-wrapper">
-                  <svg
-                    className="input-icon"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <rect
-                      x="3"
-                      y="11"
-                      width="18"
-                      height="11"
-                      rx="2"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    />
-
-                    <path
-                      d="M7 11V7a5 5 0 0110 0v4"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    required
-                  />
-
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M3 3l18 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                        <path d="M10.58 10.58A2 2 0 0012 15a2 2 0 001.41-.59" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                        <path d="M9.88 5.09A10.94 10.94 0 0112 5c5 0 9.27 3.11 11 7.5a11.6 11.6 0 01-2.12 3.17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                        <path d="M6.12 6.12A11.6 11.6 0 001 12.5C2.73 16.89 7 20 12 20a10.94 10.94 0 003.12-.46" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    ) : (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M1 12.5C2.73 8.11 7 5 12 5s9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S2.73 16.89 1 12.5z" stroke="currentColor" strokeWidth="1.5" />
-                        <circle cx="12" cy="12.5" r="3" stroke="currentColor" strokeWidth="1.5" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="form-options">
-                <label className="remember-me">
-                  <input type="checkbox" />
-                  <span>Remember me</span>
-                </label>
-
-                <a
-                  href="/forgot-password"
-                  className="forgot-password"
+              <button type="submit" className="reset-btn" disabled={submitting}>
+                <svg
+                  className="btn-icon"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
                 >
-                  Forgot Password?
-                </a>
-              </div>
-
-              <button type="submit" className="login-btn">
-                Sign In
+                  <path
+                    d="M22 2L11 13"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M22 2l-7 20-4-9-9-4 20-7z"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                {submitting ? 'Sending…' : 'Send Reset Link'}
               </button>
-
             </form>
 
             <div className="divider">
@@ -217,14 +181,13 @@ function LoginForm() {
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
               </svg>
-
-              Sign in with Google
+              Reset with Google
             </button>
 
-            <p className="signup-text">
-              Don&apos;t have an account?{' '}
-              <a href="#" className="signup-link">
-                Sign up
+            <p className="signin-text">
+              Remember your password?{' '}
+              <a href="/login" className="signin-link">
+                Sign In
               </a>
             </p>
           </div>
@@ -234,4 +197,4 @@ function LoginForm() {
   );
 }
 
-export default LoginForm;
+export default ForgotPasswordForm;
