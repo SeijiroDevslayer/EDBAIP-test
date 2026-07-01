@@ -171,7 +171,7 @@ function CreateNewPasswordForm() {
 
     console.log('Password reset submitted for', location.state?.destination);
 
-    navigate('/', { replace: true });
+    navigate('/password-reset-success', { replace: true });
   };
 
   return (
