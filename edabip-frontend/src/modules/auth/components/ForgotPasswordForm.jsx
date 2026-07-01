@@ -342,7 +342,13 @@ function ForgotPasswordForm() {
     console.log("Verifying OTP", otp, "for", destination);
 
     setToast(null);
-    setStep("verified");
+     navigate('/create-new-password', {
+      state: {
+        otpVerified: true,
+        destination,
+        method,
+      },
+    });
   };
 
   const handleChangeDestination = () => {
