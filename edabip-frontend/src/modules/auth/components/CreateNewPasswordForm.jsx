@@ -1,0 +1,344 @@
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import backgroundImg from '../../../assets/login/background.png';
+import logoImg from '../../../assets/login/logo.png';
+import logoImgc from '../../../assets/login/logoc.png';
+import featureAnalytics from '../../../assets/login/feature-analytics.png';
+import featureAi from '../../../assets/login/feature-ai.png';
+import featureSecurity from '../../../assets/login/feature-security.png';
+import featureScalable from '../../../assets/login/feature-scalable.png';
+import './CreateNewPasswordForm.css';
+
+const FEATURES = [
+  {
+    src: featureAnalytics,
+    alt: 'Real-Time Analytics',
+    label: 'Real-Time Analytics',
+  },
+  {
+    src: featureAi,
+    alt: 'AI-Powered Insights',
+    label: 'AI-Powered Insights',
+  },
+  {
+    src: featureSecurity,
+    alt: 'Enterprise Security',
+    label: 'Enterprise Security',
+  },
+  {
+    src: featureScalable,
+    alt: 'Scalable Platform',
+    label: 'Scalable Platform',
+  },
+];
+
+function CardLogo() {
+  return (
+    <div className="cnp-card-logo">
+      <img src={logoImgc} alt="" className="cnp-card-logo-icon" />
+      <span className="cnp-card-logo-text">EDABIP</span>
+    </div>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <rect
+        x="3"
+        y="11"
+        width="18"
+        height="11"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M7 11V7a5 5 0 0110 0v4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function PasswordToggleIcon({ visible }) {
+  if (visible) {
+    return (
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M3 3l18 18"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M10.58 10.58A2 2 0 0012 15a2 2 0 001.41-.59"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M9.88 5.09A10.94 10.94 0 0112 5c5 0 9.27 3.11 11 7.5a11.6 11.6 0 01-2.12 3.17"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M6.12 6.12A11.6 11.6 0 001 12.5C2.73 16.89 7 20 12 20a10.94 10.94 0 003.12-.46"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M1 12.5C2.73 8.11 7 5 12 5s9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S2.73 16.89 1 12.5z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <circle
+        cx="12"
+        cy="12.5"
+        r="3"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+function CreateNewPasswordForm() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+
+  useEffect(() => {
+    if (!location.state?.otpVerified) {
+      navigate('/forgot-password', { replace: true });
+    }
+  }, [location.state, navigate]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    let hasError = false;
+
+    if (password.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
+      hasError = true;
+    } else {
+      setPasswordError('');
+    }
+
+    if (confirmPassword !== password) {
+      setConfirmPasswordError('Passwords do not match');
+      hasError = true;
+    } else {
+      setConfirmPasswordError('');
+    }
+
+    if (hasError) return;
+
+    console.log('Password reset submitted for', location.state?.destination);
+
+    navigate('/', { replace: true });
+  };
+
+  return (
+    <div className="cnp-container">
+      <div className="cnp-background">
+        <img
+          src={backgroundImg}
+          alt=""
+          className="cnp-background-image"
+        />
+      </div>
+
+      <div className="cnp-content">
+        <div className="cnp-left-section">
+          <img
+            src={logoImg}
+            alt="EDABIP"
+            className="cnp-brand-logo"
+          />
+          <div className='cnp-heading-group'>
+
+          <h1 className="cnp-welcome-heading">
+            Welcome to your Analytics Dashboard
+          </h1>
+
+          <p className="cnp-welcome-description">
+            Track performance, analyze data, and make smarter business decisions in real-time.
+          </p>
+          </div>
+
+          <div className="cnp-features-container">
+            {FEATURES.map((feature) => (
+              <div
+                key={feature.alt}
+                className="cnp-feature-item"
+              >
+                <img
+                  src={feature.src}
+                  alt={feature.alt}
+                  className="cnp-feature-badge"
+                />
+                <span className="cnp-feature-label">
+                  {feature.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="cnp-right-section">
+          <div className="cnp-card">
+            <CardLogo />
+
+            <h2 className="cnp-title">
+              Create Your New Password
+            </h2>
+
+            <p className="cnp-subtitle">
+              Enter a new password to secure your account
+            </p>
+
+            <form
+              onSubmit={handleSubmit}
+              className="cnp-form"
+            >
+              <div className="cnp-form-group">
+                <label htmlFor="cnp-password">
+                  New Password
+                </label>
+
+                <div className="cnp-input-wrapper">
+                  <span className="cnp-input-icon">
+                    <LockIcon />
+                  </span>
+
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="cnp-password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (passwordError) setPasswordError('');
+                    }}
+                    placeholder="Enter your password"
+                    aria-invalid={Boolean(passwordError)}
+                    autoFocus
+                    required
+                  />
+
+                  <button
+                    type="button"
+                    className="cnp-password-toggle"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    <PasswordToggleIcon visible={showPassword} />
+                  </button>
+                </div>
+
+                {passwordError && (
+                  <p className="cnp-field-error">
+                    {passwordError}
+                  </p>
+                )}
+              </div>
+
+              <div className="cnp-form-group">
+                <label htmlFor="cnp-confirm-password">
+                  Confirm Password
+                </label>
+
+                <div className="cnp-input-wrapper">
+                  <span className="cnp-input-icon">
+                    <LockIcon />
+                  </span>
+
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    id="cnp-confirm-password"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      if (confirmPasswordError) setConfirmPasswordError('');
+                    }}
+                    placeholder="Enter your password"
+                    aria-invalid={Boolean(confirmPasswordError)}
+                    required
+                  />
+
+                  <button
+                    type="button"
+                    className="cnp-password-toggle"
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                  >
+                    <PasswordToggleIcon visible={showConfirmPassword} />
+                  </button>
+                </div>
+
+                {confirmPasswordError && (
+                  <p className="cnp-field-error">
+                    {confirmPasswordError}
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="cnp-submit-btn"
+              >
+                Submit
+              </button>
+            </form>
+
+            <div className='cnp-support-group'>
+            <p className="cnp-support-text">
+              Need help?{' '}
+              <span className="cnp-support-link">
+                Contact Support
+              </span>
+            </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default CreateNewPasswordForm;
