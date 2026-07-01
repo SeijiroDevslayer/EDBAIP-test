@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import backgroundImg from '../../../assets/login/background.png';
-import logoImg from '../../../assets/login/logo.png';
-import logoImgc from '../../../assets/login/logoc.png';
-import featureAnalytics from '../../../assets/login/feature-analytics.png';
-import featureAi from '../../../assets/login/feature-ai.png';
-import featureSecurity from '../../../assets/login/feature-security.png';
-import featureScalable from '../../../assets/login/feature-scalable.png';
-import './ForgotPasswordForm.css';
+import { useEffect, useRef, useState } from "react";
+import backgroundImg from "../../../assets/login/background.png";
+import logoImg from "../../../assets/login/logo.png";
+import logoImgc from "../../../assets/login/logoc.png";
+import featureAnalytics from "../../../assets/login/feature-analytics.png";
+import featureAi from "../../../assets/login/feature-ai.png";
+import featureSecurity from "../../../assets/login/feature-security.png";
+import featureScalable from "../../../assets/login/feature-scalable.png";
+import "./ForgotPasswordForm.css";
 
 const FEATURES = [
   {
@@ -218,9 +217,8 @@ function CloseIcon() {
 }
 
 function ForgotPasswordForm() {
-  const navigate = useNavigate();
-  const [method, setMethod] = useState('email');
-  const [step, setStep] = useState('request'); // 'request' | 'verify'
+  const [method, setMethod] = useState("email");
+  const [step, setStep] = useState("request"); // 'request' | 'verify' | 'verified'
 
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
@@ -343,13 +341,7 @@ function ForgotPasswordForm() {
     console.log("Verifying OTP", otp, "for", destination);
 
     setToast(null);
-    navigate('/create-new-password', {
-      state: {
-        otpVerified: true,
-        destination,
-        method,
-      },
-    });
+    setStep("verified");
   };
 
   const handleChangeDestination = () => {
@@ -621,6 +613,25 @@ function ForgotPasswordForm() {
               </>
             )}
 
+            {step === "verified" && (
+              <div className="fp-verified-panel">
+                <div className="fp-verified-icon">
+                  <CheckCircleIcon size={28} />
+                </div>
+
+                <h2 className="fp-verified-title">OTP Verified!</h2>
+
+                <p className="fp-verified-message">
+                  Your identity has been verified successfully. You can continue
+                  to sign in once your password has been reset.
+                </p>
+
+                <a href="/" className="fp-submit-btn fp-verified-cta">
+                  Back to Sign In
+                </a>
+              </div>
+            )}
+          </div>
           </div>
         </div>
       </div>
