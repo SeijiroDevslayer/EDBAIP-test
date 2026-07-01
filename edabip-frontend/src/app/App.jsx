@@ -1,11 +1,11 @@
 import AppRouter from './AppRouter.jsx';
+import { AuthProvider } from '../context/AuthContext';
 
 function App() {
   return (
-    <div>
+    <AuthProvider>
       <AppRouter />
-    </div>
+    </AuthProvider>
   );
 }
-
 export default App;

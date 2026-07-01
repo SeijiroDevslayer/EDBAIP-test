@@ -1,0 +1,144 @@
+.mfa-page {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow: hidden;
+}
+/* OTP CARD */
+.mfa-card {
+  position: absolute;
+  top: 47%;
+  left: 52%;
+  transform: translate(-50%, -50%);
+  width: 350px;
+  height: 480px;
+  border-radius: 20px;
+  background: #2F2F9A;
+  padding: 15px 32px 36px;
+  box-shadow: 0 24px 48px -12px rgba(53, 44, 143, 0.45);
+  color: #fff;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  justify-content: flex-start;
+}
+.mfa-card-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 45px;
+  gap: 4px;
+}
+.mfa-card-brand-icon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+.mfa-card-brand-text {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+.mfa-card-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 25px;
+}
+.mfa-card-back-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+.mfa-card-title {
+  font-size: 1.30rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: #fff;
+}
+.mfa-card-subtitle {
+  font-size: 0.60rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0 0 20px;
+}
+.mfa-card-phone {
+  color: rgba(255, 255, 255, 0.9);
+}
+.mfa-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 19px;
+  margin-bottom: 12px;
+  margin-top: 25px;
+}
+.mfa-input-box {
+  width: 35px;
+  height: 35px;
+  border-radius: 10px;
+  border: 2px solid #095ad3;
+  background: #fff;
+  color: #2c2470;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  caret-color: #2c2470;
+}
+.mfa-resend {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 40px;
+  text-decoration: underline;
+}
+.mfa-resend-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #0EA5E9;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.7rem;
+  text-decoration: underline;
+}
+.mfa-submit {
+  width: 80%;
+  background: #fff;
+  color: #352c8f;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: not-allowed;
+  margin-bottom: 18px;
+}
+.mfa-submit-active {
+  background: #fff;
+  cursor: pointer;
+}
+.mfa-support-wrapper {
+  margin-top: auto;
+  padding-top: 18px;
+}
+.mfa-support {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 20px;
+}
+.mfa-support-link {
+  color: #0EA5E9;
+  font-weight: 600;
+  text-decoration: none;
+}
