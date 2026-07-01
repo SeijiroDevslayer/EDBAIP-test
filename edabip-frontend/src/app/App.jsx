@@ -3,6 +3,7 @@ import LoginPage from '../modules/auth/pages/LoginPage';
 import SignupPage from '../modules/auth/pages/SignupPage';
 import ForgotPasswordPage from '../modules/auth/pages/ForgotPasswordPage';
 import CreateNewPasswordPage from '../modules/auth/pages/CreateNewPasswordPage';
+import PasswordResetSuccessPage from '../modules/auth/pages/PasswordResetSuccessPage';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/create-new-password" element={<CreateNewPasswordPage />} />
+        <Route path="/password-reset-success" element={<PasswordResetSuccessPage />} />
       </Routes>
     </BrowserRouter>
   );
