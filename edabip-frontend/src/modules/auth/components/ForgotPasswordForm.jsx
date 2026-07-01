@@ -220,7 +220,7 @@ function CloseIcon() {
 function ForgotPasswordForm() {
   const [method, setMethod] = useState("email");
   const [step, setStep] = useState("request"); // 'request' | 'verify' | 'verified'
-
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [mobileError, setMobileError] = useState("");
