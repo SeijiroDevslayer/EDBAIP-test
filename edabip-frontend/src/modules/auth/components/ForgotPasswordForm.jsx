@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import backgroundImg from '../../../assets/login/background.png';
 import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
@@ -166,8 +167,9 @@ function CloseIcon() {
 }
 
 function ForgotPasswordForm() {
+  const navigate = useNavigate();
   const [method, setMethod] = useState('email');
-  const [step, setStep] = useState('request'); // 'request' | 'verify' | 'verified'
+  const [step, setStep] = useState('request'); // 'request' | 'verify'
 
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('');
@@ -261,7 +263,13 @@ function ForgotPasswordForm() {
     console.log('Verifying OTP', otp, 'for', destination);
 
     setToast(null);
-    setStep('verified');
+    navigate('/create-new-password', {
+      state: {
+        otpVerified: true,
+        destination,
+        method,
+      },
+    });
   };
 
   const handleChangeDestination = () => {
@@ -569,27 +577,6 @@ function ForgotPasswordForm() {
                   {method === 'email' ? 'Change email address' : 'Change mobile number'}
                 </button>
               </>
-            )}
-
-            {step === 'verified' && (
-              <div className="fp-verified-panel">
-
-                <div className="fp-verified-icon">
-                  <CheckCircleIcon size={28} />
-                </div>
-
-                <h2 className="fp-verified-title">
-                  OTP Verified!
-                </h2>
-
-                <p className="fp-verified-message">
-                  Your identity has been verified successfully. You can continue to sign in once your password has been reset.
-                </p>
-
-                <a href="/" className="fp-submit-btn fp-verified-cta">
-                  Back to Sign In
-                </a>
-              </div>
             )}
 
           </div>
