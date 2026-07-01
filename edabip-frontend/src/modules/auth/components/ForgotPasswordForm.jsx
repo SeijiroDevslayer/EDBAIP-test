@@ -218,9 +218,8 @@ function CloseIcon() {
 }
 
 function ForgotPasswordForm() {
-  const navigate = useNavigate();
-  const [method, setMethod] = useState('email');
-  const [step, setStep] = useState('request'); // 'request' | 'verify'
+  const [method, setMethod] = useState("email");
+  const [step, setStep] = useState("request"); // 'request' | 'verify' | 'verified'
 
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
@@ -343,13 +342,7 @@ function ForgotPasswordForm() {
     console.log("Verifying OTP", otp, "for", destination);
 
     setToast(null);
-    navigate('/create-new-password', {
-      state: {
-        otpVerified: true,
-        destination,
-        method,
-      },
-    });
+    setStep("verified");
   };
 
   const handleChangeDestination = () => {
