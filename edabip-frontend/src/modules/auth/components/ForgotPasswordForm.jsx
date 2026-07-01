@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState,useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import backgroundImg from '../../../assets/login/background.png';
 import logoImg from '../../../assets/login/logo.png';
@@ -543,13 +543,9 @@ function ForgotPasswordForm() {
 
                 <p className="fp-support-text">
                   Need help ?{" "}
-                  <span
-                    className="fp-support-link fp-support-link--disabled"
-                    aria-disabled="true"
-                    title="Coming soon"
-                  >
-                    Contact Support
-                  </span>
+                  <span className="cnp-support-link">
+                Contact Support
+              </span>
                 </p>
               </>
             )}
@@ -624,6 +620,7 @@ function ForgotPasswordForm() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
