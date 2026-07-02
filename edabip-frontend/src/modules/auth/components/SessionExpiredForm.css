@@ -150,11 +150,12 @@
 
 /* ─── Card ───────────────────────────────────────────────────────── */
 .se-card {
-  background: #2B3499;
+  background: #2F2F9A;
   border-radius: 20px;
-  padding: 36px 40px 28px;
+  padding: 48px 40px 32px;
   width: 100%;
   max-width: 483px;
+  min-height: 743px;
   box-shadow: 0 12px 32px rgba(43, 52, 153, 0.3);
 }
 
@@ -163,7 +164,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 28px;
   color: #A78BFA;
 }
 
@@ -184,7 +185,7 @@
   font-weight: 700;
   color: #ffffff;
   text-align: center;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 .se-subtitle {
@@ -203,7 +204,7 @@
   color: rgba(255, 255, 255, 0.8);
   text-align: center;
   line-height: 1.55;
-  margin-bottom: 18px;
+  margin-bottom: 28px;
 }
 
 /* ─── Info box ───────────────────────────────────────────────────── */
@@ -212,7 +213,7 @@
   border: 1px solid #5A7CC5;
   border-radius: 10px;
   padding: 14px 16px;
-  margin-bottom: 18px;
+  margin-bottom: 35px;
   display: flex;
   gap: 10px;
 }
@@ -255,7 +256,7 @@
   background: #ffffff;
   color: #2B3499;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -264,7 +265,7 @@
   justify-content: center;
   gap: 8px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin-bottom: 10px;
+  margin-bottom: 33px;
 }
 
 .se-primary-btn:hover {
@@ -288,7 +289,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s ease, box-shadow 0.2s ease;
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 }
 
 .se-secondary-btn:hover {
@@ -304,8 +305,9 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: 6px;
+  gap: 13px;
   line-height: 1.5;
+  min-height: 48px;
 }
 
 .se-support-link {
@@ -325,8 +327,8 @@
 }
 
 .se-lock-icon {
-  width: 20px;
-  height: 20px;
+  width: 23px;
+  height: 23px;
 }
 
 .se-support-body {
