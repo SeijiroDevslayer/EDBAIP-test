@@ -1,0 +1,400 @@
+.se-container {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.se-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.se-background-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.se-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: stretch;
+}
+
+.se-left-section {
+  flex: 0 0 30%;
+  padding: 60px 56px 60px 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+.se-brand-logo {
+  height: 42px;
+  width: auto;
+  margin-bottom: 28px;
+  object-fit: contain;
+  object-position: left center;
+  flex-shrink: 0;
+}
+
+.se-welcome-heading {
+  font-family: 'Inter', sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  max-width: 302px;
+  color: #343495;
+  line-height: 100%;
+  margin-bottom: 8px;
+  letter-spacing: 0%;
+  flex-shrink: 0;
+}
+
+.se-purple-text {
+  color: #8B5CF6;
+}
+
+.se-welcome-description {
+  font-size: 18px;
+  font-family: 'Inter', sans-serif;
+  color: #343495;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  max-width: 278px;
+  flex-shrink: 0;
+}
+
+.se-features-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.se-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.se-feature-badge {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  object-position: left center;
+  flex-shrink: 0;
+}
+
+.se-feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.se-feature-label {
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  color: #343495;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.se-feature-description {
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  color: #6B7280;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.se-right-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  background: transparent;
+  align-items: center;
+  padding: 40px 48px;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+.se-card {
+  background: #2B3499;
+  border-radius: 16px;
+  padding: 40px 48px 32px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 12px 32px rgba(43, 52, 153, 0.3);
+  border: 2px solid #3B82F6;
+}
+
+.se-card-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.se-card-logo-icon {
+  height: 28px;
+  width: auto;
+}
+
+.se-card-logo-icon-outerline{
+  width: 156px;
+  height: 153px;
+}
+.se-card-logo-icon-innerline{
+  width:133px;
+  height: 117px;
+  margin-left: -130px;
+}
+
+.se-card-logo-text {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.se-lock-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+  color: #A78BFA;
+}
+
+.se-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.se-subtitle {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.se-red-text {
+  color: #EF4444;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.se-description {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.se-info-box {
+  background: rgba(20, 28, 100, 0.5);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 12px;
+}
+
+.se-info-icon{
+  width: 23.45px;
+  height: 23.45px;
+}
+
+.se-info-icon-wrapper {
+  flex-shrink: 0;
+  color: #EF4444;
+  margin-top: 2px;
+}
+
+.se-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.se-loop-icon{
+  width:16px;
+  height: 16px;
+}
+
+.se-lock-icon{
+  width:23.45px;
+  height:23.45px;
+}
+
+.se-info-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.se-info-description {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.se-primary-btn {
+  width: 100%;
+  padding: 14px;
+  background: #ffffff;
+  color: #2B3499;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 12px;
+}
+
+.se-primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+.se-secondary-btn {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  margin-bottom: 24px;
+}
+
+.se-secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.se-support-text {
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  line-height: 1.5;
+}
+
+.se-support-link {
+  color: #5CE1E6;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.se-support-link:hover {
+  color: #80EFF3;
+}
+.se-support-icon {
+  flex-shrink: 0;  
+  margin-top: 2px;           
+}
+
+.se-support-body {
+  flex: 1;                   
+}
+
+@media (max-width: 900px) {
+  .se-background {
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+  }
+
+  .se-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .se-left-section {
+    flex: none;
+    width: 100%;
+    padding: 40px 32px 24px;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .se-right-section {
+    width: 100%;
+    padding: 24px 24px 48px;
+    justify-content: center;
+  }
+
+  .se-card {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .se-left-section {
+    padding: 32px 24px 20px;
+  }
+
+  .se-feature-badge {
+    height: 44px;
+  }
+
+  .se-right-section {
+    padding: 20px 20px 40px;
+  }
+
+  .se-card {
+    padding: 32px 28px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .se-left-section {
+    justify-content: flex-start;
+  }
+
+  .se-welcome-heading {
+    font-size: 24px;
+    max-width: 100%;
+  }
+
+  .se-welcome-description {
+    max-width: 100%;
+    max-height: none;
+  }
+}
