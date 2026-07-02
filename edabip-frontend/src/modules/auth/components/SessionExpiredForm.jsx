@@ -147,7 +147,7 @@ function SessionExpiredForm() {
                 <span className="se-support-icon"><LockIcon /></span>
                 <span className="se-support-body">
                   If you continue to have trouble, please try again later or{' '}
-                  <span className="se-support-link" style={{ whiteSpace: 'nowrap' }}>contact support</span>{' '}for assistance
+                  <span className="se-support-link">contact support</span>{' '}for assistance
                 </span>
               </p>
             </div>
