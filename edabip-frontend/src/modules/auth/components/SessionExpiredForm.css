@@ -155,7 +155,7 @@
   padding: 48px 40px 32px;
   width: 100%;
   max-width: 483px;
-  min-height: 700px;
+  min-height: 743px;
   box-shadow: 0 12px 32px rgba(43, 52, 153, 0.3);
 }
 
@@ -299,39 +299,38 @@
 
 /* ─── Support text ───────────────────────────────────────────────── */
 .se-support-text {
-  text-align: left;
-  font-size: 14px;
-  font-weight: 400;
+  text-align: center;
+  font-size: 12.5px;
   color: rgba(255, 255, 255, 0.7);
   display: flex;
-  align-items: center;
-  line-height: 24px;
-  justify-content: flex-start;
-  gap: 6px;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 13px;
   line-height: 1.5;
+  min-height: 48px;
 }
- 
+
 .se-support-link {
   color: #5CE1E6;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
+  text-decoration: underline;
 }
- 
+
 .se-support-link:hover {
   color: #80EFF3;
 }
- 
+
 .se-support-icon {
   flex-shrink: 0;
   margin-top: 2px;
 }
- 
+
 .se-lock-icon {
-  width: 23.45px;
-  height: 23.45px;
-  align-items: center;
+  width: 23px;
+  height: 23px;
 }
- 
+
 .se-support-body {
   flex: 1;
 }
