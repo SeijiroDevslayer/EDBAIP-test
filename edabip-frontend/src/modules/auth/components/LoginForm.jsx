@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import backgroundImg from '../../../assets/login/background.png';
 import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
@@ -6,6 +7,7 @@ import featureAnalytics from '../../../assets/login/feature-analytics.png';
 import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
+import { useAuthContext } from '../../../context/AuthContext.jsx';
 import './LoginForm.css';
 
 const FEATURES = [
@@ -44,6 +46,8 @@ function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuthContext();
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -52,6 +56,10 @@ function LoginForm() {
       email,
       password,
     });
+
+    // Simulate successful login
+    login({ email });
+    navigate('/dashboard');
   };
 
   return (
