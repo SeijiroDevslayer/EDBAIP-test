@@ -6,17 +6,17 @@ import bg from '../../../assets/temp-block/bg.png';
 import matinfo from '../../../assets/temp-block/mat-info.png';
 import lock from '../../../assets/temp-block/mat-lock.png';
 import loop from '../../../assets/temp-block/loop.png';
-import featureSecureReset from '../../../assets/login/feature-analytics.png';
-import featureProtectAccount from '../../../assets/login/feature-ai.png';
-import featureQuickEasy from '../../../assets/login/feature-security.png';
+import featureSecureReset from '../../../assets/login/feature-secure-reset.png';
+import featureProtectAccount from '../../../assets/login/feature-protect-account.png';
+import featureQuickEasy from '../../../assets/login/feature-quick-easy.png';
 import './SessionExpiredForm.css';
 
 const FEATURES = [
   {
-    src: featureSecureReset,
+    src: featureQuickEasy,
     alt: 'Secure Reset Link',
     label: 'Secure Reset Link',
-    description: 'We\'ll send you a secure link to reset your password.',
+    description: "We'll send you a secure link to reset your password.",
   },
   {
     src: featureProtectAccount,
@@ -25,26 +25,17 @@ const FEATURES = [
     description: 'We take extra steps to keep your account safe.',
   },
   {
-    src: featureQuickEasy,
+    src: featureSecureReset,
     alt: 'Quick & Easy',
     label: 'Quick & Easy',
     description: 'Reset your password in just a few simple steps.',
   },
 ];
 
-function CardLogo() {
-  return (
-    <div className="se-card-logo">
-      <img src={logoImg} alt="" className="se-card-logo-icon" />
-      <span className="se-card-logo-text">EDABIP</span>
-    </div>
-  );
-}
-
 function LockWithClockIcon() {
   return (
     <div className="se-lock-icon-container">
-      <img src={Ecllipse} alt=""className="se-card-logo-icon-outerline" />
+      <img src={Ecllipse} alt="" className="se-card-logo-icon-outerline" />
       <img src={bg} alt="" className="se-card-logo-icon-innerline" />
     </div>
   );
@@ -60,7 +51,7 @@ function InfoIcon() {
 
 function RefreshIcon() {
   return (
-   <div className="se-loop-icon-container">
+    <div className="se-loop-icon-container">
       <img src={loop} alt="" className="se-loop-icon" />
     </div>
   );
@@ -68,9 +59,7 @@ function RefreshIcon() {
 
 function LockIcon() {
   return (
-    <div className="se-lock-icon-container">
-      <img src={lock} alt="" className="se-lock-icon" />
-    </div>
+    <img src={lock} alt="" className="se-lock-icon" />
   );
 }
 
@@ -78,30 +67,22 @@ function SessionExpiredForm() {
   const navigate = useNavigate();
 
   const handleStartAgain = () => {
-    navigate('/login');
+    navigate('/');
   };
 
   const handleBackToSignIn = () => {
-    navigate('/login');
+    navigate('/');
   };
 
   return (
     <div className="se-container">
       <div className="se-background">
-        <img
-          src={backgroundImg}
-          alt=""
-          className="se-background-image"
-        />
+        <img src={backgroundImg} alt="" className="se-background-image" />
       </div>
 
       <div className="se-content">
         <div className="se-left-section">
-          <img
-            src={logoImg}
-            alt="EDABIP"
-            className="se-brand-logo"
-          />
+          <img src={logoImg} alt="EDABIP" className="se-brand-logo" />
 
           <h1 className="se-welcome-heading">
             Reset your <span className="se-purple-text">Password</span>
@@ -113,15 +94,10 @@ function SessionExpiredForm() {
 
           <div className="se-features-container">
             {FEATURES.map((feature) => (
-              <div
-                key={feature.alt}
-                className="se-feature-item"
-              >
-                <img
-                  src={feature.src}
-                  alt={feature.alt}
-                  className="se-feature-badge"
-                />
+              <div key={feature.alt} className="se-feature-item">
+                <div className="se-feature-icon-wrapper">
+                  <img src={feature.src} alt={feature.alt} className="se-feature-svg-badge" />
+                </div>
                 <div className="se-feature-text">
                   <span className="se-feature-label">{feature.label}</span>
                   <p className="se-feature-description">{feature.description}</p>
@@ -135,9 +111,7 @@ function SessionExpiredForm() {
           <div className="se-card">
             <LockWithClockIcon />
 
-            <h2 className="se-title">
-              Session Expired
-            </h2>
+            <h2 className="se-title">Session Expired</h2>
 
             <p className="se-subtitle">
               <span className="se-red-text">Your session has expired.</span>
@@ -159,31 +133,24 @@ function SessionExpiredForm() {
               </div>
             </div>
 
-            <button
-              type="button"
-              className="se-primary-btn"
-              onClick={handleStartAgain}
-            >
+            <button type="button" className="se-primary-btn" onClick={handleStartAgain}>
               <RefreshIcon />
               Start Again
             </button>
 
-            <button
-              type="button"
-              className="se-secondary-btn"
-              onClick={handleBackToSignIn}
-            >
+            <button type="button" className="se-secondary-btn" onClick={handleBackToSignIn}>
               Back to Sign In
             </button>
+
             <div className="se-support-container">
-  <p className="se-support-text">
-    <span className="se-support-icon"><LockIcon /></span>
-    <span className="se-support-body">
-      If you continue to have trouble, please try again later or{' '}
-      <span className="se-support-link">contact support</span> for assistance
-    </span>
-  </p>
-</div>
+              <p className="se-support-text">
+                <span className="se-support-icon"><LockIcon /></span>
+                <span className="se-support-body">
+                  If you continue to have trouble, please try again later or{' '}
+                  <span className="se-support-link" style={{ whiteSpace: 'nowrap' }}>contact support</span>{' '}for assistance
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
