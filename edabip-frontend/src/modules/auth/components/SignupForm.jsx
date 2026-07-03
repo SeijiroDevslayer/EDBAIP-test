@@ -77,6 +77,8 @@ function SignupForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  const [showCreateErrorNotice, setShowCreateErrorNotice] = useState(false);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === 'checkbox' ? checked : value;
@@ -128,7 +130,11 @@ function SignupForm() {
     setSubmitted(true);
     const newErrors = getErrors(formData);
     setErrors(newErrors);
-    if (Object.values(newErrors).some((m) => m !== '')) return;
+    if (Object.values(newErrors).some((m) => m !== ''))    {
+      setShowCreateErrorNotice(true); return; }
+
+     // Hide notification when the form is valid
+     setShowCreateErrorNotice(false);
 
     console.log('Signup form submitted:', {
       fullName: formData.fullName,
@@ -161,12 +167,55 @@ function SignupForm() {
         <img src={backgroundImg} alt="" className="su-background-image" />
       </div>
 
+      {/* Negative-state notification shown only when signup validation fails */}
+  {showCreateErrorNotice && (
+    <div className="su-error-notification" role="alert">
+    <div className="su-error-icon">
+  <svg
+    width="19"
+    height="19"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M12 3L22 20H2L12 3Z"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12 9V13"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <circle cx="12" cy="17" r="1" fill="white" />
+  </svg>
+</div>
+
+      <div className="su-error-message">
+        <h4>Unable to create account</h4>
+        <p>Please fix the errors below and try again</p>
+      </div>
+
+      <button
+        type="button"
+        className="su-error-close"
+        onClick={() => setShowCreateErrorNotice(false)}
+        aria-label="Close notification"
+      >
+        ×
+      </button>
+    </div>
+  )}
+
       <div className="su-content">
         {/* Left Info Section */}
         <div className="su-left">
           <img src={logoImg} alt="EDABIP" className="su-brand-logo" />
 
-          <h1 className="su-heading">Create you Account</h1>
+          <h1 className="su-heading">Create your Account</h1>
           <p className="su-subheading">
             Start your analytics journey<br />with <strong>EDABIP</strong>
           </p>
@@ -187,7 +236,7 @@ function SignupForm() {
         {/* Right Card Section */}
         <div className="su-right">
           <div className="su-card">
-            <CardLogo />
+            
 
             <h2 className="su-card-title">Create your Account</h2>
             <p className="su-card-subtitle">
