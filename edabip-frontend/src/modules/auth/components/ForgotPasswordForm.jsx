@@ -469,8 +469,9 @@ useEffect(() => {
             <CardLogo />
 
             <a href="/" className="fp-back-link">
-              <span className="fp-back-icon-circle"></span>
-              <ArrowLeftIcon />
+              <span className="fp-back-icon-circle">
+                <ArrowLeftIcon />
+              </span>  
               Back to Sign in
             </a>
 
@@ -623,7 +624,7 @@ useEffect(() => {
                       {otpError}
                     </p>
                   )}
-
+                <div className="fp-resend-block"></div>
                   <div className="fp-resend-row">
                     <span>Didn&apos;t received it ?</span>
                     <button
@@ -661,7 +662,7 @@ useEffect(() => {
                     Verify OTP
                   </button>
                 </form>
-
+                
                 <p className="fp-support-text">
                   Need help ?{" "}
                   <span
