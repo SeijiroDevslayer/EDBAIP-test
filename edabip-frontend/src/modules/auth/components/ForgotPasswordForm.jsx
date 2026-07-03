@@ -197,6 +197,14 @@ function InfoIcon() {
     </svg>
   );
 }
+function ClockIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M12 7v5l3.5 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 function CloseIcon() {
   return (
@@ -230,6 +238,7 @@ function ForgotPasswordForm() {
   const [resendSeconds, setResendSeconds] = useState(0);
 
   const [toast, setToast] = useState(null);
+  const [toastLeaving, setToastLeaving] = useState(false);
 
   const otpInputRefs = useRef([]);
 
@@ -241,9 +250,40 @@ function ForgotPasswordForm() {
     const timer = setTimeout(() => {
       setResendSeconds((seconds) => seconds - 1);
     }, 1000);
-
+    
     return () => clearTimeout(timer);
   }, [step, resendSeconds]);
+
+  useEffect(() => {
+  if (!toast) return undefined;
+
+  setToastLeaving(false);
+
+  const leaveTimer = setTimeout(() => {
+    setToastLeaving(true);
+  }, 3600);
+
+  const removeTimer = setTimeout(() => {
+    setToast(null);
+    setToastLeaving(false);
+  }, 4000);
+
+  return () => {
+    clearTimeout(leaveTimer);
+    clearTimeout(removeTimer);
+  };
+}, [toast]);
+
+useEffect(() => {
+  if (!toastLeaving) return undefined;
+
+  const removeTimer = setTimeout(() => {
+    setToast(null);
+    setToastLeaving(false);
+  }, 300);
+
+  return () => clearTimeout(removeTimer);
+}, [toastLeaving]);
 
   const selectMethod = (next) => {
     setMethod(next);
@@ -339,17 +379,17 @@ function ForgotPasswordForm() {
       return;
     }
 
-    console.log("Verifying OTP", otp, "for", destination);
-
-    setToast(null);
-     navigate('/create-new-password', {
-      state: {
-        otpVerified: true,
-        destination,
-        method,
-      },
+    setToast({
+      title: 'OTP Verified Successfully !',
+      message: 'You can now create a new password for your account.',
     });
-  };
+
+    setTimeout(() => {
+    navigate('/create-new-password', {
+      state: { otpVerified: true, destination, method },
+    });
+  }, 1500);
+}
 
   const handleChangeDestination = () => {
     setStep("request");
@@ -395,7 +435,7 @@ function ForgotPasswordForm() {
         <div className="fp-right-section">
           <div className="fp-card-wrapper">
             {toast && (
-              <div className="fp-toast" role="status">
+              <div className={`fp-toast ${toastLeaving ? 'fp-toast--leaving' : ''}`} role="status">
                 <span className="fp-toast-icon">
                   <CheckCircleIcon size={16} />
                 </span>
@@ -418,7 +458,7 @@ function ForgotPasswordForm() {
                   type="button"
                   className="fp-toast-close"
                   aria-label="Dismiss notification"
-                  onClick={() => setToast(null)}
+                  onClick={() => setToastLeaving(true)}
                 >
                   <CloseIcon />
                 </button>
@@ -429,6 +469,7 @@ function ForgotPasswordForm() {
             <CardLogo />
 
             <a href="/" className="fp-back-link">
+              <span className="fp-back-icon-circle"></span>
               <ArrowLeftIcon />
               Back to Sign in
             </a>
@@ -542,7 +583,7 @@ function ForgotPasswordForm() {
 
                 <p className="fp-support-text">
                   Need help ?{" "}
-                  <span className="cnp-support-link">
+                  <span className="fp-support-link">
                 Contact Support
               </span>
                 </p>
@@ -585,21 +626,39 @@ function ForgotPasswordForm() {
 
                   <div className="fp-resend-row">
                     <span>Didn&apos;t received it ?</span>
-
                     <button
                       type="button"
-                      className="fp-resend-btn"
+                      className="fp-resend-link"
                       onClick={handleResendOtp}
                       disabled={resendSeconds > 0}
                     >
-                      {resendSeconds > 0
-                        ? `Resend in 0:${String(resendSeconds).padStart(2, "0")}`
-                        : "Resend OTP"}
+                      Resend OTP
                     </button>
                   </div>
 
+                  {resendSeconds > 0 && (
+                    <>
+                      <div className="fp-resend-status">
+                        <span className="fp-resend-status-label">Resend OTP</span>
+                        <span className="fp-resend-timer">
+                          <ClockIcon />
+                          00:{String(resendSeconds).padStart(2, "0")}
+                        </span>
+                      </div>
+
+                      <div className="fp-resend-info-banner">
+                        <span className="fp-resend-info-icon">
+                        <InfoIcon />
+                          </span>
+                            <p className="fp-resend-info-text">
+                              You can resend the otp after the timers end.
+                            </p>
+                          </div>
+                        </>
+                      )}
+
                   <button type="submit" className="fp-submit-btn">
-                    Confirm OTP
+                    Verify OTP
                   </button>
                 </form>
 
