@@ -624,7 +624,7 @@ useEffect(() => {
                       {otpError}
                     </p>
                   )}
-                <div className="fp-resend-block"></div>
+                <div className="fp-resend-block"></div> 
                   <div className="fp-resend-row">
                     <span>Didn&apos;t received it ?</span>
                     <button
