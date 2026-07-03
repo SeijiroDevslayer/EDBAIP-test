@@ -8,6 +8,7 @@ import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
 import { verifyEmail } from "../api/mockForgotPasswordApi";
+import { verifyMobile } from "../api/mockForgetPasswordMobile";
 import './ForgotPasswordForm.css';
 
 const FEATURES = [
@@ -255,7 +256,7 @@ function ErrorTriangleIcon() {
 
 function ForgotPasswordForm() {
   const [method, setMethod] = useState("email");
-  const [step, setStep] = useState("request"); // 'request' | 'verify' | 'verified'
+  const [step, setStep] = useState("request");
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
@@ -337,6 +338,7 @@ function ForgotPasswordForm() {
     setStep("verify");
     setResendSeconds(RESEND_SECONDS);
     setToast({
+      type: 'success',
       title: 'OTP Send Successfully !',
       message: 'A 4-digit OTP has been send to',
       destination,
@@ -344,27 +346,51 @@ function ForgotPasswordForm() {
   };
 
   const handleSendOtp = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (method === "mobile" && !INDIA_MOBILE_REGEX.test(mobile)) {
-    setMobileError("Enter a valid 10-digit Indian mobile number");
-    return;
-  }
+    if (method === "mobile") {
+      if (!INDIA_MOBILE_REGEX.test(mobile)) {
+        setMobileError("Enter a valid 10-digit Indian mobile number");
+        return;
+      }
 
-  try {
-    if (method === "email") {
-      await verifyEmail(email);
+      try {
+        const res = await verifyMobile(mobile);
+        if (!res || res.success === false) {
+          setMobileError("We couldn't find an account with this number");
+          setToast({
+            type: "error",
+            title: "Mobile Number Not Found",
+            message: res?.message || "No account is associated with this mobile number.",
+          });
+          return;
+        }
+        setMobileError("");
+      } catch (err) {
+        setToast({
+          type: "error",
+          title: "Error",
+          message: err?.message || "Something went wrong",
+        });
+        return;
+      }
     }
-    setEmailError("");
-    sendOtp();
-  } catch (err) {
-    setEmailError("We couldn't find an account with this email address.");
-    setToast({
-      title: err.title || "Error",
-      message: err.message || "Something went wrong",
-    });
-  }
-};
+
+    try {
+      if (method === "email") {
+        await verifyEmail(email);
+      }
+      setEmailError("");
+      sendOtp();
+    } catch (err) {
+      setEmailError("We couldn't find an account with this email address.");
+        setToast({
+          type: 'error',
+          title: err.title || "Error",
+          message: err.message || "Something went wrong",
+        });
+    }
+  };
   const handleResendOtp = () => {
     if (resendSeconds > 0) return;
 
@@ -444,23 +470,13 @@ function ForgotPasswordForm() {
         <div className="fp-right-section">
           <div className="fp-card-wrapper">
             {toast && (
-              // <div className="fp-toast" role="status">
               <div
-                className={`fp-toast ${
-                toast?.title === "Email Not Found"
-                ? "fp-toast-error"
-                : "fp-toast-success"
-              }`}
+                className={`fp-toast ${toast?.type === 'error' ? 'fp-toast-error' : ''}`}
                 role="status"
->
-              
-              <span className="fp-toast-icon">
-              {toast?.title === "Email Not Found" ? (
-              <ErrorTriangleIcon />
-              ) : (
-              <CheckCircleIcon size={16} />
-              )}
-            </span>
+              >
+                <span className={`fp-toast-icon ${toast?.type === 'error' ? 'fp-toast-icon-error' : ''}`}>
+                  {toast?.type === 'error' ? <ErrorTriangleIcon /> : <CheckCircleIcon size={16} />}
+                </span>
 
 
 
