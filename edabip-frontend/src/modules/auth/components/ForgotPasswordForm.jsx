@@ -7,7 +7,6 @@ import featureAnalytics from '../../../assets/login/feature-analytics.png';
 import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
-import { verifyEmail } from "../api/mockForgotPasswordApi";
 import './ForgotPasswordForm.css';
 
 const FEATURES = [
@@ -198,6 +197,14 @@ function InfoIcon() {
     </svg>
   );
 }
+function ClockIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M12 7v5l3.5 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 function CloseIcon() {
   return (
@@ -218,41 +225,6 @@ function CloseIcon() {
   );
 }
 
-function ErrorTriangleIcon() {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="11" fill="#E53935" />
-
-      <path
-        d="M12 6L18 17H6L12 6Z"
-        fill="white"
-      />
-
-      <rect
-        x="11.35"
-        y="9"
-        width="1.3"
-        height="4.5"
-        rx="0.6"
-        fill="#E53935"
-      />
-
-      <circle
-        cx="12"
-        cy="15.5"
-        r="0.8"
-        fill="#E53935"
-      />
-    </svg>
-  );
-}
-
 function ForgotPasswordForm() {
   const [method, setMethod] = useState("email");
   const [step, setStep] = useState("request"); // 'request' | 'verify' | 'verified'
@@ -266,8 +238,7 @@ function ForgotPasswordForm() {
   const [resendSeconds, setResendSeconds] = useState(0);
 
   const [toast, setToast] = useState(null);
-
-  const [emailError, setEmailError] = useState("");
+  const [toastLeaving, setToastLeaving] = useState(false);
 
   const otpInputRefs = useRef([]);
 
@@ -279,9 +250,40 @@ function ForgotPasswordForm() {
     const timer = setTimeout(() => {
       setResendSeconds((seconds) => seconds - 1);
     }, 1000);
-
+    
     return () => clearTimeout(timer);
   }, [step, resendSeconds]);
+
+  useEffect(() => {
+  if (!toast) return undefined;
+
+  setToastLeaving(false);
+
+  const leaveTimer = setTimeout(() => {
+    setToastLeaving(true);
+  }, 3600);
+
+  const removeTimer = setTimeout(() => {
+    setToast(null);
+    setToastLeaving(false);
+  }, 4000);
+
+  return () => {
+    clearTimeout(leaveTimer);
+    clearTimeout(removeTimer);
+  };
+}, [toast]);
+
+useEffect(() => {
+  if (!toastLeaving) return undefined;
+
+  const removeTimer = setTimeout(() => {
+    setToast(null);
+    setToastLeaving(false);
+  }, 300);
+
+  return () => clearTimeout(removeTimer);
+}, [toastLeaving]);
 
   const selectMethod = (next) => {
     setMethod(next);
@@ -343,28 +345,17 @@ function ForgotPasswordForm() {
     });
   };
 
-  const handleSendOtp = async (e) => {
-  e.preventDefault();
+  const handleSendOtp = (e) => {
+    e.preventDefault();
 
-  if (method === "mobile" && !INDIA_MOBILE_REGEX.test(mobile)) {
-    setMobileError("Enter a valid 10-digit Indian mobile number");
-    return;
-  }
-
-  try {
-    if (method === "email") {
-      await verifyEmail(email);
+    if (method === "mobile" && !INDIA_MOBILE_REGEX.test(mobile)) {
+      setMobileError("Enter a valid 10-digit Indian mobile number");
+      return;
     }
-    setEmailError("");
+
     sendOtp();
-  } catch (err) {
-    setEmailError("We couldn't find an account with this email address.");
-    setToast({
-      title: err.title || "Error",
-      message: err.message || "Something went wrong",
-    });
-  }
-};
+  };
+
   const handleResendOtp = () => {
     if (resendSeconds > 0) return;
 
@@ -388,17 +379,17 @@ function ForgotPasswordForm() {
       return;
     }
 
-    console.log("Verifying OTP", otp, "for", destination);
-
-    setToast(null);
-     navigate('/create-new-password', {
-      state: {
-        otpVerified: true,
-        destination,
-        method,
-      },
+    setToast({
+      title: 'OTP Verified Successfully !',
+      message: 'You can now create a new password for your account.',
     });
-  };
+
+    setTimeout(() => {
+    navigate('/create-new-password', {
+      state: { otpVerified: true, destination, method },
+    });
+  }, 1500);
+}
 
   const handleChangeDestination = () => {
     setStep("request");
@@ -444,25 +435,10 @@ function ForgotPasswordForm() {
         <div className="fp-right-section">
           <div className="fp-card-wrapper">
             {toast && (
-              // <div className="fp-toast" role="status">
-              <div
-                className={`fp-toast ${
-                toast?.title === "Email Not Found"
-                ? "fp-toast-error"
-                : "fp-toast-success"
-              }`}
-                role="status"
->
-              
-              <span className="fp-toast-icon">
-              {toast?.title === "Email Not Found" ? (
-              <ErrorTriangleIcon />
-              ) : (
-              <CheckCircleIcon size={16} />
-              )}
-            </span>
-
-
+              <div className={`fp-toast ${toastLeaving ? 'fp-toast--leaving' : ''}`} role="status">
+                <span className="fp-toast-icon">
+                  <CheckCircleIcon size={16} />
+                </span>
 
                 <div className="fp-toast-content">
                   <p className="fp-toast-title">{toast.title}</p>
@@ -482,7 +458,7 @@ function ForgotPasswordForm() {
                   type="button"
                   className="fp-toast-close"
                   aria-label="Dismiss notification"
-                  onClick={() => setToast(null)}
+                  onClick={() => setToastLeaving(true)}
                 >
                   <CloseIcon />
                 </button>
@@ -493,7 +469,9 @@ function ForgotPasswordForm() {
             <CardLogo />
 
             <a href="/" className="fp-back-link">
-              <ArrowLeftIcon />
+              <span className="fp-back-icon-circle">
+                <ArrowLeftIcon />
+              </span>  
               Back to Sign in
             </a>
 
@@ -549,37 +527,16 @@ function ForgotPasswordForm() {
                         />
                       </div>
 
-
-                    {/* ✅ ERROR TEXT (RED) */}
-                      {emailError && (
-                      <p className="fp-field-error">
-                      {emailError}
-                      </p>
-                    )}
-
-
-                  {!emailError ? (
-                    <div className="fp-helper-row">
-                    <span className="fp-helper-icon">
-                    <InfoIcon />
-                    </span>
-                    <p className="fp-helper-text">
-                    We&apos;ll send a secure reset link to this address.
-                    It will expire in 30 minutes.
-                    </p>
-                  </div>
-                ) : (
-              <div className="fp-helper-row fp-helper-error">
-              <span className="fp-helper-icon">
-              <InfoIcon />
-              </span>
-
-              <p className="fp-helper-text">
-              Please check your email and try again. If you still have trouble, contact support.
-              </p>
-            </div>
-            )}
-              </div>
+                      <div className="fp-helper-row">
+                        <span className="fp-helper-icon">
+                          <InfoIcon />
+                        </span>
+                        <p className="fp-helper-text">
+                          We&apos;ll send a secure reset link to this address.
+                          It will expire in 30 minutes.
+                        </p>
+                      </div>
+                    </div>
                   ) : (
                     <div className="fp-form-group">
                       <label htmlFor="fp-mobile">Mobile Number</label>
@@ -627,7 +584,7 @@ function ForgotPasswordForm() {
 
                 <p className="fp-support-text">
                   Need help ?{" "}
-                  <span className="cnp-support-link">
+                  <span className="fp-support-link">
                 Contact Support
               </span>
                 </p>
@@ -667,27 +624,45 @@ function ForgotPasswordForm() {
                       {otpError}
                     </p>
                   )}
-
+                <div className="fp-resend-block"></div> 
                   <div className="fp-resend-row">
                     <span>Didn&apos;t received it ?</span>
-
                     <button
                       type="button"
-                      className="fp-resend-btn"
+                      className="fp-resend-link"
                       onClick={handleResendOtp}
                       disabled={resendSeconds > 0}
                     >
-                      {resendSeconds > 0
-                        ? `Resend in 0:${String(resendSeconds).padStart(2, "0")}`
-                        : "Resend OTP"}
+                      Resend OTP
                     </button>
                   </div>
 
+                  {resendSeconds > 0 && (
+                    <>
+                      <div className="fp-resend-status">
+                        <span className="fp-resend-status-label">Resend OTP</span>
+                        <span className="fp-resend-timer">
+                          <ClockIcon />
+                          00:{String(resendSeconds).padStart(2, "0")}
+                        </span>
+                      </div>
+
+                      <div className="fp-resend-info-banner">
+                        <span className="fp-resend-info-icon">
+                        <InfoIcon />
+                          </span>
+                            <p className="fp-resend-info-text">
+                              You can resend the otp after the timers end.
+                            </p>
+                          </div>
+                        </>
+                      )}
+
                   <button type="submit" className="fp-submit-btn">
-                    Confirm OTP
+                    Verify OTP
                   </button>
                 </form>
-
+                
                 <p className="fp-support-text">
                   Need help ?{" "}
                   <span
