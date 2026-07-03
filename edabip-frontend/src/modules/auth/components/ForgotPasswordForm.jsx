@@ -7,6 +7,7 @@ import featureAnalytics from '../../../assets/login/feature-analytics.png';
 import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
+import { verifyEmail } from "../api/mockForgotPasswordApi";
 import './ForgotPasswordForm.css';
 
 const FEATURES = [
@@ -217,6 +218,41 @@ function CloseIcon() {
   );
 }
 
+function ErrorTriangleIcon() {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="11" fill="#E53935" />
+
+      <path
+        d="M12 6L18 17H6L12 6Z"
+        fill="white"
+      />
+
+      <rect
+        x="11.35"
+        y="9"
+        width="1.3"
+        height="4.5"
+        rx="0.6"
+        fill="#E53935"
+      />
+
+      <circle
+        cx="12"
+        cy="15.5"
+        r="0.8"
+        fill="#E53935"
+      />
+    </svg>
+  );
+}
+
 function ForgotPasswordForm() {
   const [method, setMethod] = useState("email");
   const [step, setStep] = useState("request"); // 'request' | 'verify' | 'verified'
@@ -230,6 +266,8 @@ function ForgotPasswordForm() {
   const [resendSeconds, setResendSeconds] = useState(0);
 
   const [toast, setToast] = useState(null);
+
+  const [emailError, setEmailError] = useState("");
 
   const otpInputRefs = useRef([]);
 
@@ -305,17 +343,28 @@ function ForgotPasswordForm() {
     });
   };
 
-  const handleSendOtp = (e) => {
-    e.preventDefault();
+  const handleSendOtp = async (e) => {
+  e.preventDefault();
 
-    if (method === "mobile" && !INDIA_MOBILE_REGEX.test(mobile)) {
-      setMobileError("Enter a valid 10-digit Indian mobile number");
-      return;
+  if (method === "mobile" && !INDIA_MOBILE_REGEX.test(mobile)) {
+    setMobileError("Enter a valid 10-digit Indian mobile number");
+    return;
+  }
+
+  try {
+    if (method === "email") {
+      await verifyEmail(email);
     }
-
+    setEmailError("");
     sendOtp();
-  };
-
+  } catch (err) {
+    setEmailError("We couldn't find an account with this email address.");
+    setToast({
+      title: err.title || "Error",
+      message: err.message || "Something went wrong",
+    });
+  }
+};
   const handleResendOtp = () => {
     if (resendSeconds > 0) return;
 
@@ -395,10 +444,25 @@ function ForgotPasswordForm() {
         <div className="fp-right-section">
           <div className="fp-card-wrapper">
             {toast && (
-              <div className="fp-toast" role="status">
-                <span className="fp-toast-icon">
-                  <CheckCircleIcon size={16} />
-                </span>
+              // <div className="fp-toast" role="status">
+              <div
+                className={`fp-toast ${
+                toast?.title === "Email Not Found"
+                ? "fp-toast-error"
+                : "fp-toast-success"
+              }`}
+                role="status"
+>
+              
+              <span className="fp-toast-icon">
+              {toast?.title === "Email Not Found" ? (
+              <ErrorTriangleIcon />
+              ) : (
+              <CheckCircleIcon size={16} />
+              )}
+            </span>
+
+
 
                 <div className="fp-toast-content">
                   <p className="fp-toast-title">{toast.title}</p>
@@ -485,16 +549,37 @@ function ForgotPasswordForm() {
                         />
                       </div>
 
-                      <div className="fp-helper-row">
-                        <span className="fp-helper-icon">
-                          <InfoIcon />
-                        </span>
-                        <p className="fp-helper-text">
-                          We&apos;ll send a secure reset link to this address.
-                          It will expire in 30 minutes.
-                        </p>
-                      </div>
-                    </div>
+
+                    {/* ✅ ERROR TEXT (RED) */}
+                      {emailError && (
+                      <p className="fp-field-error">
+                      {emailError}
+                      </p>
+                    )}
+
+
+                  {!emailError ? (
+                    <div className="fp-helper-row">
+                    <span className="fp-helper-icon">
+                    <InfoIcon />
+                    </span>
+                    <p className="fp-helper-text">
+                    We&apos;ll send a secure reset link to this address.
+                    It will expire in 30 minutes.
+                    </p>
+                  </div>
+                ) : (
+              <div className="fp-helper-row fp-helper-error">
+              <span className="fp-helper-icon">
+              <InfoIcon />
+              </span>
+
+              <p className="fp-helper-text">
+              Please check your email and try again. If you still have trouble, contact support.
+              </p>
+            </div>
+            )}
+              </div>
                   ) : (
                     <div className="fp-form-group">
                       <label htmlFor="fp-mobile">Mobile Number</label>
