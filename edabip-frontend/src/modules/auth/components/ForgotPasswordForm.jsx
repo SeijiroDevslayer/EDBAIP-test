@@ -474,7 +474,7 @@ useEffect(() => {
               </span>  
               Back to Sign in
             </a>
-
+            
             {step === "request" && (
               <>
                 <h2 className="fp-title">Forgot password</h2>
