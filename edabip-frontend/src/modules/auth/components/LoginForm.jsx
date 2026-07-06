@@ -46,24 +46,120 @@ function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({
+    email: '',
+    password: '',
+  });
+  const [showLoginFailed, setShowLoginFailed] = useState(false);
+  const [attemptsRemaining, setAttemptsRemaining] = useState(null);
+  const [isLocked, setIsLocked] = useState(false);
   const { login } = useAuthContext();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log('Login submitted:', {
-      email,
-      password,
-    });
+    let emailError = '';
+    let passwordError = '';
 
-    // Simulate successful login
-    login({ email });
-    navigate('/dashboard');
+    if (!email || !emailRegex.test(email)) {
+      emailError = 'Please enter a valid email address';
+    }
+
+    if (!password) {
+      passwordError = 'Incorrect password';
+    }
+
+    if (emailError || passwordError) {
+      setErrors({
+        email: emailError,
+        password: passwordError,
+      });
+      return;
+    }
+
+    try {
+      const result = await login({ email, password });
+
+      if (result.success) {
+        navigate('/dashboard');
+        return;
+      }
+
+      setIsLocked(!!result.locked);
+      setAttemptsRemaining(result.attemptsRemaining ?? null);
+      setErrors({ email: '', password: '' });
+      setEmail('');
+      setPassword('');
+      setShowLoginFailed(true);
+      setTimeout(() => setShowLoginFailed(false), 5000);
+    } catch (error) {
+      // only for genuine network/unexpected errors now
+      setErrors({ email: '', password: '' });
+      setIsLocked(false);
+      setAttemptsRemaining(null);
+      setShowLoginFailed(true);
+      setTimeout(() => setShowLoginFailed(false), 5000);
+    }
+  };
+
+  const closeLoginFailed = () => {
+    setShowLoginFailed(false);
   };
 
   return (
     <div className="login-container">
+      {showLoginFailed && (
+        <div className="login-failed-notification">
+          <div className="notification-content">
+            <div className="notification-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div className="notification-text">
+              <span className="notification-title">{isLocked ? 'Account Locked' : 'Login Failed'}</span>
+              <span className="notification-message">{isLocked ? 'Too many failed attempts. Please try again later.' : 'Please check your credentials and try again'}</span>
+              {!isLocked && attemptsRemaining !== null && (
+                <span className="notification-detail">
+                  <strong>
+                    You have {attemptsRemaining} more attempt{attemptsRemaining !== 1 ? 's' : ''} left.
+                  </strong>
+                </span>
+              )}
+              {!isLocked && (
+                <span className="notification-detail">
+                  After 5 failed login attempts, your account will be <strong>temporarily locked.</strong>
+                </span>
+              )}
+
+            </div>
+ 
+            <button
+              className="notification-close"
+              onClick={closeLoginFailed}
+              aria-label="Close notification"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M18 6L6 18M6 6l12 12"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="login-background">
         <img
@@ -74,9 +170,7 @@ function LoginForm() {
       </div>
 
       <div className="login-content">
-
         <div className="left-section">
-
           <img
             src={logoImg}
             alt="EDABIP"
@@ -92,7 +186,6 @@ function LoginForm() {
           </p>
 
           <div className="features-container">
-
             {FEATURES.map((feature) => (
               <div
                 key={feature.alt}
@@ -109,14 +202,11 @@ function LoginForm() {
                 </span>
               </div>
             ))}
-
           </div>
         </div>
 
         <div className="right-section">
-
           <div className="login-card">
-
             <CardLogo />
 
             <h2 className="card-welcome">
@@ -133,16 +223,14 @@ function LoginForm() {
             <form
               onSubmit={handleSubmit}
               className="login-form"
+              noValidate
             >
-
               <div className="form-group">
-
                 <label htmlFor="email">
                   Email
                 </label>
 
-                <div className="input-wrapper">
-
+                <div className={`input-wrapper ${errors.email ? 'error' : ''}`}>
                   <svg
                     className="input-icon"
                     width="18"
@@ -173,22 +261,39 @@ function LoginForm() {
                     type="email"
                     id="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (errors.email) {
+                        setErrors((prev) => ({ ...prev, email: '' }));
+                      }
+                    }}
                     placeholder="Enter your email address"
-                    required
+                    aria-invalid={errors.email ? 'true' : 'false'}
+                    aria-describedby={errors.email ? 'email-error' : undefined}
                   />
 
+                  {errors.email && (
+                    <div className="error-icon-circle">
+                      <span className="error-exclamation">!</span>
+                    </div>
+                  )}
                 </div>
+
+                <span
+                  className={`error-message ${errors.email ? 'show' : ''}`}
+                  id="email-error"
+                  role="alert"
+                >
+                  {errors.email || '\u00A0'}
+                </span>
               </div>
 
               <div className="form-group">
-
                 <label htmlFor="password">
                   Password
                 </label>
 
-                <div className="input-wrapper">
-
+                <div className={`input-wrapper ${errors.password ? 'error' : ''}`}>
                   <svg
                     className="input-icon"
                     width="18"
@@ -219,9 +324,15 @@ function LoginForm() {
                     type={showPassword ? 'text' : 'password'}
                     id="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (errors.password) {
+                        setErrors((prev) => ({ ...prev, password: '' }));
+                      }
+                    }}
                     placeholder="Enter your password"
-                    required
+                    aria-invalid={errors.password ? 'true' : 'false'}
+                    aria-describedby={errors.password ? 'password-error' : undefined}
                   />
 
                   <button
@@ -234,7 +345,6 @@ function LoginForm() {
                         : 'Show password'
                     }
                   >
-
                     {showPassword ? (
                       <svg
                         width="18"
@@ -294,14 +404,25 @@ function LoginForm() {
                         />
                       </svg>
                     )}
-
                   </button>
 
+                  {errors.password && (
+                    <div className="error-icon-circle">
+                      <span className="error-exclamation">!</span>
+                    </div>
+                  )}
                 </div>
+
+                <span
+                  className={`error-message ${errors.password ? 'show' : ''}`}
+                  id="password-error"
+                  role="alert"
+                >
+                  {errors.password || '\u00A0'}
+                </span>
               </div>
 
               <div className="form-options">
-
                 <label className="remember-me">
                   <input type="checkbox" />
                   <span>Remember me</span>
@@ -313,7 +434,6 @@ function LoginForm() {
                 >
                   Forgot Password?
                 </a>
-
               </div>
 
               <button
@@ -322,7 +442,6 @@ function LoginForm() {
               >
                 Sign In
               </button>
-
             </form>
 
             <div className="divider">
@@ -333,7 +452,6 @@ function LoginForm() {
               type="button"
               className="sso-btn google-btn"
             >
-
               <svg
                 className="btn-icon"
                 width="18"
@@ -363,7 +481,6 @@ function LoginForm() {
               </svg>
 
               Sign in with Google
-
             </button>
 
             <p className="signup-text">
@@ -375,7 +492,6 @@ function LoginForm() {
                 Sign up
               </a>
             </p>
-
           </div>
         </div>
       </div>
