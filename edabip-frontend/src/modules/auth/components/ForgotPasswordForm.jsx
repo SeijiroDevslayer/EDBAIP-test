@@ -428,6 +428,7 @@ useEffect(() => {
             )}
 
           <div className="fp-card">
+            <CardLogo />
             <a href="/" className="fp-back-link">
               <span className="fp-back-icon-circle">
                 <ArrowLeftIcon />
@@ -435,7 +436,7 @@ useEffect(() => {
               Back to Sign in
             </a>
 
-            <CardLogo />
+            
             
             {step === "request" && (
               <>
@@ -472,7 +473,7 @@ useEffect(() => {
                 <form onSubmit={handleSendOtp} className="fp-form">
                   {method === "email" ? (
                     <div className="fp-form-group">
-                      <label htmlFor="fp-email">Email</label>
+                      <label htmlFor="fp-email">Email ID</label>
 
                       <div className="fp-input-wrapper">
                         <span className="fp-input-icon">
@@ -491,6 +492,11 @@ useEffect(() => {
                           aria-invalid={Boolean(emailError)}
                           required
                         />
+                         {emailError && (
+                        <span className="fp-input-status-icon">
+                        <CheckCircleIcons />
+                        </span>
+                        )}
                       </div>
 
                       {emailError ? (
@@ -501,7 +507,6 @@ useEffect(() => {
                               <InfoIcon />
                             </span>
                             <div className="fp-error-info-text">
-                              <p className="fp-error-info-title">What does this means?</p>
                               <p className="fp-error-info-description">
                                 Please check your email and try again. If you still have trouble, contact support
                               </p>
