@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import backgroundImg from '../../../assets/login/background.png';
 import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
+import lockIcon from '../../../assets/login/lock.png';
+import mailIcon from "../../../assets/login/line-email.png";
+import EyeIcon from "../../../assets/login/eye-off.svg";
 import featureAnalytics from '../../../assets/login/feature-analytics.png';
 import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
@@ -231,32 +234,9 @@ function LoginForm() {
                 </label>
 
                 <div className={`input-wrapper ${errors.email ? 'error' : ''}`}>
-                  <svg
-                    className="input-icon"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <rect
-                      x="2"
-                      y="4"
-                      width="20"
-                      height="16"
-                      rx="2"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    />
-
-                    <path
-                      d="M2 6l10 7 10-7"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-
+                  <div>
+                    <img src={mailIcon} alt="" className="input-icon mail-icon" />
+                  </div>
                   <input
                     type="email"
                     id="email"
@@ -294,31 +274,9 @@ function LoginForm() {
                 </label>
 
                 <div className={`input-wrapper ${errors.password ? 'error' : ''}`}>
-                  <svg
-                    className="input-icon"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <rect
-                      x="3"
-                      y="11"
-                      width="18"
-                      height="11"
-                      rx="2"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    />
-
-                    <path
-                      d="M7 11V7a5 5 0 0110 0v4"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
+                  
+                    <img src={lockIcon} alt="" className="input-icon lock-icon" />
+                  
 
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -345,65 +303,69 @@ function LoginForm() {
                         : 'Show password'
                     }
                   >
+                    
                     {showPassword ? (
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M3 3l18 18"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                        />
+  // 👁 OPEN EYE (password is visible)
 
-                        <path
-                          d="M10.58 10.58A2 2 0 0012 15a2 2 0 001.41-.59"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                        />
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M1 12.5C2.73 8.11 7 5 12 5s9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S2.73 16.89 1 12.5z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+    <circle
+      cx="12"
+      cy="12.5"
+      r="3"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    />
+  </svg>
+) : (
+  // 🚫 EYE-OFF (password is hidden)
 
-                        <path
-                          d="M9.88 5.09A10.94 10.94 0 0112 5c5 0 9.27 3.11 11 7.5a11.6 11.6 0 01-2.12 3.17"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                        />
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M3 3l18 18"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
 
-                        <path
-                          d="M6.12 6.12A11.6 11.6 0 001 12.5C2.73 16.89 7 20 12 20a10.94 10.94 0 003.12-.46"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M1 12.5C2.73 8.11 7 5 12 5s9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S2.73 16.89 1 12.5z"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                        />
+    <path
+      d="M10.58 10.58A2 2 0 0012 15a2 2 0 001.41-.59"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
 
-                        <circle
-                          cx="12"
-                          cy="12.5"
-                          r="3"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                        />
-                      </svg>
-                    )}
+    <path
+      d="M9.88 5.09A10.94 10.94 0 0112 5c5 0 9.27 3.11 11 7.5a11.6 11.6 0 01-2.12 3.17"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+
+    <path
+      d="M6.12 6.12A11.6 11.6 0 001 12.5C2.73 16.89 7 20 12 20a10.94 10.94 0 003.12-.46"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+  </svg>
+)}
                   </button>
 
                   {errors.password && (
