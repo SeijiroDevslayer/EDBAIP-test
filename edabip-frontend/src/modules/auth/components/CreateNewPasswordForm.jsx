@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import backgroundImg from '../../../assets/login/background.png';
+import warningImg from '../../../assets/login/warning.png';
+import warningFieldImg from '../../../assets/login/Vectorplaceholder.png';
 import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
 import featureAnalytics from '../../../assets/login/feature-analytics.png';
@@ -31,6 +33,50 @@ const FEATURES = [
     label: 'Scalable Platform',
   },
 ];
+
+const STRENGTH_LEVELS = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+
+function getPasswordStrength(pwd) {
+  if (!pwd) return { level: '', score: 0, rules: { minLength: false, uppercase: false, lowercase: false, number: false, special: false } };
+  const rules = {
+    minLength: pwd.length >= 8,
+    uppercase: /[A-Z]/.test(pwd),
+    lowercase: /[a-z]/.test(pwd),
+    number: /[0-9]/.test(pwd),
+    special: /[^A-Za-z0-9]/.test(pwd),
+  };
+  const score = Object.values(rules).filter(Boolean).length;
+  const level = score <= 2 ? 'Weak' : score === 3 ? 'Fair' : score === 4 ? 'Good' : 'Strong';
+  return { level, score, rules };
+}
+
+function WarningIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" fill="#EF4444" />
+      <path d="M12 7v6" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="12" cy="16.5" r="1" fill="#fff" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" fill="#22C55E" />
+      <path d="M7 12l3.5 3.5L17 8" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CrossIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" fill="#EF4444" />
+      <path d="M8 8l8 8M16 8l-8 8" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 function CardLogo() {
   return (
@@ -141,23 +187,25 @@ function CreateNewPasswordForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [showToast, setShowToast] = useState(false);
 
-  useEffect(() => {
-    if (!location.state?.otpVerified) {
-      navigate('/forgot-password', { replace: true });
-    }
-  }, [location.state, navigate]);
+  const strength = useMemo(() => getPasswordStrength(password), [password]);
+
+  // useEffect(() => {
+  //   if (!location.state?.otpVerified) {
+  //     navigate('/forgot-password', { replace: true });
+  //   }
+  // }, [location.state, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     let hasError = false;
 
-    if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters');
+    if (strength.level !== 'Strong') {
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 4000);
       hasError = true;
-    } else {
-      setPasswordError('');
     }
 
     if (confirmPassword !== password) {
@@ -169,13 +217,27 @@ function CreateNewPasswordForm() {
 
     if (hasError) return;
 
-    console.log('Password reset submitted for', location.state?.destination);
-
     navigate('/password-reset-success', { replace: true });
   };
 
+  const strengthColors = { Weak: '#EF4444', Fair: '#F97316', Good: '#EAB308', Strong: '#22C55E' };
+  const strengthColor = strengthColors[strength.level] || '#E5E7EB';
+
   return (
     <div className="cnp-container">
+      {showToast && (
+        <div className="cnp-toast">
+          <div className="cnp-toast-icon">
+            <img src={warningImg} alt="warning" style={{ width: 35, height: 35 }} />
+          </div>
+          <div className="cnp-toast-body">
+            <p className="cnp-toast-title">Weak Password</p>
+            <p className="cnp-toast-message">Your password is too weak. Please follow the password requirements shown above.</p>
+          </div>
+          <button className="cnp-toast-close" onClick={() => setShowToast(false)}>×</button>
+        </div>
+      )}
+
       <div className="cnp-background">
         <img
           src={backgroundImg}
@@ -263,13 +325,54 @@ function CreateNewPasswordForm() {
 
                   <button
                     type="button"
-                    className="cnp-password-toggle"
+                    className={`cnp-password-toggle${password && strength.level !== 'Strong' ? ' cnp-password-toggle--has-warning' : ''}`}
                     onClick={() => setShowPassword((prev) => !prev)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     <PasswordToggleIcon visible={showPassword} />
                   </button>
+                  {password && strength.level !== 'Strong' && (
+                    <span className="cnp-warning-icon">
+                      <img src={warningFieldImg} alt="weak password" style={{ width: 14, height: 14 }} />
+                    </span>
+                  )}
                 </div>
+
+                {password && (
+                  <>
+                    <div className="cnp-strength-row">
+                      <div className="cnp-strength-bar">
+                        {[1, 2, 3, 4, 5].map((seg) => (
+                          <div
+                            key={seg}
+                            className="cnp-strength-segment"
+                            style={{ background: seg <= strength.score ? strengthColor : 'rgba(255,255,255,0.12)' }}
+                          />
+                        ))}
+                      </div>
+                      {strength.level && (
+                        <span className="cnp-strength-label" style={{ color: strengthColor }}>
+                          {strength.level}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="cnp-requirements">
+                      {[
+                        { key: 'minLength', label: '8+ Characters' },
+                        { key: 'number',    label: 'Numbers' },
+                        { key: 'uppercase', label: 'Uppercase Letter' },
+                        { key: 'special',   label: 'Special character' },
+                        { key: 'lowercase', label: 'Lowercase Letter' },
+                      ].map(({ key, label }) => (
+                        <div key={key} className="cnp-requirement-item">
+                          {strength.rules[key] ? <CheckIcon /> : <CrossIcon />}
+                          <span className={strength.rules[key] ? 'cnp-req-met' : 'cnp-req-unmet'}>{label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
 
                 {passwordError && (
                   <p className="cnp-field-error">
@@ -283,7 +386,7 @@ function CreateNewPasswordForm() {
                   Confirm Password
                 </label>
 
-                <div className="cnp-input-wrapper">
+                <div className="cnp-input-wrapper cnp-input-wrapper--confirm">
                   <span className="cnp-input-icon">
                     <LockIcon />
                   </span>
@@ -296,7 +399,7 @@ function CreateNewPasswordForm() {
                       setConfirmPassword(e.target.value);
                       if (confirmPasswordError) setConfirmPasswordError('');
                     }}
-                    placeholder="Enter your password"
+                    placeholder="Confirm your password"
                     aria-invalid={Boolean(confirmPasswordError)}
                     required
                   />
