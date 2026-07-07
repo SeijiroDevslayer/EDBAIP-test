@@ -5,20 +5,23 @@ import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
 import featureAnalytics from '../../../assets/login/feature-analytics.png';
 import checkCircle from '../../../assets/login/checkcircle.png';
-import triangleIcon from '../../../assets/login/triangleicon.png';
+import crossIcon from '../../../assets/negative-state/close-red-icon.png';
 import mailIcon from "../../../assets/login/mail.svg";
+import backCircleIcon from "../../../assets/login/back.png";
 import mobileIcon from "../../../assets/login/mobile.svg";
 import backIcon from "../../../assets/login/back.png";
 import mailIconm from "../../../assets/login/mailm.svg";
 import tickIcon from "../../../assets/login/tick.png";
 import closeIcon from "../../../assets/login/close.png";
 import featureAi from '../../../assets/login/feature-ai.png';
+import redIcon from '../../../assets/negative-state/material-symbols.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
+import clockIcon from "../../../assets/negative-state/clock-icon.png";
 import { verifyEmail } from "../api/mockForgotPasswordApi";
 import { verifyMobile } from "../api/mockForgetPasswordMobile";
 import './ForgotPasswordForm.css';
-
+ 
 const FEATURES = [
   {
     src: featureAnalytics,
@@ -41,10 +44,10 @@ const FEATURES = [
     label: "Scalable Platform",
   },
 ];
-
+ 
 const INDIA_MOBILE_REGEX = /^[6-9]\d{9}$/;
 const RESEND_SECONDS = 30;
-
+ 
 function CardLogo() {
   return (
     <div className="fp-card-logo">
@@ -53,7 +56,7 @@ function CardLogo() {
     </div>
   );
 }
-
+ 
 function MailIcon() {
   return (
     <div>
@@ -61,7 +64,7 @@ function MailIcon() {
     </div>
   );
 }
-
+ 
 function PhoneIcon() {
   return (
     <div>
@@ -70,6 +73,32 @@ function PhoneIcon() {
   );
 }
 
+function ClockIcon() {
+  return (
+    <div>
+      <img src={clockIcon} alt="" className="fp-clock-icon"/>
+    </div>
+  );
+}
+  
+
+
+function CrossIcon() {
+  return (
+    <div>
+      <img src={crossIcon} alt="" className="fp-cross-icon"/>
+    </div>
+  );
+}
+
+function RedIcon() {
+  return (
+    <div>
+      <img src={redIcon} alt="" className="fp-red-i"/>
+    </div>
+  );
+}
+ 
 function ArrowLeftIcon() {
   return (
     <div>
@@ -77,7 +106,7 @@ function ArrowLeftIcon() {
     </div>
   );
 }
-
+ 
 function CheckCircleIcons({ size = 14 }) {
   return (
     <div>
@@ -85,7 +114,7 @@ function CheckCircleIcons({ size = 14 }) {
     </div>
   );
 }
-
+ 
 function PhoneHandsetIcon() {
   return (
     <svg
@@ -104,7 +133,7 @@ function PhoneHandsetIcon() {
     </svg>
   );
 }
-
+ 
 function InfoIcon() {
   return (
     <svg
@@ -115,14 +144,14 @@ function InfoIcon() {
       aria-hidden="true"
     >
       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
-
+ 
       <path
         d="M12 8h.01"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
       />
-
+ 
       <path
         d="M12 12v4"
         stroke="currentColor"
@@ -132,15 +161,28 @@ function InfoIcon() {
     </svg>
   );
 }
-function ClockIcon() {
+
+
+// function ClockIcon() {
+//   return (
+//     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+//       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
+//       <path d="M12 7v5l3.5 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+//     </svg>
+//   );
+// }
+
+
+function WarningIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M12 7v5l3.5 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M12 8v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
-
+ 
 function CloseIcon() {
   return (
     <div>
@@ -148,11 +190,11 @@ function CloseIcon() {
     </div>
   );
 }
-
+ 
 function ErrorTriangleIcon() {
   return (
     <div className = "erroricon" >
-      <img src={triangleIcon} alt="" className="fp-error-triangle-icon" />
+      <img src={errorTriangleIcon} alt="" className="fp-error-triangle-icon" />
     </div>
   );
 }
@@ -166,7 +208,7 @@ function MailIconm() {
   function CheckCircleIcontick() {
   return (
     <div >
-      <img src={mailIconm} alt="" className="fp-mail-tick-icon" />
+      <img src={tickIcon} alt="" className="fp-check-tick-icon" />
     </div>
   );
 }
@@ -178,33 +220,44 @@ function ForgotPasswordForm() {
   const [emailError, setEmailError] = useState("");
   const [mobile, setMobile] = useState("");
   const [mobileError, setMobileError] = useState("");
-
+ 
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState("");
+  const [otpInvalid, setOtpInvalid] = useState(false);
   const [resendSeconds, setResendSeconds] = useState(0);
-
+  const MOCK_VALID_OTP = "1234";
   const [toast, setToast] = useState(null);
-
+ 
   const otpInputRefs = useRef([]);
-
+ 
   const destination = method === "email" ? email : `+91 ${mobile}`;
-
+ 
   useEffect(() => {
     if (step !== "verify" || resendSeconds <= 0) return undefined;
-
+ 
     const timer = setTimeout(() => {
       setResendSeconds((seconds) => seconds - 1);
     }, 1000);
-    
+   
     return () => clearTimeout(timer);
   }, [step, resendSeconds]);
+ 
+  useEffect(() => {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
 
-useEffect(() => {
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
-}, []);
+  useEffect(() => {
+    if (!toast) return;
 
+    const timer = setTimeout(() => {
+      setToast(null);
+    }, 5000);
 
+    return () => clearTimeout(timer);
+  }, [toast]);
+ 
+ 
   const selectMethod = (next) => {
     setMethod(next);
     setStep("request");
@@ -214,19 +267,19 @@ useEffect(() => {
     setMobileError("");
     setToast(null);
   };
-
+ 
   const handleMobileChange = (e) => {
     const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
     setMobile(digits);
     if (mobileError) setMobileError("");
   };
-
+ 
   const handleOtpChange = (e) => {
     const digits = e.target.value.replace(/\D/g, "").slice(0, 4);
     setOtp(digits);
     if (otpError) setOtpError("");
   };
-
+ 
   const handleOtpBoxChange = (index, e) => {
     const val = e.target.value.replace(/\D/g, '').slice(-1);
     const chars = otp.padEnd(4, ' ').split('');
@@ -234,11 +287,12 @@ useEffect(() => {
     const newOtp = chars.join('').trimEnd();
     setOtp(newOtp);
     if (otpError) setOtpError('');
+    if (otpInvalid) setOtpInvalid(false);
     if (val && index < 3) {
       otpInputRefs.current[index + 1]?.focus();
     }
   };
-
+ 
   const handleOtpBoxKeyDown = (index, e) => {
     if (e.key === 'Backspace') {
       if (!otp[index] && index > 0) {
@@ -251,10 +305,10 @@ useEffect(() => {
     if (e.key === 'ArrowLeft' && index > 0) otpInputRefs.current[index - 1]?.focus();
     if (e.key === 'ArrowRight' && index < 3) otpInputRefs.current[index + 1]?.focus();
   };
-
+ 
   const sendOtp = () => {
     console.log("OTP requested via", method, destination);
-
+ 
     setOtp("");
     setOtpError("");
     setStep("verify");
@@ -266,16 +320,21 @@ useEffect(() => {
       destination,
     });
   };
-
+ 
   const handleSendOtp = async (e) => {
     e.preventDefault();
-
+ 
     if (method === "mobile") {
       if (!INDIA_MOBILE_REGEX.test(mobile)) {
         setMobileError("Enter a valid 10-digit Indian mobile number");
+        setToast({
+          type: "error",
+          title: "Invalid Mobile Number",
+          message: "Please enter a valid 10-digit Indian mobile number.",
+        });
         return;
       }
-
+ 
       try {
         const res = await verifyMobile(mobile);
         if (!res || res.success === false) {
@@ -297,7 +356,7 @@ useEffect(() => {
         return;
       }
     }
-
+ 
     try {
       if (method === "email") {
         await verifyEmail(email);
@@ -315,9 +374,9 @@ useEffect(() => {
   };
   const handleResendOtp = () => {
     if (resendSeconds > 0) return;
-
+ 
     console.log("Resending OTP via", method, destination);
-
+ 
     setOtp("");
     setOtpError("");
     setResendSeconds(RESEND_SECONDS);
@@ -327,53 +386,68 @@ useEffect(() => {
       destination,
     });
   };
-
+ 
   const handleVerifyOtp = (e) => {
-    e.preventDefault();
-
-    if (otp.length !== 4) {
-      setOtpError("Enter the 4-digit OTP sent to you");
-      return;
-    }
-
+  e.preventDefault();
+ 
+  if (otp.length !== 4) {
+    setOtpError("Enter the 4-digit OTP sent to you");
+    setOtpInvalid(true);
+    return;
+  }
+ 
+  if (otp !== MOCK_VALID_OTP) {
+    setOtpInvalid(true);
+    setOtpError("Invalid OTP");
+    setOtp("");
     setToast({
-      title: 'OTP Verified Successfully !',
-      message: 'You can now create a new password for your account.',
+      type: 'error',
+      title: 'OTP Verified Unsuccessfully',
+      message: "We couldn't verify the OTP you entered. Please check the code and try again.",
     });
-
-    setTimeout(() => {
+    return;
+  }
+ 
+  setOtpInvalid(false);
+  setOtpError("");
+  setToast({
+    title: 'OTP Verified Successfully !',
+    message: 'You can now create a new password for your account.',
+  });
+ 
+  setTimeout(() => {
     navigate('/create-new-password', {
       state: { otpVerified: true, destination, method },
     });
   }, 1500);
-}
-
+};
+ 
   const handleChangeDestination = () => {
     setStep("request");
     setOtp("");
     setOtpError("");
     setToast(null);
   };
-
+ 
   return (
     <div className="fp-container">
       <div className="fp-background">
         <img src={backgroundImg} alt="" className="fp-background-image" />
       </div>
-
+ 
       <div className="fp-content">
         <div className="fp-left-section">
           <img src={logoImg} alt="EDABIP" className="fp-brand-logo" />
-
+ 
           <h1 className="fp-welcome-heading">
             Welcome to your Analytics Dashboard
           </h1>
-
+ 
           <p className="fp-welcome-description">
             Track performance, analyze data, and make smarter business decisions
             in real-time.
           </p>
-
+ 
           <div className="fp-features-container">
             {FEATURES.map((feature) => (
               <div key={feature.alt} className="fp-feature-item">
@@ -382,13 +456,13 @@ useEffect(() => {
                   alt={feature.alt}
                   className="fp-feature-badge"
                 />
-
+ 
                 <span className="fp-feature-label">{feature.label}</span>
               </div>
             ))}
           </div>
         </div>
-
+ 
         <div className="fp-right-section">
           <div className="fp-card-wrapper">
             {toast && (
@@ -396,15 +470,15 @@ useEffect(() => {
                 className={`fp-toast ${toast?.type === 'error' ? 'fp-toast-error' : ''}`}
                 role="status"
               >
-                <span className={`fp-toast-icon ${toast?.type === 'error' ? 'fp-toast-icon-error' : ''}`}>
-                  {toast?.type === 'error' ? <ErrorTriangleIcon /> : <CheckCircleIcontick />}
+                <span className={`fp-toast-icon ${toast?.type === 'error' ? 'fp-toast-icon-error' : 'fp-toast-icon-success'}`}>
+                  {toast?.type === 'error' ? <CrossIcon /> : <CheckCircleIcontick />}
                 </span>
-
-
-
+ 
+ 
+ 
                 <div className="fp-toast-content">
                   <p className="fp-toast-title">{toast.title}</p>
-
+ 
                   <p className="fp-toast-message">
                     {toast.message}
                     {toast.destination && (
@@ -415,7 +489,7 @@ useEffect(() => {
                     )}
                   </p>
                 </div>
-
+ 
                 <button
                   type="button"
                   className="fp-toast-close"
@@ -426,25 +500,25 @@ useEffect(() => {
                 </button>
               </div>
             )}
-
+ 
+ 
           <div className="fp-card">
-            <a href="/" className="fp-back-link">
-              <span className="fp-back-icon-circle">
-                <ArrowLeftIcon />
-              </span>  
-              Back to Sign in
-            </a>
-
-            <CardLogo />
-            
+             <CardLogo />
+              <a href="/" className="fp-back-link">
+                <img src={backCircleIcon} alt="" className="fp-back-icon-circle-img" />
+                Back to Sign in
+              </a>
+ 
+           
+           
             {step === "request" && (
               <>
                 <h2 className="fp-title">Forgot password</h2>
-
+ 
                 <p className="fp-subtitle">
                   Choose how you&apos;d like to receive your reset instructions
                 </p>
-
+ 
                 <div className="fp-method-toggle" role="tablist">
                   <button
                     type="button"
@@ -456,7 +530,7 @@ useEffect(() => {
                     <MailIcon />
                     Reset via Email
                   </button>
-
+ 
                   <button
                     type="button"
                     role="tab"
@@ -468,17 +542,17 @@ useEffect(() => {
                     Reset via Mobile
                   </button>
                 </div>
-
+ 
                 <form onSubmit={handleSendOtp} className="fp-form">
                   {method === "email" ? (
                     <div className="fp-form-group">
                       <label htmlFor="fp-email">Email</label>
-
+ 
                       <div className="fp-input-wrapper">
                         <span className="fp-input-icon">
                           <MailIconm />
                         </span>
-
+ 
                         <input
                           type="email"
                           id="fp-email"
@@ -492,7 +566,7 @@ useEffect(() => {
                           required
                         />
                       </div>
-
+ 
                       {emailError ? (
                         <>
                           <p className="fp-field-error">{emailError}</p>
@@ -523,14 +597,14 @@ useEffect(() => {
                   ) : (
                     <div className="fp-form-group">
                       <label htmlFor="fp-mobile">Mobile Number</label>
-
+ 
                       <div className="fp-input-wrapper fp-input-wrapper--phone">
                         <span className="fp-input-icon">
                           <PhoneHandsetIcon />
                         </span>
-
+ 
                         <span className="fp-mobile-prefix">+91</span>
-
+ 
                         <input
                           type="tel"
                           inputMode="numeric"
@@ -542,21 +616,21 @@ useEffect(() => {
                           aria-invalid={Boolean(mobileError)}
                           required
                         />
-
+ 
                         {mobileError && (
                           <span className="fp-input-status-icon">
                             <CheckCircleIcons />
                             </span>
                           )}
                       </div>
-
+ 
                       {mobileError ? (
                         <>
                           <p className="fp-field-error">{mobileError}</p>
                           <div className="fp-error-info-banner">
                             <span className="fp-error-info-icon">
                               <InfoIcon />
-                              
+                             
                             </span>
                             <div className="fp-error-info-text">
                               <p className="fp-error-info-title">What does this means?</p>
@@ -579,12 +653,12 @@ useEffect(() => {
                       )}
                     </div>
                   )}
-
+ 
                   <button type="submit" className="fp-submit-btn">
                     Send OTP
                   </button>
                 </form>
-
+ 
                 <p className="fp-support-text">
                   Need help ?{" "}
                   <span className="fp-support-link">
@@ -593,16 +667,16 @@ useEffect(() => {
                 </p>
               </>
             )}
-
+ 
             {step === "verify" && (
               <>
                 <h2 className="fp-title">Enter Verification Code</h2>
-
+ 
                 <p className="fp-subtitle">
                   A 4-digit code was sent to{' '}
                   <strong className="fp-subtitle-dest">{destination}</strong>
                 </p>
-
+ 
                 <form onSubmit={handleVerifyOtp} className="fp-form">
                   <div className="fp-otp-boxes">
                     {[0, 1, 2, 3].map((index) => (
@@ -611,7 +685,7 @@ useEffect(() => {
                         ref={(el) => { otpInputRefs.current[index] = el; }}
                         type="tel"
                         inputMode="numeric"
-                        className="fp-otp-box"
+                        className={`fp-otp-box ${otpInvalid ? 'fp-otp-box-error' : ''}`}
                         value={otp[index] && otp[index] !== ' ' ? otp[index] : ''}
                         onChange={(e) => handleOtpBoxChange(index, e)}
                         onKeyDown={(e) => handleOtpBoxKeyDown(index, e)}
@@ -621,35 +695,38 @@ useEffect(() => {
                       />
                     ))}
                   </div>
-
+                  
                   {otpError && (
-                    <p className="fp-field-error fp-field-error--center">
-                      {otpError}
-                    </p>
+                    <div className="fp-otp-error-row">
+                      <p className="fp-field-error">
+                        {otpError}
+                        <span className="fp-otp-error-icon"><redIcon /></span>
+                      </p>
+                    </div>
                   )}
-                <div className="fp-resend-block"></div> 
-                  <div className="fp-resend-row">
-                    <span>Didn&apos;t received it ?</span>
-                    <button
-                      type="button"
-                      className="fp-resend-link"
-                      onClick={handleResendOtp}
-                      disabled={resendSeconds > 0}
-                    >
-                      Resend OTP
-                    </button>
-                  </div>
-
+                  <div className="fp-resend-block"></div>
+                    <div className="fp-resend-row">
+                      <span>Didn&apos;t received it ?</span>
+                      <button
+                        type="button"
+                        className="fp-resend-link"
+                        onClick={handleResendOtp}
+                        disabled={resendSeconds > 0}
+                      >
+                        Resend OTP
+                      </button>
+                    </div>
+ 
                   {resendSeconds > 0 && (
                     <>
                       <div className="fp-resend-status">
                         <span className="fp-resend-status-label">Resend OTP</span>
                         <span className="fp-resend-timer">
-                          <ClockIcon />
+                          < ClockIcon />
                           00:{String(resendSeconds).padStart(2, "0")}
                         </span>
                       </div>
-
+                   
                       <div className="fp-resend-info-banner">
                         <span className="fp-resend-info-icon">
                         <InfoIcon />
@@ -657,15 +734,15 @@ useEffect(() => {
                             <p className="fp-resend-info-text">
                               You can resend the otp after the timers end.
                             </p>
-                          </div>
-                        </>
-                      )}
-
+                      </div>
+                    </>
+                  )}
+ 
                   <button type="submit" className="fp-submit-btn">
                     Verify OTP
                   </button>
                 </form>
-                
+               
                 <p className="fp-support-text">
                   Need help ?{" "}
                   <span
@@ -678,7 +755,7 @@ useEffect(() => {
                 </p>
               </>
             )}
-
+ 
           </div>
         </div>
       </div>
@@ -686,5 +763,6 @@ useEffect(() => {
     </div>
   );
 }
-
+ 
 export default ForgotPasswordForm;
+ 
