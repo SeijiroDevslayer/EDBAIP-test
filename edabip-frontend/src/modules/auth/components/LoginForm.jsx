@@ -46,7 +46,7 @@ function CardLogo() {
 }
 
 function LoginForm() {
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -62,9 +62,8 @@ const [isLocked, setIsLocked] = useState(false);
 //  Account Locked logic
 const [loginError, setLoginError] = useState('');
 const [failedAttempts, setFailedAttempts] = useState(0);
-
 const { login } = useAuthContext();
-const navigate = useNavigate();
+
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
