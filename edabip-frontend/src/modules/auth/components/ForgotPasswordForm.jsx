@@ -1,4 +1,4 @@
-import { useEffect, useState,useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import backgroundImg from '../../../assets/login/background.png';
 import logoImg from '../../../assets/login/logo.png';
@@ -12,6 +12,8 @@ import backIcon from "../../../assets/login/back.png";
 import mailIconm from "../../../assets/login/mailm.svg";
 import tickIcon from "../../../assets/login/tick.png";
 import closeIcon from "../../../assets/login/close.png";
+import closedRedIcon from "../../../assets/negative-state/close-red-icon.png";
+import invalidOtpInfoIcon from "../../../assets/negative-state/err-info-icon.png";
 import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
@@ -45,6 +47,8 @@ const FEATURES = [
 const INDIA_MOBILE_REGEX = /^[6-9]\d{9}$/;
 const RESEND_SECONDS = 30;
 
+const OTP_EXPIRY_SECONDS = 60; //  timing for otp expiry
+
 function CardLogo() {
   return (
     <div className="fp-card-logo">
@@ -65,7 +69,7 @@ function MailIcon() {
 function PhoneIcon() {
   return (
     <div>
-      <img src={mobileIcon} alt="" className="fp-mobile-icon"/>
+      <img src={mobileIcon} alt="" className="fp-mobile-icon" />
     </div>
   );
 }
@@ -73,7 +77,7 @@ function PhoneIcon() {
 function ArrowLeftIcon() {
   return (
     <div>
-      <img src={backIcon} alt="" className="fp-back-icon"/>
+      <img src={backIcon} alt="" className="fp-back-icon" />
     </div>
   );
 }
@@ -151,19 +155,19 @@ function CloseIcon() {
 
 function ErrorTriangleIcon() {
   return (
-    <div className = "erroricon" >
+    <div className="erroricon" >
       <img src={triangleIcon} alt="" className="fp-error-triangle-icon" />
     </div>
   );
 }
 function MailIconm() {
   return (
-    <div className = "erroricon" >
+    <div className="erroricon" >
       <img src={mailIconm} alt="" className="fp-mail-m-icon" />
     </div>
   );
 }
-  function CheckCircleIcontick() {
+function CheckCircleIcontick() {
   return (
     <div >
       <img src={mailIconm} alt="" className="fp-mail-tick-icon" />
@@ -181,11 +185,15 @@ function ForgotPasswordForm() {
 
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState("");
+  const [invalidOtp, setInvalidOtp] = useState(false);
   const [resendSeconds, setResendSeconds] = useState(0);
+  const [isOtpExpired, setIsOtpExpired] = useState(false);
+  const [showOtpExpiredToast, setShowOtpExpiredToast] = useState(false);
 
   const [toast, setToast] = useState(null);
 
   const otpInputRefs = useRef([]);
+
 
   const destination = method === "email" ? email : `+91 ${mobile}`;
 
@@ -195,14 +203,20 @@ function ForgotPasswordForm() {
     const timer = setTimeout(() => {
       setResendSeconds((seconds) => seconds - 1);
     }, 1000);
-    
+
     return () => clearTimeout(timer);
   }, [step, resendSeconds]);
 
-useEffect(() => {
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
-}, []);
+  useEffect(() => {
+    if (step === "verify" && resendSeconds === 0) {
+      setIsOtpExpired(true);
+    }
+  }, [step, resendSeconds]);
+
+  useEffect(() => {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
 
 
   const selectMethod = (next) => {
@@ -252,6 +266,15 @@ useEffect(() => {
     if (e.key === 'ArrowRight' && index < 3) otpInputRefs.current[index + 1]?.focus();
   };
 
+  useEffect(() => {
+    if (otp.length === 0) {
+      setShowOtpExpiredToast(false);
+      setToast(null);
+      setOtpError("");
+      
+    }
+  }, [otp]);
+
   const sendOtp = () => {
     console.log("OTP requested via", method, destination);
 
@@ -259,6 +282,8 @@ useEffect(() => {
     setOtpError("");
     setStep("verify");
     setResendSeconds(RESEND_SECONDS);
+    setIsOtpExpired(false);
+    setShowOtpExpiredToast(false);
     setToast({
       type: 'success',
       title: 'OTP Send Successfully !',
@@ -306,11 +331,11 @@ useEffect(() => {
       sendOtp();
     } catch (err) {
       setEmailError("We couldn't find an account with this email address.");
-        setToast({
-          type: 'error',
-          title: err.title || "Error",
-          message: err.message || "Something went wrong",
-        });
+      setToast({
+        type: 'error',
+        title: err.title || "Error",
+        message: err.message || "Something went wrong",
+      });
     }
   };
   const handleResendOtp = () => {
@@ -321,6 +346,8 @@ useEffect(() => {
     setOtp("");
     setOtpError("");
     setResendSeconds(RESEND_SECONDS);
+    setIsOtpExpired(false);
+    setShowOtpExpiredToast(false);
     setToast({
       title: 'OTP Resent Successfully !',
       message: 'A new 4-digit OTP has been send to',
@@ -330,11 +357,19 @@ useEffect(() => {
 
   const handleVerifyOtp = (e) => {
     e.preventDefault();
+    if (isOtpExpired) {
+      setShowOtpExpiredToast(true);
+      
+      setOtpError("invalid OTP");
+      return;
+    }
 
     if (otp.length !== 4) {
       setOtpError("Enter the 4-digit OTP sent to you");
+
       return;
     }
+
 
     setToast({
       title: 'OTP Verified Successfully !',
@@ -342,11 +377,11 @@ useEffect(() => {
     });
 
     setTimeout(() => {
-    navigate('/create-new-password', {
-      state: { otpVerified: true, destination, method },
-    });
-  }, 1500);
-}
+      navigate('/create-new-password', {
+        state: { otpVerified: true, destination, method },
+      });
+    }, 1500);
+  }
 
   const handleChangeDestination = () => {
     setStep("request");
@@ -391,6 +426,35 @@ useEffect(() => {
 
         <div className="fp-right-section">
           <div className="fp-card-wrapper">
+            {isOtpExpired && showOtpExpiredToast && (
+              <div className="fp-toast fp-toast-error">
+                <div>
+                  <img
+                    src={closedRedIcon}
+                    alt="OTP Expired"
+                    className="fp-error-triangle-icon"
+                  />
+                </div>
+
+                <div className="fp-toast-content">
+                  <h4 className="fp-toast-title">OTP Expired</h4>
+
+                  <p className="fp-toast-message">
+                    Your verification code has expired.
+                    <br />
+                    Please request a new OTP.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  className="fp-toast-close"
+                  onClick={() => setShowOtpExpiredToast(false)}
+                >
+                  <CloseIcon className="fp-close-icon" />
+                </button>
+              </div>
+            )}
             {toast && (
               <div
                 className={`fp-toast ${toast?.type === 'error' ? 'fp-toast-error' : ''}`}
@@ -442,43 +506,43 @@ useEffect(() => {
               <>
                 <h2 className="fp-title">Forgot password</h2>
 
-                <p className="fp-subtitle">
-                  Choose how you&apos;d like to receive your reset instructions
-                </p>
+                  <p className="fp-subtitle">
+                    Choose how you&apos;d like to receive your reset instructions
+                  </p>
 
-                <div className="fp-method-toggle" role="tablist">
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={method === "email"}
-                    className={`fp-method-btn ${method === "email" ? "active" : ""}`}
-                    onClick={() => selectMethod("email")}
-                  >
-                    <MailIcon />
-                    Reset via Email
-                  </button>
+                  <div className="fp-method-toggle" role="tablist">
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={method === "email"}
+                      className={`fp-method-btn ${method === "email" ? "active" : ""}`}
+                      onClick={() => selectMethod("email")}
+                    >
+                      <MailIcon />
+                      Reset via Email
+                    </button>
 
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={method === "mobile"}
-                    className={`fp-method-btn ${method === "mobile" ? "active" : ""}`}
-                    onClick={() => selectMethod("mobile")}
-                  >
-                    <PhoneIcon />
-                    Reset via Mobile
-                  </button>
-                </div>
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={method === "mobile"}
+                      className={`fp-method-btn ${method === "mobile" ? "active" : ""}`}
+                      onClick={() => selectMethod("mobile")}
+                    >
+                      <PhoneIcon />
+                      Reset via Mobile
+                    </button>
+                  </div>
 
                 <form onSubmit={handleSendOtp} className="fp-form">
                   {method === "email" ? (
                     <div className="fp-form-group">
                       <label htmlFor="fp-email">Email ID</label>
 
-                      <div className="fp-input-wrapper">
-                        <span className="fp-input-icon">
-                          <MailIconm />
-                        </span>
+                        <div className="fp-input-wrapper">
+                          <span className="fp-input-icon">
+                            <MailIconm />
+                          </span>
 
                         <input
                           type="email"
@@ -529,165 +593,188 @@ useEffect(() => {
                     <div className="fp-form-group">
                       <label htmlFor="fp-mobile">Mobile Number</label>
 
-                      <div className="fp-input-wrapper fp-input-wrapper--phone">
-                        <span className="fp-input-icon">
-                          <PhoneHandsetIcon />
-                        </span>
+                        <div className="fp-input-wrapper fp-input-wrapper--phone">
+                          <span className="fp-input-icon">
+                            <PhoneHandsetIcon />
+                          </span>
 
-                        <span className="fp-mobile-prefix">+91</span>
+                          <span className="fp-mobile-prefix">+91</span>
 
-                        <input
-                          type="tel"
-                          inputMode="numeric"
-                          id="fp-mobile"
-                          value={mobile}
-                          onChange={handleMobileChange}
-                          placeholder="98765 43210"
-                          maxLength={10}
-                          aria-invalid={Boolean(mobileError)}
-                          required
-                        />
+                          <input
+                            type="tel"
+                            inputMode="numeric"
+                            id="fp-mobile"
+                            value={mobile}
+                            onChange={handleMobileChange}
+                            placeholder="98765 43210"
+                            maxLength={10}
+                            aria-invalid={Boolean(mobileError)}
+                            required
+                          />
 
-                        {mobileError && (
-                          <span className="fp-input-status-icon">
-                            <CheckCircleIcons />
+                          {mobileError && (
+                            <span className="fp-input-status-icon">
+                              <CheckCircleIcons />
                             </span>
                           )}
-                      </div>
-
-                      {mobileError ? (
-                        <>
-                          <p className="fp-field-error">{mobileError}</p>
-                          <div className="fp-error-info-banner">
-                            <span className="fp-error-info-icon">
-                              <InfoIcon />
-                              
-                            </span>
-                            <div className="fp-error-info-text">
-                              <p className="fp-error-info-title">What does this means?</p>
-                              <p className="fp-error-info-description">
-                                Please check your mobile number and try again. If you still have trouble, contact support
-                              </p>
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="fp-helper-row">
-                          <span className="fp-helper-icon">
-                            <InfoIcon />
-                          </span>
-                          <p className="fp-helper-text">
-                            We&apos;ll send a secure reset link to this address.
-                            It will expire in 30 minutes.
-                          </p>
                         </div>
-                      )}
-                    </div>
-                  )}
 
-                  <button type="submit" className="fp-submit-btn">
-                    Send OTP
-                  </button>
-                </form>
+                        {mobileError ? (
+                          <>
+                            <p className="fp-field-error">{mobileError}</p>
+                            <div className="fp-error-info-banner">
+                              <span className="fp-error-info-icon">
+                                <InfoIcon />
 
-                <p className="fp-support-text">
-                  Need help ?{" "}
-                  <span className="fp-support-link">
-                Contact Support
-              </span>
-                </p>
-              </>
-            )}
+                              </span>
+                              <div className="fp-error-info-text">
+                                <p className="fp-error-info-title">What does this means?</p>
+                                <p className="fp-error-info-description">
+                                  Please check your mobile number and try again. If you still have trouble, contact support
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="fp-helper-row">
+                            <span className="fp-helper-icon">
+                              <InfoIcon />
+                            </span>
+                            <p className="fp-helper-text">
+                              We&apos;ll send a secure reset link to this address.
+                              It will expire in 30 minutes.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
-            {step === "verify" && (
-              <>
-                <h2 className="fp-title">Enter Verification Code</h2>
-
-                <p className="fp-subtitle">
-                  A 4-digit code was sent to{' '}
-                  <strong className="fp-subtitle-dest">{destination}</strong>
-                </p>
-
-                <form onSubmit={handleVerifyOtp} className="fp-form">
-                  <div className="fp-otp-boxes">
-                    {[0, 1, 2, 3].map((index) => (
-                      <input
-                        key={index}
-                        ref={(el) => { otpInputRefs.current[index] = el; }}
-                        type="tel"
-                        inputMode="numeric"
-                        className="fp-otp-box"
-                        value={otp[index] && otp[index] !== ' ' ? otp[index] : ''}
-                        onChange={(e) => handleOtpBoxChange(index, e)}
-                        onKeyDown={(e) => handleOtpBoxKeyDown(index, e)}
-                        maxLength={1}
-                        autoFocus={index === 0}
-                        aria-label={`OTP digit ${index + 1}`}
-                      />
-                    ))}
-                  </div>
-
-                  {otpError && (
-                    <p className="fp-field-error fp-field-error--center">
-                      {otpError}
-                    </p>
-                  )}
-                <div className="fp-resend-block"></div> 
-                  <div className="fp-resend-row">
-                    <span>Didn&apos;t received it ?</span>
-                    <button
-                      type="button"
-                      className="fp-resend-link"
-                      onClick={handleResendOtp}
-                      disabled={resendSeconds > 0}
-                    >
-                      Resend OTP
+                    <button type="submit" className="fp-submit-btn">
+                      Send OTP
                     </button>
-                  </div>
+                  </form>
 
-                  {resendSeconds > 0 && (
+                  <p className="fp-support-text">
+                    Need help ?{" "}
+                    <span className="fp-support-link">
+                      Contact Support
+                    </span>
+                  </p>
+                </>
+              )}
+
+              {step === "verify" && (
+                <>
+                  <h2 className="fp-title">Enter Verification Code</h2>
+
+                  <p className="fp-subtitle">
+                    A 4-digit code was sent to{' '}
+                    <strong className="fp-subtitle-dest">{destination}</strong>
+                  </p>
+
+                  <form onSubmit={handleVerifyOtp} className="fp-form">
+                    <div className="fp-otp-boxes">
+
+                      {[0, 1, 2, 3].map((index) => (
+                        <input
+                          key={index}
+                          ref={(el) => { otpInputRefs.current[index] = el; }}
+                          type="tel"
+                          inputMode="numeric"
+                          className={`fp-otp-box ${otpError ? "fp-otp-box-error" : ""}`}
+                          value={otp[index] && otp[index] !== ' ' ? otp[index] : ''}
+                          onChange={(e) => handleOtpBoxChange(index, e)}
+                          onKeyDown={(e) => handleOtpBoxKeyDown(index, e)}
+                          maxLength={1}
+                          autoFocus={index === 0}
+                          aria-label={`OTP digit ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+
+              
+                    {otpError && (
+                      <div className="fp-otp-error-row">
+                        <span className="fp-otp-error-text">
+                          {otpError}
+                        </span>
+
+                        <img
+                          src={invalidOtpInfoIcon}
+                          alt="Info"
+                          className="fp-otp-error-icon"
+                        />
+
+                      </div>
+                    )}
+                    <div className="fp-resend-block"></div>
+                    <div className="fp-resend-row">
+                      <span>Didn&apos;t received it ?</span>
+                      <button
+                        type="button"
+                        className="fp-resend-link"
+                        onClick={handleResendOtp}
+                        disabled={resendSeconds > 0}
+                      >
+                        Resend OTP
+                      </button>
+                    </div>
+
+                    {/* Modified: always show resend status timer (shows 00:00 when seconds === 0)
+                        and keep the expired info banner visible even when OTP input is cleared.
+                        We do not switch to the literal "Expired" label — timer shows 00:00 instead. */}
                     <>
                       <div className="fp-resend-status">
                         <span className="fp-resend-status-label">Resend OTP</span>
-                        <span className="fp-resend-timer">
+                        <span className={`fp-resend-timer ${isOtpExpired ? 'fp-resend-expired' : ''}`}>
                           <ClockIcon />
                           00:{String(resendSeconds).padStart(2, "0")}
                         </span>
                       </div>
 
-                      <div className="fp-resend-info-banner">
-                        <span className="fp-resend-info-icon">
-                        <InfoIcon />
+                      {resendSeconds > 0 ? (
+                        <div className="fp-resend-info-banner">
+                          <span className="fp-resend-info-icon">
+                            <InfoIcon />
                           </span>
-                            <p className="fp-resend-info-text">
-                              You can resend the otp after the timers end.
-                            </p>
-                          </div>
-                        </>
-                      )}
+                          <p className="fp-resend-info-text">
+                            You can resend the otp after the timers end.
+                          </p>
+                        </div>
+                      ) : isOtpExpired ? (
+                        <div className="fp-resend-info-banner">
+                          <span className="fp-resend-info-icon">
+                            <InfoIcon />
+                          </span>
+                          <p className="fp-resend-info-text">
+                            Your OTP has expired. Please request a new OTP.
+                          </p>
+                        </div>
+                      ) : null}
+                    </>
 
-                  <button type="submit" className="fp-submit-btn">
-                    Verify OTP
-                  </button>
-                </form>
-                
-                <p className="fp-support-text">
-                  Need help ?{" "}
-                  <span
-                    className="fp-support-link fp-support-link--disabled"
-                    aria-disabled="true"
-                    title="Coming soon"
-                  >
-                    Contact Support
-                  </span>
-                </p>
-              </>
-            )}
+                    <button type="submit" className="fp-submit-btn">
+                      Verify OTP
+                    </button>
+                  </form>
 
+                  <p className="fp-support-text">
+                    Need help ?{" "}
+                    <span
+                      className="fp-support-link fp-support-link--disabled"
+                      aria-disabled="true"
+                      title="Coming soon"
+                    >
+                      Contact Support
+                    </span>
+                  </p>
+                </>
+              )}
+
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }
