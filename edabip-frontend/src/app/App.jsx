@@ -3,11 +3,7 @@ import LoginPage from '../modules/auth/pages/LoginPage';
 import SignupPage from '../modules/auth/pages/SignupPage';
 import ForgotPasswordPage from '../modules/auth/pages/ForgotPasswordPage';
 import CreateNewPasswordPage from '../modules/auth/pages/CreateNewPasswordPage';
-<<<<<<< Updated upstream
-=======
-import PasswordResetSuccessPage from '../modules/auth/pages/PasswordResetSuccessPage';
 import AccountLockedPage from '../modules/auth/pages/AccountLockedPage';
->>>>>>> Stashed changes
 
 function App() {
   return (
@@ -17,13 +13,7 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/create-new-password" element={<CreateNewPasswordPage />} />
-<<<<<<< Updated upstream
-=======
-        <Route path="/password-reset-success" element={<PasswordResetSuccessPage />} />
-        <Route path="/account-locked" element={<AccountLockedPage />}
-        />
-
->>>>>>> Stashed changes
+        <Route path="/account-locked" element={<AccountLockedPage />} />
       </Routes>
     </BrowserRouter>
   );
