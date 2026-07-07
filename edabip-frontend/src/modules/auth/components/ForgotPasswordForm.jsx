@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from "react";
-import backgroundImg from "../../../assets/login/background.png";
-import logoImg from "../../../assets/login/logo.png";
-import logoImgc from "../../../assets/login/logoc.png";
-import featureAnalytics from "../../../assets/login/feature-analytics.png";
-import featureAi from "../../../assets/login/feature-ai.png";
-import featureSecurity from "../../../assets/login/feature-security.png";
-import featureScalable from "../../../assets/login/feature-scalable.png";
-import "./ForgotPasswordForm.css";
+import { useEffect, useState,useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import backgroundImg from '../../../assets/login/background.png';
+import logoImg from '../../../assets/login/logo.png';
+import logoImgc from '../../../assets/login/logoc.png';
+import featureAnalytics from '../../../assets/login/feature-analytics.png';
+import featureAi from '../../../assets/login/feature-ai.png';
+import featureSecurity from '../../../assets/login/feature-security.png';
+import featureScalable from '../../../assets/login/feature-scalable.png';
+import './ForgotPasswordForm.css';
 
 const FEATURES = [
   {
@@ -341,7 +342,13 @@ function ForgotPasswordForm() {
     console.log("Verifying OTP", otp, "for", destination);
 
     setToast(null);
-    setStep("verified");
+     navigate('/create-new-password', {
+      state: {
+        otpVerified: true,
+        destination,
+        method,
+      },
+    });
   };
 
   const handleChangeDestination = () => {
@@ -535,13 +542,9 @@ function ForgotPasswordForm() {
 
                 <p className="fp-support-text">
                   Need help ?{" "}
-                  <span
-                    className="fp-support-link fp-support-link--disabled"
-                    aria-disabled="true"
-                    title="Coming soon"
-                  >
-                    Contact Support
-                  </span>
+                  <span className="cnp-support-link">
+                Contact Support
+              </span>
                 </p>
               </>
             )}
@@ -613,28 +616,10 @@ function ForgotPasswordForm() {
               </>
             )}
 
-            {step === "verified" && (
-              <div className="fp-verified-panel">
-                <div className="fp-verified-icon">
-                  <CheckCircleIcon size={28} />
-                </div>
-
-                <h2 className="fp-verified-title">OTP Verified!</h2>
-
-                <p className="fp-verified-message">
-                  Your identity has been verified successfully. You can continue
-                  to sign in once your password has been reset.
-                </p>
-
-                <a href="/" className="fp-submit-btn fp-verified-cta">
-                  Back to Sign In
-                </a>
-              </div>
-            )}
-          </div>
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
