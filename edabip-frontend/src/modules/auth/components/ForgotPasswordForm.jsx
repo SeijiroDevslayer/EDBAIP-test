@@ -13,11 +13,16 @@ import backIcon from "../../../assets/login/back.png";
 import mailIconm from "../../../assets/login/mailm.svg";
 import tickIcon from "../../../assets/login/tick.png";
 import closeIcon from "../../../assets/login/close.png";
+import expiredIcon from "../../../assets/negative-state/Vector-cross.png";
 import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
 import { verifyEmail } from "../api/mockForgotPasswordApi";
 import { verifyMobile } from "../api/mockForgetPasswordMobile";
+import closeRedIcon from "../../../assets/negative-state/close-red-icon.png";
+import infoIcon from "../../../assets/negative-state/info-icon.png";
+import redInfoIcon from "../../../assets/negative-state/red-info-icon.png";
+import { sendMockOtp, verifyMockOtp } from "../api/mockOtpApi";
 import './ForgotPasswordForm.css';
  
 const FEATURES = [
@@ -174,6 +179,25 @@ function ErrorTriangleIcon() {
     </div>
   );
 }
+function ExpiredIcon() {
+  return (
+    <img
+      src={closeRedIcon}
+      alt=""
+      className="fp-expired-icon"
+    />
+  );
+}
+
+function InvalidOtpIcon() {
+  return (
+    <img
+      src={redInfoIcon}
+      alt=""
+      className="fp-invalid-otp-icon"
+    />
+  );
+}
 function MailIconm() {
   return (
     <div className = "erroricon" >
@@ -207,7 +231,13 @@ function ForgotPasswordForm() {
   const otpInputRefs = useRef([]);
  
   const destination = method === "email" ? email : `+91 ${mobile}`;
- 
+
+  // Mobile OTP expired state: timer reached 00:00 on mobile OTP screen
+  const isMobileOtpExpired = step === "verify" && method === "mobile" && resendSeconds <= 0;
+
+  // Used to show Figma red OTP border and Invalid OTP icon
+  const isExpiredOtpError = otpError === "Invalid OTP";
+
   useEffect(() => {
     if (step !== "verify" || resendSeconds <= 0) return undefined;
  
@@ -271,22 +301,26 @@ useEffect(() => {
     if (e.key === 'ArrowLeft' && index > 0) otpInputRefs.current[index - 1]?.focus();
     if (e.key === 'ArrowRight' && index < 3) otpInputRefs.current[index + 1]?.focus();
   };
- 
-  const sendOtp = () => {
-    console.log("OTP requested via", method, destination);
- 
-    setOtp("");
-    setOtpError("");
-    setStep("verify");
-    setResendSeconds(RESEND_SECONDS);
-    setToast({
-      type: 'success',
-      title: 'OTP Send Successfully !',
-      message: 'A 4-digit OTP has been send to',
-      destination,
-    });
-  };
- 
+
+const sendOtp = async () => {
+  console.log("OTP requested via", method, destination);
+
+  await sendMockOtp();
+
+  setOtp("");
+  setOtpError("");
+  setStep("verify");
+
+  setResendSeconds(RESEND_SECONDS);
+
+  setToast({
+    type: "success",
+    title: "OTP Send Successfully !",
+    message: "A 4-digit OTP has been send to",
+    destination,
+  });
+};
+
   const handleSendOtp = async (e) => {
     e.preventDefault();
  
@@ -328,7 +362,7 @@ useEffect(() => {
         await verifyEmail(email);
       }
       setEmailError("");
-      sendOtp();
+      await sendOtp();
     } catch (err) {
       setEmailError("We couldn't find an account with this email address.");
         setToast({
@@ -338,55 +372,75 @@ useEffect(() => {
         });
     }
   };
-  const handleResendOtp = () => {
-    if (resendSeconds > 0) return;
- 
-    console.log("Resending OTP via", method, destination);
- 
-    setOtp("");
-    setOtpError("");
-    setResendSeconds(RESEND_SECONDS);
-    setToast({
-      title: 'OTP Resent Successfully !',
-      message: 'A new 4-digit OTP has been send to',
-      destination,
-    });
-  };
- 
-  const handleVerifyOtp = (e) => {
+const handleResendOtp = async () => {
+  if (resendSeconds > 0) return;
+
+  console.log("Resending OTP via", method, destination);
+
+  await sendMockOtp();
+
+  setOtp("");
+  setOtpError("");
+
+  // Only resend timer again
+  setResendSeconds(RESEND_SECONDS);
+
+  setToast({
+    type: "success",
+    title: "OTP Resent Successfully !",
+    message: "A new 4-digit OTP has been send to",
+    destination,
+  });
+};
+
+
+const handleVerifyOtp = async (e) => {
   e.preventDefault();
- 
+
   if (otp.length !== 4) {
     setOtpError("Enter the 4-digit OTP sent to you");
-    setOtpInvalid(true);
     return;
   }
- 
-  if (otp !== MOCK_VALID_OTP) {
-    setOtpInvalid(true);
+
+  const verifyResponse = await verifyMockOtp(otp);
+
+  if (!verifyResponse.success) {
+    if (verifyResponse.reason === "OTP_EXPIRED") {
+      setOtpError("Invalid OTP");
+
+      setToast({
+        type: "expired",
+        title: "OTP Expired",
+        message: "Your verification code has expired.\nPlease request a new OTP.",
+      });
+
+      return;
+    }
+
+    if (verifyResponse.reason === "INVALID_OTP") {
+      setOtpError("Invalid OTP");
+      return;
+    }
+
     setOtpError("Invalid OTP");
-    setToast({
-      type: 'error',
-      title: 'OTP Verified Unsuccessfully',
-      message: "We couldn't verify the OTP you entered. Please check the code and try again.",
-    });
     return;
   }
- 
-  setOtpInvalid(false);
+
   setOtpError("");
+
   setToast({
-    title: 'OTP Verified Successfully !',
-    message: 'You can now create a new password for your account.',
+    type: "success",
+    title: "OTP Verified Successfully !",
+    message: "You can now create a new password for your account.",
   });
- 
+
   setTimeout(() => {
-    navigate('/create-new-password', {
+    navigate("/create-new-password", {
       state: { otpVerified: true, destination, method },
     });
   }, 1500);
 };
- 
+
   const handleChangeDestination = () => {
     setStep("request");
     setOtp("");
@@ -395,7 +449,7 @@ useEffect(() => {
   };
  
   return (
-    <div className="fp-container">
+    <div className={`fp-container ${step === "verify" ? "fp-container--verify" : ""}`}>
       <div className="fp-background">
         <img src={backgroundImg} alt="" className="fp-background-image" />
       </div>
@@ -432,11 +486,17 @@ useEffect(() => {
           <div className="fp-card-wrapper">
             {toast && (
               <div
-                className={`fp-toast ${toast?.type === 'error' ? 'fp-toast-error' : ''}`}
+                className={`fp-toast ${toast?.type === "error" ? "fp-toast-error" : ""} ${toast?.type === "expired" ? "fp-toast-expired" : ""}`}
                 role="status"
               >
-                <span className={`fp-toast-icon ${toast?.type === 'error' ? 'fp-toast-icon-error' : 'fp-toast-icon-success'}`}>
-                  {toast?.type === 'error' ? <CrossIcon /> : <CheckCircleIcontick />}
+                <span className={`fp-toast-icon ${toast?.type === 'error' ? 'fp-toast-icon-error' : ''}`}>
+                  {toast?.type === "expired" ? (
+                    <ExpiredIcon />
+                  ) : toast?.type === 'error' ? (
+                    <ErrorTriangleIcon />
+                  ) : (
+                    <CheckCircleIcontick />
+                  )}
                 </span>
  
  
@@ -465,17 +525,17 @@ useEffect(() => {
                 </button>
               </div>
             )}
- 
- 
-          <div className="fp-card">
-             <CardLogo />
-              <a href="/" className="fp-back-link">
-                <img src={backCircleIcon} alt="" className="fp-back-icon-circle-img" />
-                Back to Sign in
-              </a>
- 
-           
-           
+
+          <div className={`fp-card ${step === "verify" ? "fp-card--verify" : ""}`}>
+            <a href="/" className="fp-back-link">
+              <span className="fp-back-icon-circle">
+                <ArrowLeftIcon />
+              </span>  
+              Back to Sign in
+            </a>
+
+            <CardLogo />
+            
             {step === "request" && (
               <>
                 <h2 className="fp-title">Forgot password</h2>
@@ -641,70 +701,68 @@ useEffect(() => {
                   A 4-digit code was sent to{' '}
                   <strong className="fp-subtitle-dest">{destination}</strong>
                 </p>
- 
-                <form onSubmit={handleVerifyOtp} className="fp-form">
+
+                <form onSubmit={handleVerifyOtp} className="fp-form fp-verify-form">
                   <div className="fp-otp-boxes">
-  {[0, 1, 2, 3].map((index) => (
-    <input
-      key={index}
-      ref={(el) => { otpInputRefs.current[index] = el; }}
-      type="tel"
-      inputMode="numeric"
-      className={`fp-otp-box ${otpInvalid ? 'fp-otp-box-error' : ''}`}
-      value={otp[index] && otp[index] !== ' ' ? otp[index] : ''}
-      onChange={(e) => handleOtpBoxChange(index, e)}
-      onKeyDown={(e) => handleOtpBoxKeyDown(index, e)}
-      maxLength={1}
-      autoFocus={index === 0}
-      aria-label={`OTP digit ${index + 1}`}
-    />
-  ))}
-</div>
- 
-{otpError && (
-  <div className="fp-otp-error-row">
-    <p className="fp-field-error">
-      {otpError}
-      <span className="fp-otp-error-icon"><WarningIcon /></span>
-    </p>
+                    {[0, 1, 2, 3].map((index) => (
+                      <input
+                        key={index}
+                        ref={(el) => { otpInputRefs.current[index] = el; }}
+                        type="tel"
+                        inputMode="numeric"
+                        className={`fp-otp-box ${isExpiredOtpError ? "fp-otp-box--error" : ""}`}
+                        value={otp[index] && otp[index] !== ' ' ? otp[index] : ''}
+                        onChange={(e) => handleOtpBoxChange(index, e)}
+                        onKeyDown={(e) => handleOtpBoxKeyDown(index, e)}
+                        maxLength={1}
+                        autoFocus={index === 0}
+                        aria-label={`OTP digit ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+
+              {otpError && (
+  <div className="fp-otp-error-line">
+    <span>{otpError}</span>
+    {isExpiredOtpError && <InvalidOtpIcon />}
   </div>
 )}
-                <div className="fp-resend-block"></div>
-                  <div className="fp-resend-row">
-                    <span>Didn&apos;t received it ?</span>
-                    <button
-                      type="button"
-                      className="fp-resend-link"
-                      onClick={handleResendOtp}
-                      disabled={resendSeconds > 0}
-                    >
-                      Resend OTP
-                    </button>
-                  </div>
-                  {resendSeconds > 0 && (
-                    <>
-                      <div className="fp-resend-status">
-                        <span className="fp-resend-status-label">Resend OTP</span>
-                        <span className="fp-resend-timer">
-                          <ClockIcon />
-                          00:{String(resendSeconds).padStart(2, "0")}
-                        </span>
-                      </div>
-                   
-                      <div className="fp-resend-info-banner">
-                        <span className="fp-resend-info-icon">
-                        <InfoIcon />
-                          </span>
-                            <p className="fp-resend-info-text">
-                              You can resend the otp after the timers end.
-                            </p>
-                          </div>
-                        </>
-                      )}
- 
-                  <button type="submit" className="fp-submit-btn">
-                    Verify OTP
-                  </button>
+
+<div className="fp-resend-row">
+  <span>Didn&apos;t received it ?</span>
+
+  <button
+    type="button"
+    className="fp-resend-link"
+    onClick={handleResendOtp}
+    disabled={resendSeconds > 0}
+  >
+    Resend OTP
+  </button>
+</div>
+
+<div className="fp-resend-status">
+  <span className="fp-resend-status-label">Resend OTP</span>
+
+  <span className="fp-resend-timer">
+    <ClockIcon />
+    00:{String(resendSeconds).padStart(2, "0")}
+  </span>
+</div>
+
+<div className="fp-resend-info-banner">
+  <span className="fp-resend-info-icon">
+    <InfoIcon />
+  </span>
+
+  <p className="fp-resend-info-text">
+    You can resend the otp after the timers end.
+  </p>
+</div>
+
+<button type="submit" className="fp-submit-btn">
+  Verify OTP
+</button>
                 </form>
                
                 <p className="fp-support-text">
