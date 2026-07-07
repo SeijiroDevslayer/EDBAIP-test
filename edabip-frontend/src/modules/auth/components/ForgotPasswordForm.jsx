@@ -5,8 +5,9 @@ import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
 import featureAnalytics from '../../../assets/login/feature-analytics.png';
 import checkCircle from '../../../assets/login/checkcircle.png';
-import triangleIcon from '../../../assets/login/triangleicon.png';
+import crossIcon from '../../../assets/negative-state/close-red-icon.png';
 import mailIcon from "../../../assets/login/mail.svg";
+import backCircleIcon from "../../../assets/login/back.png";
 import mobileIcon from "../../../assets/login/mobile.svg";
 import backIcon from "../../../assets/login/back.png";
 import mailIconm from "../../../assets/login/mailm.svg";
@@ -14,13 +15,18 @@ import tickIcon from "../../../assets/login/tick.png";
 import closeIcon from "../../../assets/login/close.png";
 import closedRedIcon from "../../../assets/negative-state/close-red-icon.png";
 import invalidOtpInfoIcon from "../../../assets/negative-state/err-info-icon.png";
+import expiredIcon from "../../../assets/negative-state/Vector-cross.png";
 import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
 import { verifyEmail } from "../api/mockForgotPasswordApi";
 import { verifyMobile } from "../api/mockForgetPasswordMobile";
+import closeRedIcon from "../../../assets/negative-state/close-red-icon.png";
+import infoIcon from "../../../assets/negative-state/info-icon.png";
+import redInfoIcon from "../../../assets/negative-state/red-info-icon.png";
+import { sendMockOtp, verifyMockOtp } from "../api/mockOtpApi";
 import './ForgotPasswordForm.css';
-
+ 
 const FEATURES = [
   {
     src: featureAnalytics,
@@ -43,7 +49,7 @@ const FEATURES = [
     label: "Scalable Platform",
   },
 ];
-
+ 
 const INDIA_MOBILE_REGEX = /^[6-9]\d{9}$/;
 const RESEND_SECONDS = 30;
 
@@ -57,7 +63,7 @@ function CardLogo() {
     </div>
   );
 }
-
+ 
 function MailIcon() {
   return (
     <div>
@@ -65,7 +71,7 @@ function MailIcon() {
     </div>
   );
 }
-
+ 
 function PhoneIcon() {
   return (
     <div>
@@ -73,7 +79,15 @@ function PhoneIcon() {
     </div>
   );
 }
-
+ 
+function CrossIcon() {
+  return (
+    <div>
+      <img src={crossIcon} alt="" className="fp-cross-icon"/>
+    </div>
+  );
+}
+ 
 function ArrowLeftIcon() {
   return (
     <div>
@@ -81,7 +95,7 @@ function ArrowLeftIcon() {
     </div>
   );
 }
-
+ 
 function CheckCircleIcons({ size = 14 }) {
   return (
     <div>
@@ -89,7 +103,7 @@ function CheckCircleIcons({ size = 14 }) {
     </div>
   );
 }
-
+ 
 function PhoneHandsetIcon() {
   return (
     <svg
@@ -108,7 +122,7 @@ function PhoneHandsetIcon() {
     </svg>
   );
 }
-
+ 
 function InfoIcon() {
   return (
     <svg
@@ -119,14 +133,14 @@ function InfoIcon() {
       aria-hidden="true"
     >
       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
-
+ 
       <path
         d="M12 8h.01"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
       />
-
+ 
       <path
         d="M12 12v4"
         stroke="currentColor"
@@ -144,7 +158,16 @@ function ClockIcon() {
     </svg>
   );
 }
-
+function WarningIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M12 8v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+ 
 function CloseIcon() {
   return (
     <div>
@@ -152,12 +175,31 @@ function CloseIcon() {
     </div>
   );
 }
-
+ 
 function ErrorTriangleIcon() {
   return (
     <div className="erroricon" >
       <img src={triangleIcon} alt="" className="fp-error-triangle-icon" />
     </div>
+  );
+}
+function ExpiredIcon() {
+  return (
+    <img
+      src={closeRedIcon}
+      alt=""
+      className="fp-expired-icon"
+    />
+  );
+}
+
+function InvalidOtpIcon() {
+  return (
+    <img
+      src={redInfoIcon}
+      alt=""
+      className="fp-invalid-otp-icon"
+    />
   );
 }
 function MailIconm() {
@@ -170,7 +212,7 @@ function MailIconm() {
 function CheckCircleIcontick() {
   return (
     <div >
-      <img src={mailIconm} alt="" className="fp-mail-tick-icon" />
+      <img src={tickIcon} alt="" className="fp-check-tick-icon" />
     </div>
   );
 }
@@ -182,28 +224,32 @@ function ForgotPasswordForm() {
   const [emailError, setEmailError] = useState("");
   const [mobile, setMobile] = useState("");
   const [mobileError, setMobileError] = useState("");
-
+ 
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState("");
   const [invalidOtp, setInvalidOtp] = useState(false);
+  const [otpInvalid, setOtpInvalid] = useState(false);
   const [resendSeconds, setResendSeconds] = useState(0);
-  const [isOtpExpired, setIsOtpExpired] = useState(false);
-  const [showOtpExpiredToast, setShowOtpExpiredToast] = useState(false);
 
   const [toast, setToast] = useState(null);
-
+ 
   const otpInputRefs = useRef([]);
-
 
   const destination = method === "email" ? email : `+91 ${mobile}`;
 
+  // Mobile OTP expired state: timer reached 00:00 on mobile OTP screen
+  const isMobileOtpExpired = step === "verify" && method === "mobile" && resendSeconds <= 0;
+
+  // Used to show Figma red OTP border and Invalid OTP icon
+  const isExpiredOtpError = otpError === "Invalid OTP";
+
   useEffect(() => {
     if (step !== "verify" || resendSeconds <= 0) return undefined;
-
+ 
     const timer = setTimeout(() => {
       setResendSeconds((seconds) => seconds - 1);
     }, 1000);
-
+    
     return () => clearTimeout(timer);
   }, [step, resendSeconds]);
 
@@ -228,19 +274,19 @@ function ForgotPasswordForm() {
     setMobileError("");
     setToast(null);
   };
-
+ 
   const handleMobileChange = (e) => {
     const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
     setMobile(digits);
     if (mobileError) setMobileError("");
   };
-
+ 
   const handleOtpChange = (e) => {
     const digits = e.target.value.replace(/\D/g, "").slice(0, 4);
     setOtp(digits);
     if (otpError) setOtpError("");
   };
-
+ 
   const handleOtpBoxChange = (index, e) => {
     const val = e.target.value.replace(/\D/g, '').slice(-1);
     const chars = otp.padEnd(4, ' ').split('');
@@ -248,11 +294,12 @@ function ForgotPasswordForm() {
     const newOtp = chars.join('').trimEnd();
     setOtp(newOtp);
     if (otpError) setOtpError('');
+    if (otpInvalid) setOtpInvalid(false);
     if (val && index < 3) {
       otpInputRefs.current[index + 1]?.focus();
     }
   };
-
+ 
   const handleOtpBoxKeyDown = (index, e) => {
     if (e.key === 'Backspace') {
       if (!otp[index] && index > 0) {
@@ -275,32 +322,50 @@ function ForgotPasswordForm() {
     }
   }, [otp]);
 
-  const sendOtp = () => {
-    console.log("OTP requested via", method, destination);
+  useEffect(() => {
+    if (otp.length === 0) {
+      setShowOtpExpiredToast(false);
+      setToast(null);
+      setOtpError("");
+      
+    }
+  }, [otp]);
 
-    setOtp("");
-    setOtpError("");
-    setStep("verify");
-    setResendSeconds(RESEND_SECONDS);
+const sendOtp = async () => {
+  console.log("OTP requested via", method, destination);
+
+  await sendMockOtp();
+
+  setOtp("");
+  setOtpError("");
+  setStep("verify");
+
+  setResendSeconds(RESEND_SECONDS);
+
     setIsOtpExpired(false);
     setShowOtpExpiredToast(false);
-    setToast({
-      type: 'success',
-      title: 'OTP Send Successfully !',
-      message: 'A 4-digit OTP has been send to',
-      destination,
-    });
-  };
+  setToast({
+    type: "success",
+    title: "OTP Send Successfully !",
+    message: "A 4-digit OTP has been send to",
+    destination,
+  });
+};
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
-
+ 
     if (method === "mobile") {
       if (!INDIA_MOBILE_REGEX.test(mobile)) {
         setMobileError("Enter a valid 10-digit Indian mobile number");
+        setToast({
+          type: "error",
+          title: "Invalid Mobile Number",
+          message: "Please enter a valid 10-digit Indian mobile number.",
+        });
         return;
       }
-
+ 
       try {
         const res = await verifyMobile(mobile);
         if (!res || res.success === false) {
@@ -322,13 +387,13 @@ function ForgotPasswordForm() {
         return;
       }
     }
-
+ 
     try {
       if (method === "email") {
         await verifyEmail(email);
       }
       setEmailError("");
-      sendOtp();
+      await sendOtp();
     } catch (err) {
       setEmailError("We couldn't find an account with this email address.");
       setToast({
@@ -338,25 +403,32 @@ function ForgotPasswordForm() {
       });
     }
   };
-  const handleResendOtp = () => {
-    if (resendSeconds > 0) return;
+const handleResendOtp = async () => {
+  if (resendSeconds > 0) return;
 
-    console.log("Resending OTP via", method, destination);
+  console.log("Resending OTP via", method, destination);
 
-    setOtp("");
-    setOtpError("");
-    setResendSeconds(RESEND_SECONDS);
+  await sendMockOtp();
+
+  setOtp("");
+  setOtpError("");
+
+  // Only resend timer again
+  setResendSeconds(RESEND_SECONDS);
     setIsOtpExpired(false);
     setShowOtpExpiredToast(false);
-    setToast({
-      title: 'OTP Resent Successfully !',
-      message: 'A new 4-digit OTP has been send to',
-      destination,
-    });
-  };
 
-  const handleVerifyOtp = (e) => {
-    e.preventDefault();
+  setToast({
+    type: "success",
+    title: "OTP Resent Successfully !",
+    message: "A new 4-digit OTP has been send to",
+    destination,
+  });
+};
+
+
+const handleVerifyOtp = async (e) => {
+  e.preventDefault();
     if (isOtpExpired) {
       setShowOtpExpiredToast(true);
       
@@ -364,24 +436,51 @@ function ForgotPasswordForm() {
       return;
     }
 
-    if (otp.length !== 4) {
-      setOtpError("Enter the 4-digit OTP sent to you");
+  if (otp.length !== 4) {
+    setOtpError("Enter the 4-digit OTP sent to you");
+
+    return;
+  }
+
+  const verifyResponse = await verifyMockOtp(otp);
+
+  if (!verifyResponse.success) {
+    if (verifyResponse.reason === "OTP_EXPIRED") {
+      setOtpError("Invalid OTP");
+
+      setToast({
+        type: "expired",
+        title: "OTP Expired",
+        message: "Your verification code has expired.\nPlease request a new OTP.",
+      });
 
       return;
     }
 
+    if (verifyResponse.reason === "INVALID_OTP") {
+      setOtpError("Invalid OTP");
+      return;
+    }
 
-    setToast({
-      title: 'OTP Verified Successfully !',
-      message: 'You can now create a new password for your account.',
-    });
-
-    setTimeout(() => {
-      navigate('/create-new-password', {
-        state: { otpVerified: true, destination, method },
-      });
-    }, 1500);
+    setOtpError("Invalid OTP");
+    return;
   }
+
+  setOtpError("");
+
+
+  setToast({
+    type: "success",
+    title: "OTP Verified Successfully !",
+    message: "You can now create a new password for your account.",
+  });
+
+  setTimeout(() => {
+    navigate("/create-new-password", {
+      state: { otpVerified: true, destination, method },
+    });
+  }, 1500);
+};
 
   const handleChangeDestination = () => {
     setStep("request");
@@ -389,26 +488,26 @@ function ForgotPasswordForm() {
     setOtpError("");
     setToast(null);
   };
-
+ 
   return (
-    <div className="fp-container">
+    <div className={`fp-container ${step === "verify" ? "fp-container--verify" : ""}`}>
       <div className="fp-background">
         <img src={backgroundImg} alt="" className="fp-background-image" />
       </div>
-
+ 
       <div className="fp-content">
         <div className="fp-left-section">
           <img src={logoImg} alt="EDABIP" className="fp-brand-logo" />
-
+ 
           <h1 className="fp-welcome-heading">
             Welcome to your Analytics Dashboard
           </h1>
-
+ 
           <p className="fp-welcome-description">
             Track performance, analyze data, and make smarter business decisions
             in real-time.
           </p>
-
+ 
           <div className="fp-features-container">
             {FEATURES.map((feature) => (
               <div key={feature.alt} className="fp-feature-item">
@@ -417,13 +516,13 @@ function ForgotPasswordForm() {
                   alt={feature.alt}
                   className="fp-feature-badge"
                 />
-
+ 
                 <span className="fp-feature-label">{feature.label}</span>
               </div>
             ))}
           </div>
         </div>
-
+ 
         <div className="fp-right-section">
           <div className="fp-card-wrapper">
             {isOtpExpired && showOtpExpiredToast && (
@@ -457,18 +556,24 @@ function ForgotPasswordForm() {
             )}
             {toast && (
               <div
-                className={`fp-toast ${toast?.type === 'error' ? 'fp-toast-error' : ''}`}
+                className={`fp-toast ${toast?.type === "error" ? "fp-toast-error" : ""} ${toast?.type === "expired" ? "fp-toast-expired" : ""}`}
                 role="status"
               >
                 <span className={`fp-toast-icon ${toast?.type === 'error' ? 'fp-toast-icon-error' : ''}`}>
-                  {toast?.type === 'error' ? <ErrorTriangleIcon /> : <CheckCircleIcontick />}
+                  {toast?.type === "expired" ? (
+                    <ExpiredIcon />
+                  ) : toast?.type === 'error' ? (
+                    <ErrorTriangleIcon />
+                  ) : (
+                    <CheckCircleIcontick />
+                  )}
                 </span>
-
-
-
+ 
+ 
+ 
                 <div className="fp-toast-content">
                   <p className="fp-toast-title">{toast.title}</p>
-
+ 
                   <p className="fp-toast-message">
                     {toast.message}
                     {toast.destination && (
@@ -479,7 +584,7 @@ function ForgotPasswordForm() {
                     )}
                   </p>
                 </div>
-
+ 
                 <button
                   type="button"
                   className="fp-toast-close"
@@ -491,8 +596,7 @@ function ForgotPasswordForm() {
               </div>
             )}
 
-          <div className="fp-card">
-            <CardLogo />
+          <div className={`fp-card ${step === "verify" ? "fp-card--verify" : ""}`}>
             <a href="/" className="fp-back-link">
               <span className="fp-back-icon-circle">
                 <ArrowLeftIcon />
@@ -500,7 +604,7 @@ function ForgotPasswordForm() {
               Back to Sign in
             </a>
 
-            
+            <CardLogo />
             
             {step === "request" && (
               <>
@@ -556,13 +660,8 @@ function ForgotPasswordForm() {
                           aria-invalid={Boolean(emailError)}
                           required
                         />
-                         {emailError && (
-                        <span className="fp-input-status-icon">
-                        <CheckCircleIcons />
-                        </span>
-                        )}
                       </div>
-
+ 
                       {emailError ? (
                         <>
                           <p className="fp-field-error">{emailError}</p>
@@ -571,6 +670,7 @@ function ForgotPasswordForm() {
                               <InfoIcon />
                             </span>
                             <div className="fp-error-info-text">
+                              <p className="fp-error-info-title">What does this means?</p>
                               <p className="fp-error-info-description">
                                 Please check your email and try again. If you still have trouble, contact support
                               </p>
@@ -778,5 +878,4 @@ function ForgotPasswordForm() {
     </div>
   );
 }
-
 export default ForgotPasswordForm;
