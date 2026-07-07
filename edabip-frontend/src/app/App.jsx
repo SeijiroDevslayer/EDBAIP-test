@@ -8,6 +8,7 @@ import CreateNewPasswordPage from '../modules/auth/pages/CreateNewPasswordPage';
 import PasswordResetSuccessPage from '../modules/auth/pages/PasswordResetSuccessPage';
 import SessionExpiredPage from '../modules/auth/pages/SessionExpiredPage';
 import DashboardPage from '../modules/dashboard/pages/DashboardPage.jsx';
+import AccountLockedPage from '../modules/auth/pages/AccountLockedPage';
 
 function App() {
   return (
@@ -19,9 +20,22 @@ function App() {
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/create-new-password" element={<CreateNewPasswordPage />} />
-            <Route path="/password-reset-success" element={<PasswordResetSuccessPage />} />
-            <Route path="/session-expired" element={<SessionExpiredPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route
+              path="/password-reset-success"
+              element={<PasswordResetSuccessPage />}
+            />
+            <Route
+              path="/session-expired"
+              element={<SessionExpiredPage />}
+            />
+            <Route
+              path="/dashboard"
+              element={<DashboardPage />}
+            />
+            <Route
+              path="/account-locked"
+              element={<AccountLockedPage />}
+            />
           </Routes>
         </SessionTimeout>
       </AuthProvider>

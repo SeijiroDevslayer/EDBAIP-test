@@ -1,0 +1,362 @@
+/* ══════════════════════════════
+   Page shell
+══════════════════════════════ */
+.al-page {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: "Poppins", "Inter", "Segoe UI", sans-serif;
+  background-color: #f2f1fc;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Content row — fixed Figma canvas, centered, scaled via JS */
+.al-row {
+  position: relative;
+  width: 1535px;
+  height: 1024px;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════
+   LEFT — branding
+══════════════════════════════ */
+.al-left {
+  position: absolute;
+  left: 109px;
+  top: 187px;
+  width: 375px;
+  height: 514px;
+  display: flex;
+  flex-direction: column;
+}
+
+.al-logo {
+  width: 160px;
+  height: 58px;
+  object-fit: contain;
+  object-position: left center;
+  margin-bottom: 20px;
+}
+
+.al-heading {
+  font-family: "Poppins", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e2060;
+  line-height: 1.25;
+  margin: 0 0 10px;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+
+.al-heading-accent {
+  color: #343495;
+}
+
+.al-desc {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  color: #343495;
+  margin: 0 0 24px;
+  max-width: 300px;
+}
+
+/* ── Feature list ── */
+.al-features {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.al-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.al-feat-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.al-feat-title {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #33339f;
+  line-height: 1.3;
+  margin: 2px 0 3px;
+}
+
+.al-feat-desc {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  color: #33339f;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 220px;
+}
+
+/* ══════════════════════════════
+   CENTER — card column
+══════════════════════════════ */
+.al-card-col {
+  position: absolute;
+  /* left: 34.2%; */
+  left: 526px;
+  /* top: 13.7%; */
+  top: 140px;
+}
+
+.al-card {
+  width: 483px;
+  min-height: 743px;
+  background: #2f2f9a;
+  border-radius: 20px;
+  padding: 44px 63px 44px;
+  box-shadow: 0 20px 60px rgba(47, 47, 154, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Lock icon circle */
+.al-lock-circle {
+  width: 153px;
+  height: 153px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(80, 80, 180, 0.45) 0%,
+    rgba(47, 47, 154, 0.25) 60%,
+    transparent 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+
+.al-lock-img {
+  width: 105px;
+  height: 105px;
+  object-fit: contain;
+}
+
+/* Card text */
+.al-title {
+  font-family: "Poppins", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 6px;
+  line-height: 1.25;
+  letter-spacing: -0.3px;
+}
+
+.al-error {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 26px;
+  letter-spacing: -0.22px;
+  text-align: center;
+  color: #f8404d;
+  margin: 0 0 5px;
+}
+
+.al-sub {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: -0.15px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 22px;
+}
+
+/* Info box */
+.al-info {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(15, 21, 85, 0.55);
+  border: 1px solid #5a7cc5;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 24px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.al-info-icon {
+  flex-shrink: 0;
+  color: #f3517e;
+  margin-top: 2px;
+  display: flex;
+  width: 22px;
+  height: 22px;
+}
+
+.al-info-title {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 22px;
+  letter-spacing: -0.14px;
+  color: #ffffff;
+  margin: 0 0 4px;
+}
+
+.al-info-desc {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: -0.13px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+/* ── Buttons ── */
+.al-btn {
+  /* width: 100%; */
+  width: 346px;
+  height: 44px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+  margin-bottom: 0;
+  box-sizing: border-box;
+  border: 1px solid #ffffff;
+}
+
+/* White "Reset Password" */
+.al-btn-white {
+  background: #ffffff;
+  color: #33339f;
+  border: none;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: -0.15px;
+  margin-bottom: 33px;
+}
+
+.al-btn-white:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+}
+
+/* Dark "Try Again" */
+.al-btn-dark {
+  background: rgba(15, 21, 85, 0.55);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  margin-bottom: 22px;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.al-btn-dark:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+/* Footer */
+.al-footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 20px;
+  color: rgba(255, 255, 255, 0.65);
+  text-align: left;
+  margin: 0;
+}
+
+.al-footer svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  width: 14px;
+  height: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.al-contact {
+  color: #5ce1e6;
+  font-weight: 600;
+}
+
+/* ══════════════════════════════
+   Responsive
+══════════════════════════════ */
+@media (max-width: 1200px) {
+  .al-left {
+    left: 4%;
+    width: 300px;
+  }
+  .al-card-col {
+    left: 32%;
+  }
+  .al-card {
+    width: 420px;
+    padding: 44px 48px 44px;
+  }
+}
+
+@media (max-width: 768px) {
+  .al-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 20px 48px;
+    gap: 28px;
+    height: auto;
+  }
+  .al-left {
+    position: static;
+    transform: none;
+    width: 100%;
+  }
+  .al-card-col {
+    position: static;
+    transform: none;
+    width: 100%;
+  }
+  .al-card {
+    width: 100%;
+    padding: 28px 24px 24px;
+  }
+}

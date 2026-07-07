@@ -46,24 +46,31 @@ function CardLogo() {
 }
 
 function LoginForm() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({
-    email: '',
-    password: '',
-  });
-  const [showLoginFailed, setShowLoginFailed] = useState(false);
-  const [attemptsRemaining, setAttemptsRemaining] = useState(null);
-  const [isLocked, setIsLocked] = useState(false);
-  const { login } = useAuthContext();
-  const navigate = useNavigate();
+const [errors, setErrors] = useState({
+  email: '',
+  password: '',
+});
+
+const [showLoginFailed, setShowLoginFailed] = useState(false);
+const [attemptsRemaining, setAttemptsRemaining] = useState(null);
+const [isLocked, setIsLocked] = useState(false);
+
+//  Account Locked logic
+const [loginError, setLoginError] = useState('');
+const [failedAttempts, setFailedAttempts] = useState(0);
+const { login } = useAuthContext();
+
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+  
     let emailError = '';
     let passwordError = '';
 
@@ -87,9 +94,20 @@ function LoginForm() {
       const result = await login({ email, password });
 
       if (result.success) {
+        setFailedAttempts(0);
+        setLoginError('');
         navigate('/dashboard');
         return;
       }
+      const updatedAttempts = failedAttempts + 1;
+      setFailedAttempts(updatedAttempts);
+
+      if (updatedAttempts >= 5 || result.locked) {
+        navigate('/account-locked');
+        return;
+      }
+
+      setLoginError(`Invalid credentials. Attempt ${updatedAttempts} of 5`);
 
       setIsLocked(!!result.locked);
       setAttemptsRemaining(result.attemptsRemaining ?? null);
@@ -397,6 +415,11 @@ function LoginForm() {
                   Forgot Password?
                 </a>
               </div>
+              {loginError && (
+                <div className="login-error">
+                  {loginError}
+                </div>
+              )}
 
               <button
                 type="submit"
