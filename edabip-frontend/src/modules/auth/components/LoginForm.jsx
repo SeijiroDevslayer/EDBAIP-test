@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import backgroundImg from '../../../assets/login/background.png';
 import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
@@ -41,12 +42,37 @@ function CardLogo() {
 }
 
 function LoginForm() {
+   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [failedAttempts, setFailedAttempts] = useState(0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+     const isValidUser = false;
+
+    if (!isValidUser) {
+      const updatedAttempts = failedAttempts + 1;
+
+      setFailedAttempts(updatedAttempts);
+
+      if (updatedAttempts >= 5) {
+        navigate('/account-locked');
+        return;
+      }
+
+      setLoginError(
+        `Invalid credentials. Attempt ${updatedAttempts} of 5`
+      );
+
+      return;
+    }
+
+    setFailedAttempts(0);
+    setLoginError('');
+  
 
     console.log('Login submitted:', {
       email,
@@ -307,6 +333,11 @@ function LoginForm() {
                 </a>
 
               </div>
+              {loginError && (
+                <div className="login-error">
+                  {loginError}
+                </div>
+              )}
 
               <button
                 type="submit"
