@@ -227,6 +227,7 @@ function ForgotPasswordForm() {
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState("");
   const [resendSeconds, setResendSeconds] = useState(0);
+  const [otpExpiresAt, setOtpExpiresAt] = useState(null);
   const [isVerificationOtpExpired, setIsVerificationOtpExpired] = useState(false);
   const [showVerificationOtpExpiredToast, setShowVerificationOtpExpiredToast] = useState(false);
 
@@ -253,10 +254,25 @@ function ForgotPasswordForm() {
   }, [step, resendSeconds]);
 
   useEffect(() => {
-    if (step === "verify" && resendSeconds === 0) {
+    if (step !== "verify") return undefined;
+
+    if (resendSeconds <= 0) {
       setIsVerificationOtpExpired(true);
+      return undefined;
     }
-  }, [step, resendSeconds]);
+
+    if (!otpExpiresAt) return undefined;
+
+    const syncOtpExpiry = () => {
+      setIsVerificationOtpExpired(Date.now() >= otpExpiresAt);
+    };
+
+    syncOtpExpiry();
+
+    const expiryTimer = window.setInterval(syncOtpExpiry, 1000);
+
+    return () => window.clearInterval(expiryTimer);
+  }, [step, resendSeconds, otpExpiresAt]);
 
   useEffect(() => {
     document.documentElement.scrollTop = 0;
@@ -269,6 +285,8 @@ function ForgotPasswordForm() {
     setStep("request");
     setOtp("");
     setOtpError("");
+    setOtpExpiresAt(null);
+    setIsVerificationOtpExpired(false);
     setEmailError("");
     setMobileError("");
     setToast(null);
@@ -312,25 +330,22 @@ function ForgotPasswordForm() {
   };
 
   useEffect(() => {
-    if (otp.length === 0) {
+    if (otp.length > 0 && showVerificationOtpExpiredToast) {
       setShowVerificationOtpExpiredToast(false);
-      setToast(null);
-      setOtpError("");
-
     }
-  }, [otp]);
+  }, [otp, showVerificationOtpExpiredToast]);
 
   const sendOtp = async () => {
     console.log("OTP requested via", method, destination);
 
-    await sendMockOtp();
+    const otpResponse = await sendMockOtp();
 
     setOtp("");
     setOtpError("");
     setStep("verify");
 
     setResendSeconds(RESEND_SECONDS);
-
+    setOtpExpiresAt(otpResponse?.expiresAt ?? Date.now() + OTP_EXPIRY_SECONDS * 1000);
     setIsVerificationOtpExpired(false);
     setShowVerificationOtpExpiredToast(false);
     setToast({
@@ -397,13 +412,13 @@ function ForgotPasswordForm() {
 
     console.log("Resending OTP via", method, destination);
 
-    await sendMockOtp();
+    const otpResponse = await sendMockOtp();
 
     setOtp("");
     setOtpError("");
 
-    // Only resend timer again
     setResendSeconds(RESEND_SECONDS);
+    setOtpExpiresAt(otpResponse?.expiresAt ?? Date.now() + OTP_EXPIRY_SECONDS * 1000);
     setIsVerificationOtpExpired(false);
     setShowVerificationOtpExpiredToast(false);
 
@@ -418,10 +433,15 @@ function ForgotPasswordForm() {
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-    if (isVerificationOtpExpired) {
+    if (resendSeconds <= 0 || isVerificationOtpExpired) {
+      setIsVerificationOtpExpired(true);
       setShowVerificationOtpExpiredToast(true);
-
       setOtpError("invalid OTP");
+      setToast({
+        type: "expired",
+        title: "OTP Expired",
+        message: "Your verification code has expired.\nPlease request a new OTP.",
+      });
       return;
     }
 
@@ -435,6 +455,9 @@ function ForgotPasswordForm() {
 
     if (!verifyResponse.success) {
       if (verifyResponse.reason === "OTP_EXPIRED") {
+        setOtpExpiresAt(Date.now());
+        setIsVerificationOtpExpired(true);
+        setShowVerificationOtpExpiredToast(true);
         setOtpError("Invalid OTP");
 
         setToast({
@@ -586,14 +609,16 @@ function ForgotPasswordForm() {
             )}
 
             <div className={`fp-card ${step === "verify" ? "fp-card--verify" : ""}`}>
+              
+
+              <CardLogo />
+
               <a href="/" className="fp-back-link">
                 <span className="fp-back-icon-circle">
                   <ArrowLeftIcon />
                 </span>
                 Back to Sign in
               </a>
-
-              <CardLogo />
 
               {step === "request" && (
                 <>
@@ -836,7 +861,7 @@ function ForgotPasswordForm() {
                             <InfoIcon />
                           </span>
                           <p className="fp-resend-info-text">
-                            Your OTP has expired. Please request a new OTP.
+                           You can resend the otp after the timers end. 
                           </p>
                         </div>
                       ) : null}
