@@ -197,57 +197,46 @@ function CreateNewPasswordForm() {
   //   }
   // }, [location.state, navigate]);
 
-const handleSubmit = (e) => {
-  e.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  // Password mismatch
-  if (password !== confirmPassword) {
-  setShowToast(true);
-  return;
-}
+    let hasError = false;
 
-  // Password strength
-  if (strength.level !== "Strong") {
-    setPasswordError("Password is too weak.");
-    return;
-  }
+    if (strength.level !== 'Strong') {
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 4000);
+      hasError = true;
+    }
 
-  navigate("/password-reset-success", { replace: true });
-};
+    if (confirmPassword !== password) {
+      setConfirmPasswordError('Passwords do not match');
+      hasError = true;
+    } else {
+      setConfirmPasswordError('');
+    }
+
+    if (hasError) return;
+
+    navigate('/password-reset-success', { replace: true });
+  };
 
   const strengthColors = { Weak: '#EF4444', Fair: '#F97316', Good: '#EAB308', Strong: '#22C55E' };
   const strengthColor = strengthColors[strength.level] || '#E5E7EB';
 
   return (
     <div className="cnp-container">
-     {showToast && (
-  <div className="cnp-toast">
-    <div className="cnp-toast-icon">
-      <img
-        src={warningImg}
-        alt="warning"
-        style={{ width: 35, height: 35 }}
-      />
-    </div>
-
-    <div className="cnp-toast-body">
-      <p className="cnp-toast-title">
-        Password Mismatch
-      </p>
-
-      <p className="cnp-toast-message">
-        Please enter the same password in both fields.
-      </p>
-    </div>
-
-    <button
-      className="cnp-toast-close"
-      onClick={() => setShowToast(false)}
-    >
-      ×
-    </button>
-  </div>
-)}
+      {showToast && (
+        <div className="cnp-toast">
+          <div className="cnp-toast-icon">
+            <img src={warningImg} alt="warning" style={{ width: 35, height: 35 }} />
+          </div>
+          <div className="cnp-toast-body">
+            <p className="cnp-toast-title">Weak Password</p>
+            <p className="cnp-toast-message">Your password is too weak. Please follow the password requirements shown above.</p>
+          </div>
+          <button className="cnp-toast-close" onClick={() => setShowToast(false)}>×</button>
+        </div>
+      )}
 
       <div className="cnp-background">
         <img
