@@ -9,6 +9,7 @@ import PasswordResetSuccessPage from '../modules/auth/pages/PasswordResetSuccess
 import SessionExpiredPage from '../modules/auth/pages/SessionExpiredPage';
 import DashboardPage from '../modules/dashboard/pages/DashboardPage.jsx';
 import AccountLockedPage from '../modules/auth/pages/AccountLockedPage';
+import LandingPage from '../modules/landing-page/Landing-Page.jsx';
 
 function App() {
   return (
@@ -35,6 +36,10 @@ function App() {
             <Route
               path="/account-locked"
               element={<AccountLockedPage />}
+            />
+            <Route
+              path="/landing-page"
+              element={<LandingPage />}
             />
           </Routes>
         </SessionTimeout>
