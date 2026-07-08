@@ -87,6 +87,14 @@ function CrossIcon() {
   );
 }
 
+function ClosedRedIcon(){
+  return (
+    <div>
+      <img src={closeRedIcon} alt="" className='fp-closered-icon'/>
+    </div>
+  )
+}
+
 function ArrowLeftIcon() {
   return (
     <div>
@@ -471,6 +479,11 @@ function ForgotPasswordForm() {
 
       if (verifyResponse.reason === "INVALID_OTP") {
         setOtpError("Invalid OTP");
+        setToast({
+          type: "invalid",
+          title: "OTP Verified Unsuccessfully",
+          message: "We couldn't verify the OTP you entered.\nPlease check the code and try again.",
+        });
         return;
       }
 
@@ -568,30 +581,46 @@ function ForgotPasswordForm() {
             )}
             {toast && (
               <div
-                className={`fp-toast ${toast?.type === "error" ? "fp-toast-error" : ""} ${toast?.type === "expired" ? "fp-toast-expired" : ""}`}
+                className={`fp-toast ${
+                  toast?.type === "error" ? "fp-toast-error" : ""
+                } ${toast?.type === "expired" ? "fp-toast-expired" : ""} ${
+                  toast?.type === "invalid" ? "fp-toast-invalid" : ""
+                }`}
                 role="status"
               >
-                <span className={`fp-toast-icon ${toast?.type === 'error' ? 'fp-toast-icon-error' : ''}`}>
+                <span
+                  className={`fp-toast-icon ${
+                    toast?.type === "error" || toast?.type === "invalid"
+                      ? "fp-toast-icon-error"
+                      : ""
+                  }`}
+                >
                   {toast?.type === "expired" ? (
                     <ExpiredIcon />
-                  ) : toast?.type === 'error' ? (
+                  ) : toast?.type === "invalid" ? (
+                    <ClosedRedIcon />
+                  ) : toast?.type === "error" ? (
                     <ErrorTriangleIcon />
                   ) : (
                     <CheckCircleIcontick />
                   )}
                 </span>
 
-
-
                 <div className="fp-toast-content">
                   <p className="fp-toast-title">{toast.title}</p>
-
                   <p className="fp-toast-message">
-                    {toast.message}
+                    {toast.message.split("\n").map((line, i) => (
+                      <span key={i}>
+                        {line}
+                        <br />
+                      </span>
+                    ))}
                     {toast.destination && (
                       <>
                         <br />
-                        <strong className="fp-toast-destination">{toast.destination}</strong>
+                        <strong className="fp-toast-destination">
+                          {toast.destination}
+                        </strong>
                       </>
                     )}
                   </p>
