@@ -182,7 +182,7 @@
 .su-card {
   width: 483px;
   max-width: 483px;
-  min-height: 850px;
+  max-height: 860px;
   background: #2f2f9a;
   border-radius: 20px;
   padding: 36px 56px 28px;
@@ -241,7 +241,7 @@
 }
 
 .su-input-wrapper {
-  position: relative;
+  position: relative; 
   display: flex;
   align-items: center;
 }
@@ -249,22 +249,34 @@
 .su-input-icon {
   position: absolute;
   left: 14px;
-  color: rgba(255, 255, 255, 0.45);
+  color: #ffffff;
   pointer-events: none;
-  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
 }
 
 .su-input-wrapper input {
   width: 100%;
   padding: 12px 44px 12px 44px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 8px;
-  font-size: 14px;
+  border: 1px solid #ffffff;
+  border-radius: 5px;
+  font-size: 11px;
+  line-height: 24px;
   outline: none;
   background: rgba(20, 28, 100, 0.55);
   color: #ffffff;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   font-family: 'Inter', sans-serif;
+}
+.su-check-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .su-input-wrapper input::placeholder {
@@ -288,10 +300,14 @@
   align-items: center;
   justify-content: center;
 }
+.su-pw-toggle-error {
+  right: 30px; 
+}
 
 .su-field-error {
   font-size: 12px;
-  color: #ff6b6b;
+    min-height: 12px;
+  color: #f8404D;
   font-weight: 400;
   margin-top: -2px;
   font-family: 'Inter', sans-serif;
@@ -371,10 +387,11 @@
 .su-divider {
   display: flex;
   align-items: center;
-  margin: 16px 0;
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 12px;
+  margin: 10px 0;
+  color: #ffffff;
+  font-size: 8px;
   font-weight: 500;
+
 }
 
 .su-divider::before,
@@ -382,15 +399,15 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: rgba(255, 255, 255, 0.15);
+  background: #8F90BA;
 }
 
 .su-divider span {
-  padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0 5px;
+  border: 1px solid #8F90BA;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -403,7 +420,8 @@
   background: #0a0a0a;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  font-size: 13.5px;
+  font-size: 14px;
+  line-height: 24px;
   font-weight: 500;
   color: #ffffff;
   cursor: pointer;
@@ -413,14 +431,17 @@
   gap: 10px;
   font-family: 'Inter', sans-serif;
 }
-
+.su-sso-icon{
+  width: 20px;
+  height: 20px;
+}
 .su-btn-icon {
   flex-shrink: 0;
 }
 
 .su-signin-text {
   text-align: center;
-  margin-top: 16px;
+  margin-top: 9px;
   font-size: 12.5px;
   color: rgba(255, 255, 255, 0.65);
   font-family: 'Inter', sans-serif;
@@ -509,8 +530,358 @@
 
 
 
-@media (max-width: 1535px), (max-height: 1024px) {
-  .su-content {
-    transform: scale(min(calc(100vw / 1535), calc(100vh / 1024)));
+
+@media (max-width:1280px){
+
+  .su-left{
+    left:30px;
+    width:360px;
   }
+
+  .su-heading{
+    font-size:28px;
+    width:340px;
+  }
+
+  .su-subheading{
+    font-size:17px;
+  }
+
+  .su-feature-item{
+    gap:18px;
+  }
+
+  .su-feature-icon{
+    width:46px;
+    height:46px;
+  }
+
+  .su-right{
+    width:450px;
+  }
+
+  .su-card{
+    width:100%;
+    padding:32px 42px;
+  }
+
+  .su-error-notification{
+    width:360px;
+  }
+
+}
+
+
+
+@media (max-width:1024px){
+
+  .su-container{
+    overflow-y:auto;
+  }
+
+  .su-content{
+
+    transform:none !important;
+
+    width:100%;
+    max-width:700px;
+    min-height:auto;
+    height:auto;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    padding:40px 24px 60px;
+
+    position:relative;
+  }
+
+  .su-left,
+  .su-right{
+
+    position:relative;
+
+    left:auto;
+    right:auto;
+    top:auto;
+
+    width:100%;
+  }
+
+  .su-left{
+
+    text-align:center;
+    margin-bottom:40px;
+  }
+
+  .su-brand-logo{
+
+    margin:0 auto;
+  }
+
+  .su-heading,
+  .su-subheading,
+  .su-features{
+
+    position:static;
+  }
+
+  .su-heading{
+
+    width:100%;
+    margin-top:30px;
+    margin-bottom:15px;
+    white-space:normal;
+  }
+
+  .su-subheading{
+
+    width:100%;
+    height:auto;
+    margin-bottom:35px;
+  }
+
+  .su-features{
+
+    width:100%;
+    height:auto;
+
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+  }
+
+  .su-feature-item{
+
+    position:static;
+    width:100% !important;
+    height:auto !important;
+  }
+
+  .su-card{
+
+    width:100%;
+    max-width:480px;
+    margin:auto;
+  }
+
+  .su-error-notification{
+
+    position:fixed;
+
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+
+    width:92%;
+    max-width:430px;
+
+    z-index:9999;
+  }
+
+}
+
+
+
+@media (max-width:768px){
+
+  .su-content{
+
+    padding:24px 18px 40px;
+  }
+
+  .su-brand-logo{
+
+    width:160px;
+    height:auto;
+  }
+
+  .su-heading{
+
+    font-size:26px;
+    line-height:34px;
+  }
+
+  .su-subheading{
+
+    font-size:16px;
+    line-height:24px;
+  }
+
+  .su-card{
+
+    padding:28px 22px;
+    border-radius:18px;
+  }
+
+  .su-card-title{
+
+    font-size:26px;
+    line-height:32px;
+  }
+
+  .su-card-subtitle{
+
+    font-size:13px;
+  }
+
+  .su-input-wrapper input{
+
+    padding:12px 44px 12px 42px;
+  }
+
+  .su-submit-btn{
+
+    font-size:14px;
+  }
+
+  .su-sso-btn{
+
+    font-size:13px;
+  }
+
+  .su-error-notification{
+
+    height:auto;
+    min-height:80px;
+    padding:16px;
+  }
+
+  .su-error-icon{
+
+    left:16px;
+    top:22px;
+  }
+
+  .su-error-message{
+
+    position:relative;
+
+    left:60px;
+    top:0;
+
+    width:calc(100% - 80px);
+    height:auto;
+  }
+
+  .su-error-close{
+
+    top:12px;
+    right:14px;
+  }
+
+}
+
+
+
+@media (max-width:480px){
+
+  .su-content{
+
+    padding:20px 14px 35px;
+  }
+
+  .su-brand-logo{
+
+    width:140px;
+  }
+
+  .su-heading{
+
+    font-size:22px;
+    line-height:30px;
+  }
+
+  .su-subheading{
+
+    font-size:14px;
+    line-height:22px;
+  }
+
+  .su-feature-icon{
+
+    width:42px;
+    height:42px;
+  }
+
+  .su-feature-title{
+
+    font-size:14px;
+  }
+
+  .su-feature-desc{
+
+    font-size:11px;
+  }
+
+  .su-card{
+
+    padding:22px 18px;
+  }
+
+  .su-card-title{
+
+    font-size:22px;
+    line-height:28px;
+  }
+
+  .su-form{
+
+    gap:12px;
+  }
+
+  .su-form-group label{
+
+    font-size:12px;
+  }
+
+  .su-input-wrapper input{
+
+    font-size:12px;
+  }
+
+  .su-submit-btn{
+
+    padding:12px;
+  }
+
+}
+
+
+
+@media (max-height:700px){
+
+  .su-content{
+
+    padding-top:24px;
+    padding-bottom:30px;
+  }
+
+  .su-brand-logo{
+
+    width:160px;
+  }
+
+  .su-heading{
+
+    margin-top:18px;
+    font-size:24px;
+  }
+
+  .su-subheading{
+
+    margin-bottom:20px;
+  }
+
+  .su-features{
+
+    gap:14px;
+  }
+
+  .su-card{
+
+    padding:24px 24px;
+  }
+
 }
