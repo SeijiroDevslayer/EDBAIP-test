@@ -1,80 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import backgroundImg from "../../../assets/login/auth_background.png";
-import logoImg from "../../../assets/login/logo.png";
-import lockIconImg from "../../../assets/login/lock_icon.png";
-import secureIcon from "../../../assets/login/secure.svg";
-import protectIcon from "../../../assets/login/protect.svg";
-import quickEasyIcon from "../../../assets/login/quick-easy.svg";
+import backgroundImg  from "../../../assets/login/auth_background.png";
+import logoImg        from "../../../assets/login/logo.png";
+import lockIconImg    from "../../../assets/login/lock_icon.png";
+import secureIcon     from "../../../assets/login/feature-security.png";
+import protectIcon    from "../../../assets/login/feature-analytics.png";
+import quickEasyIcon  from "../../../assets/login/feature-scalable.png";
+import refreshIcon    from "../../../assets/login/refresh_icon.png";
+import footerLockIcon from "../../../assets/login/material-symbols_lock-outline.png";
+import infoBoxIcon    from "../../../assets/login/Vector.png";
 import "./AccountLockedForm.css";
-
-function RefreshCwIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#ffffff"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M23 4v6h-6" />
-      <path d="M1 20v-6h6" />
-      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-    </svg>
-  );
-}
-
-function SmallLockIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <rect
-        x="3"
-        y="11"
-        width="18"
-        height="11"
-        rx="2"
-        stroke="currentColor"
-        strokeWidth="2"
-      />
-      <path
-        d="M7 11V7a5 5 0 0110 0v4"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function InfoIcon() {
-  return (
-    <svg
-      width="23"
-      height="23"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="M12 8h.01M12 12v4"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
 
 const FEATURES = [
   {
@@ -101,12 +36,12 @@ function AccountLockedForm() {
   const navigate = useNavigate();
 
   const [scale, setScale] = useState(() =>
-    Math.min(1, window.innerWidth / 1535, window.innerHeight / 1024)
+    Math.min(1, window.innerWidth / 1536, (window.innerHeight - 30) / 883)
   );
 
   useEffect(() => {
     const computeScale = () =>
-      setScale(Math.min(1, window.innerWidth / 1535, window.innerHeight / 1024));
+      setScale(Math.min(1, window.innerWidth / 1536, (window.innerHeight - 30) / 883));
     window.addEventListener("resize", computeScale);
     return () => window.removeEventListener("resize", computeScale);
   }, []);
@@ -119,9 +54,13 @@ function AccountLockedForm() {
   return (
     <div
       className="al-page"
-      style={{ backgroundImage: `url(${backgroundImg})` }}
+      style={{
+        backgroundImage: `url(${backgroundImg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center center",
+        backgroundRepeat: "no-repeat",
+      }}
     >
-      {/* Content row — fixed 1535×1024 canvas, anchored top-left */}
       <div
         className="al-row"
         style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}
@@ -155,7 +94,7 @@ function AccountLockedForm() {
         {/* ── CARD ── */}
         <div className="al-card-col">
           <div className="al-card">
-            {/* Lock circle */}
+            {/* Lock icon with glow */}
             <div className="al-lock-circle">
               <img
                 src={lockIconImg}
@@ -164,48 +103,55 @@ function AccountLockedForm() {
               />
             </div>
 
-            <h2 className="al-title">Account Locked</h2>
-            <p className="al-error">Too many failed attempts</p>
-            <p className="al-sub">
-              Please try again after some time or reset your password to continue.
-            </p>
+            {/* Inner content — starts at 211px from card top */}
+            <div className="al-card-inner">
+              <h2 className="al-title">Account Locked</h2>
+              <p className="al-error">Too many failed attempts</p>
+              <p className="al-sub">
+                Please try again after some time or reset your password to continue.
+              </p>
 
-            {/* Info box */}
-            <div className="al-info">
-              <span className="al-info-icon">
-                <InfoIcon />
-              </span>
-              <div>
-                <p className="al-info-title">What is this happening?</p>
-                <p className="al-info-desc">
-                  For you security, we’ve temporarily locked your account due to
-                  multiple failed login attempts.
-                </p>
+              {/* Info box */}
+              <div className="al-info">
+                <span className="al-info-icon">
+                  <img src={infoBoxIcon} alt="" width="27.72" height="27.72" />
+                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p className="al-info-title">What is this happening?</p>
+                  <p className="al-info-desc">
+                    For your security, we’ve temporarily locked your account due to
+                    multiple failed login attempts.
+                  </p>
+                </div>
               </div>
+
+              {/* Buttons */}
+              <a href="/forgot-password" className="al-btn al-btn-white">
+                Reset Password
+              </a>
+
+              <button
+                type="button"
+                className="al-btn al-btn-dark"
+                onClick={handleTryAgain}
+              >
+                <img src={refreshIcon} alt="" width="16" height="16" /> Try Again
+              </button>
+
+              {/* Footer */}
+              <p className="al-footer">
+                <img src={footerLockIcon} alt="" width="23.45" height="23.45" style={{ flexShrink: 0 }} />
+                <span>
+                  If you continue to have trouble, please try again later or{" "}
+                  <span
+                    className="al-contact"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigate("/contact-support")}
+                  >contact support</span>{" "}
+                  for assistance
+                </span>
+              </p>
             </div>
-
-            {/* Buttons */}
-            <a href="/forgot-password" className="al-btn al-btn-white">
-              Reset Password
-            </a>
-
-            <button
-              type="button"
-              className="al-btn al-btn-dark"
-              onClick={handleTryAgain}
-            >
-              <RefreshCwIcon /> Try Again
-            </button>
-
-            {/* Footer */}
-            <p className="al-footer">
-              <SmallLockIcon />
-              <span>
-                If you continue to have trouble, please try again later or{" "}
-                <span className="al-contact">contact support</span>{" "}
-                for assistance
-              </span>
-            </p>
           </div>
         </div>
       </div>
