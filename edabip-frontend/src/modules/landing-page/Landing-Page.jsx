@@ -27,38 +27,61 @@ import DHLLogo from "../../assets/landing-page/dhl.png";
 
 // Platform Overview Assets
 import IconDataIntegration from "../../assets/landing-page/dbicon.png";
-import IconDataWarehouse from "../../assets/landing-page/dataimg.png";
-import IconBusinessIntelligence from "../../assets/landing-page/graph-icon.png";
+import IconDataWarehouse from "../../assets/landing-page/home.png";
+import PlatformOverviewright from "../../assets/landing-page/dataimg.png";
+import PlatformOverviewleft from "../../assets/landing-page/graph6.png";
+import IconBusinessIntelligence from "../../assets/landing-page/barcomponent.png";
 import IconAIAnalytics from "../../assets/landing-page/ai.png";
 import IconSecurity from "../../assets/landing-page/gaurd.png";
 import IconBilling from "../../assets/landing-page/payment.png";
+import IllustrationDataIntegration from "../../assets/landing-page/dataimg4.png";
+import IllustrationDataWarehouse from "../../assets/landing-page/datamodel1.png";
+import IllustrationBI from "../../assets/landing-page/graph1.png";
+import IllustrationAI from "../../assets/landing-page/graph4.png";
+import IllustrationSecurity from "../../assets/landing-page/dataimg5.png";
+import IllustrationBilling from "../../assets/landing-page/bargraph1.png";
+import PlatformOverviewCenter from "../../assets/landing-page/barimg.png";
 
 // Dashboard Showcase Assets
-import DashboardBGLeft from "../../assets/landing-page/subbg2.png";
-import DashboardBGRight from "../../assets/landing-page/subbg3.png";
-import Dashboard1 from "../../assets/landing-page/bargraph1.png";
-import Dashboard2 from "../../assets/landing-page/bargraph2.png";
-import Dashboard3 from "../../assets/landing-page/piegraph1.png";
-import Dashboard4 from "../../assets/landing-page/graph1.png";
-import DashIcon1 from "../../assets/landing-page/snapicon1.png";
-import DashIcon2 from "../../assets/landing-page/snapicon2.png";
-import DashIcon3 from "../../assets/landing-page/snapicon3.png";
-import DashIcon4 from "../../assets/landing-page/bar-icon.png";
+import DashboardBGLeft from "../../assets/landing-page/dataimg3.png";
+import DashboardBGRight from "../../assets/landing-page/piegraph1.png";
+import DashboardBGBottom from "../../assets/landing-page/bg2.png";
+import DashboardBGBottomRight from "../../assets/landing-page/subright.png";
+import Dashboard1 from "../../assets/landing-page/gradient3.png";
+import Dashboard2 from "../../assets/landing-page/gradient2.png";
+import Dashboard3 from "../../assets/landing-page/gradient1.png";
+import Dashboard4 from "../../assets/landing-page/gradient4.png";
+import DashIcon1 from "../../assets/landing-page/map-icon.png";
+import DashIcon2 from "../../assets/landing-page/graph-icon.png";
+import DashIcon3 from "../../assets/landing-page/bar-icon.png";
+import DashIcon4 from "../../assets/landing-page/persons.png";
 
 // How It Works Assets
-import HowBGBottom from "../../assets/landing-page/subbg4.png";
-import HowBGTopRight from "../../assets/landing-page/Realistic Abstract 4.png";
-import HowBGTopLeft from "../../assets/landing-page/Realistic Abstract 3.png";
-import StepIcon1 from "../../assets/landing-page/home.png";
-import StepIcon2 from "../../assets/landing-page/dataimg2.png";
-import StepIcon3 from "../../assets/landing-page/dataimg3.png";
-import StepIcon4 from "../../assets/landing-page/dataimg4.png";
+import HowBGBottom from "../../assets/landing-page/subbg21.png";
+import HowBGTopRight from "../../assets/landing-page/dataforecast1.png";
+import HowBGTopLeft from "../../assets/landing-page/graph2.png";
+import StepIcon1 from "../../assets/landing-page/dbicon.png";
+import StepIcon2 from "../../assets/landing-page/way.png";
+import StepIcon3 from "../../assets/landing-page/sched.png";
+import StepIcon4 from "../../assets/landing-page/target.png";
+import Illustration1 from "../../assets/landing-page/planimg.png";
+import Illustration2 from "../../assets/landing-page/datamodel2.png";
+import Illustration3 from "../../assets/landing-page/dataimg2.png";
+import Illustration4 from "../../assets/landing-page/graph3.png";
 
 // Stats Section Assets
 import StatIcon from "../../assets/landing-page/Ellipse 2026.png";
+import StatIconUsers from "../../assets/landing-page/People-stat.png";
+import StatIconUptime from "../../assets/landing-page/Time-stat.png";
+import StatIconData from "../../assets/landing-page/db-stat.png";
+import StatIconResources from "../../assets/landing-page/work-stat.png";
+import StatIconSupport from "../../assets/landing-page/speaker-stat.png";
 
 // Footer Assets
 import FooterLogoMark from "../../assets/landing-page/IconE.png";
+import Location from "../../assets/landing-page/location_on.png";
+import Email from "../../assets/landing-page/email.png";
+import Call from "../../assets/landing-page/call.png";
 
 const trustedLogos = [
   { name: "AXIS MAX", img: AxisLogo },
@@ -74,31 +97,37 @@ const platformCards = [
     title: "Data Integration",
     desc: "Connect and ingest data from ERP, CRM, HRMS, APIs, Databases and cloud systems.",
     icon: IconDataIntegration,
+    illustration: IllustrationDataIntegration,
   },
   {
     title: "Data Warehouse",
     desc: "Centralized, secure and scalable data storage with historical tracking and multi-tenant architecture.",
     icon: IconDataWarehouse,
+    illustration: IllustrationDataWarehouse,
   },
   {
     title: "Business Intelligence",
     desc: "Power BI & Tableau dashboards for real-time reporting, KPI tracking and automated analytics.",
     icon: IconBusinessIntelligence,
+    illustration: IllustrationBI,
   },
   {
     title: "AI Analytics",
     desc: "Leverage machine learning models for forecasting, churn prediction and demand planning.",
     icon: IconAIAnalytics,
+    illustration: IllustrationAI,
   },
   {
     title: "Security & Governance",
     desc: "Role-based access control, data security, compliance and audit logging.",
     icon: IconSecurity,
+    illustration: IllustrationSecurity,
   },
   {
     title: "Subscription & Billing",
     desc: "Flexible SaaS subscription plans with automated billing, invoicing and license management.",
     icon: IconBilling,
+    illustration: IllustrationBilling,
   },
 ];
 
@@ -135,35 +164,38 @@ const howSteps = [
     title: "Connect",
     text: "Integrate data from multiple sources seamlessly.",
     icon: StepIcon1,
+    illustration: Illustration1,
   },
   {
     no: "02",
     title: "Transform",
     text: "Clean, validate and transform data for accuracy.",
     icon: StepIcon2,
+    illustration: Illustration2,
   },
   {
     no: "03",
     title: "Analyse",
     text: "Generate insights with powerful dashboards and AI models.",
     icon: StepIcon3,
+    illustration: Illustration3,
   },
   {
     no: "04",
     title: "Act",
     text: "Make smarter decisions and drive business growth.",
     icon: StepIcon4,
+    illustration: Illustration4,
   },
 ];
 
 const stats = [
-  { value: "10,000+", label: "Concurrent Users Supported" },
-  { value: "99.9%", label: "System Uptime Guarantee" },
-  { value: "100GB+", label: "Daily Data Processing" },
-  { value: "500+", label: "Enterprise Grade Resources" },
-  { value: "24/7", label: "Monitoring & Support" },
+  { value: "10,000+", label: "Concurrent Users Supported", icon: StatIconUsers },
+  { value: "99.9%", label: "System Uptime Guarantee", icon: StatIconUptime },
+  { value: "100GB+", label: "Daily Data Processing", icon: StatIconData },
+  { value: "500+", label: "Enterprise Grade Resources", icon: StatIconResources },
+  { value: "24/7", label: "Monitoring & Support", icon: StatIconSupport },
 ];
-
 export default function LandingPage() {
   return (
     <main className="landing-page">
@@ -217,22 +249,22 @@ export default function LandingPage() {
           <button className="primary-btn">Explore Platform</button>
         </div>
         <div className="hero-panels">
-  <article className="hero-panel large">   {/* 528px — Executive Analytics */}
-    <img src={Widget1} alt="Executive Analytics" className="panel-widget" />
-    <h4>Executive Analytics</h4>
-    <p>Gain complete visibility into business performance</p>
-  </article>
-  <article className="hero-panel medium">  {/* 430px — AI Predictive Intelligence */}
-    <img src={Widget2} alt="AI Predictive" className="panel-widget" />
-    <h4>AI Predictive Intelligence</h4>
-    <p>Predict revenue, customer behavior</p>
-  </article>
-  <article className="hero-panel small">   {/* 362px — Revenue Performance */}
-    <img src={Widget3} alt="Revenue Performance" className="panel-widget" />
-    <h4>Revenue Performance</h4>
-    <p>Monitor revenue streams, profitability</p>
-  </article>
-</div>
+            <article className="hero-panel large">
+              <img src={Widget1} alt="Executive Analytics" className="panel-widget" />
+              <h4>Executive Analytics</h4>
+              <p>Gain complete visibility into business performance</p>
+            </article>
+            <article className="hero-panel medium">
+              <img src={Widget2} alt="AI Predictive" className="panel-widget" />
+              <h4>AI Predictive Intelligence</h4>
+              <p>Predict revenue, customer behavior</p>
+            </article>
+            <article className="hero-panel small"> 
+              <img src={Widget3} alt="Revenue Performance" className="panel-widget" />
+              <h4>Revenue Performance</h4>
+                <p>Monitor revenue streams, profitability</p>
+              </article>
+            </div>
       </section>
 
       <section className="trusted">
@@ -255,22 +287,30 @@ export default function LandingPage() {
 
       <section className="platform-overview">
         <div className="section-title">
+        <img className="trusted-bg platform-overview-left" src={PlatformOverviewleft} alt="" />
+        <img className="trusted-bg platform-overview-right" src={PlatformOverviewright} alt="" />
           <small>PLATFORM OVERVIEW</small>
           <h2>
-            One Platform. <span>Unlimited Insights.</span>
+             One Platform<span className="title-dot"></span> <span>Unlimited Insights<span className="title-dot"></span> </span>
           </h2>
         </div>
+        <img className="platform-overview-center" src={PlatformOverviewCenter} alt="" />
         <div className="platform-grid">
-          {platformCards.map((card, index) => (
-            <article key={index} className="platform-card">
-              <div className="platform-icon">
-                <img src={card.icon} alt={card.title} />
-              </div>
-              <h3>{card.title}</h3>
-              <p>{card.desc}</p>
-            </article>
-          ))}
-        </div>
+            {platformCards.map((card, index) => (
+              <article key={index} className="platform-card">
+                <div className="platform-icon">
+                  <img src={card.icon} alt={card.title} />
+                </div>
+                <h3>{card.title}</h3>
+                <p>{card.desc}</p>
+                <img
+                  className="platform-card-illustration"
+                  src={card.illustration}
+                  alt=""
+                />
+              </article>
+            ))}
+          </div>
       </section>
 
       <section className="dashboard-showcase">
@@ -279,7 +319,7 @@ export default function LandingPage() {
         <div className="section-title">
           <small>DASHBOARD SHOWCASE</small>
           <h2>
-            powerful dashboards for <span>every decision</span>
+            POWERFUL DASHBOARD FOR  <span>EVERY DECISION</span>
           </h2>
         </div>
         <div className="dashboard-grid">
@@ -300,12 +340,13 @@ export default function LandingPage() {
             </article>
           ))}
         </div>
+        <img className="dash-bg dash-left" src={DashboardBGLeft} alt="" />
+        <img className="dash-bg dash-right" src={DashboardBGRight} alt="" />
       </section>
 
       <section className="how-it-works">
         <img className="how-bg how-left" src={HowBGTopLeft} alt="" />
         <img className="how-bg how-right" src={HowBGTopRight} alt="" />
-        <img className="how-bg how-bottom" src={HowBGBottom} alt="" />
         <div className="section-title">
           <small>HOW IT WORKS</small>
           <h2>
@@ -321,35 +362,41 @@ export default function LandingPage() {
               </div>
               <h3>{step.title}</h3>
               <p>{step.text}</p>
+              <img
+                  className="step-card-illustration"
+                  src={step.illustration}
+                  alt=""
+                />
             </article>
           ))}
         </div>
+        <img className="how-bg how-bottom" src={HowBGBottom} alt="" />
       </section>
 
-      <section className="stats-strip">
-        {stats.map((item, index) => (
-          <article key={index} className="stat-item">
-            <div className="stat-dot">
-              <img src={StatIcon} alt="" />
-            </div>
-            <div>
-              <h3>{item.value}</h3>
-              <p>{item.label}</p>
-            </div>
-          </article>
-        ))}
-      </section>
+          <section className="stats-strip">
+            {stats.map((item, index) => (
+              <article key={index} className="stat-item">
+                <div className="stat-dot">
+                  <img src={item.icon} alt="" />
+                </div>
+                <div>
+                  <h3>{item.value}</h3>
+                  <p>{item.label}</p>
+                </div>
+              </article>
+            ))}
+          </section>
 
       <footer className="landing-footer">
         <div className="footer-top">
           <div className="footer-brand">
-            <div className="footer-logo">
-              <img src={FooterLogoMark} alt="EDABIP" />
-              <span>EDABIP</span>
-            </div>
-            <p>8819 Ohio St. South Gate, CA 90280</p>
-            <p>Ourstudio@hello.com</p>
-            <p>+1 386-688-3295</p>
+             <div className="footer-logo">
+                <img src={FooterLogoMark} alt="EDABIP" />
+                <span>EDABIP</span>
+              </div>
+                  <p><img src={Location} alt="" className="footer-icon" /> 8819 Ohio St. South Gate, CA 90280</p>
+                  <p><img src={Email} alt="" className="footer-icon" /> Ourstudio@hello.com</p>
+                  <p><img src={Call} alt="" className="footer-icon" /> +1 386-688-3295</p>
           </div>
 
           <div className="footer-col">
@@ -376,11 +423,12 @@ export default function LandingPage() {
             <a href="#!">Support</a>
           </div>
 
+
           <div className="footer-col footer-contact">
             <h4>Contact Us</h4>
-            <p>Hyderabad-500032</p>
-            <p>info@stackly.com</p>
-            <p>+ 123 456 789</p>
+            <p><img src={Location} alt="" className="footer-icon" /> Hyderabad-500032</p>
+            <p><img src={Email} alt="" className="footer-icon" /> info@stackly.com</p>
+            <p><img src={Call} alt="" className="footer-icon" /> + 123 456 789</p>
           </div>
         </div>
 
