@@ -167,7 +167,7 @@ function CreateNewPasswordForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordError, setPasswordError] = useState('');
+  // const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [toast, setToast] = useState({
       show: false,
@@ -203,9 +203,9 @@ function CreateNewPasswordForm() {
 
     // Weak password
     if (strength.level !== "Strong") {
-      setPasswordError(
-        "Password must contain at least 8 characters, uppercase, lowercase, number and special character."
-      );
+      // setPasswordError(
+      //   "Password must contain at least 8 characters, uppercase, lowercase, number and special character."
+      // );
 
       showToastMessage(
         "Weak Password",
@@ -214,7 +214,7 @@ function CreateNewPasswordForm() {
 
       hasError = true;
     } else {
-      setPasswordError("");
+      // setPasswordError("");
     }
 
     // Password mismatch
@@ -331,10 +331,10 @@ function CreateNewPasswordForm() {
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
-                      if (passwordError) setPasswordError('');
+                      // if (passwordError) setPasswordError('');
                     }}
                     placeholder="Enter your password"
-                    aria-invalid={Boolean(passwordError)}
+                    // aria-invalid={Boolean(passwordError)}
                     autoFocus
                     required
                   />
@@ -349,7 +349,7 @@ function CreateNewPasswordForm() {
                   </button>
                   {password && strength.level !== 'Strong' && (
                     <span className="cnp-warning-icon">
-                      <img src={warningFieldImg} alt="weak password" style={{ width: 14, height: 14 }} />
+                      <img src={warningFieldImg} alt="weak password" style={{ width: 15, height: 15 }} />
                     </span>
                   )}
                 </div>
@@ -388,11 +388,11 @@ function CreateNewPasswordForm() {
                     </div>
                 </div>
 
-                {passwordError && (
+                {/* {passwordError && (
                   <p className="cnp-field-error">
                     {passwordError}
                   </p>
-                )}
+                )} */}
               </div>
 
               <div className="cnp-form-group">
