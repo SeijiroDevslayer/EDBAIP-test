@@ -1,27 +1,17 @@
-const mockUsers = [
-  {
-    email: "test@gmail.com",
-  },
-];
+const REGISTERED_EMAIL = "test@gmail.com";
 
-export const verifyEmail = (email) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const user = mockUsers.find(
-        (u) => u.email.toLowerCase() === email.toLowerCase()
-      );
+export const verifyEmail = async (email) => {
+  await new Promise((resolve) => setTimeout(resolve, 300));
 
-      if (user) {
-        resolve({
-          success: true,
-        });
-      } else {
-        reject({
-  success: false,
-  title: "Email Not Found",
-  message: "No account is associated with this email address.",
-});
-      }
-    }, 800); // simulate API delay
-  });
+  if (email.trim().toLowerCase() === REGISTERED_EMAIL) {
+    return {
+      success: true,
+      message: "Email found",
+    };
+  }
+
+  const error = new Error("No account is associated with this email address");
+  error.title = "Email Not Found";
+  error.message = "No account is associated with this email address";
+  throw error;
 };

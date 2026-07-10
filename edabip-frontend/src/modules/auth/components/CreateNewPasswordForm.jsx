@@ -181,6 +181,10 @@ function CreateNewPasswordForm() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const resetPassword = location.state?.resetPassword;
+const destination = location.state?.destination;
+const method = location.state?.method;
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
