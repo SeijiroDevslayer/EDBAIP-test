@@ -5,11 +5,13 @@ import warningImg from '../../../assets/login/warning.png';
 import warningFieldImg from '../../../assets/login/Vectorplaceholder.png';
 import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
+import lockIcon from '../../../assets/login/lock.png';
 import featureAnalytics from '../../../assets/login/feature-analytics.png';
 import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
 import './CreateNewPasswordForm.css';
+
 
 const FEATURES = [
   {
@@ -89,29 +91,9 @@ function CardLogo() {
 
 function LockIcon() {
   return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <rect
-        x="3"
-        y="11"
-        width="18"
-        height="11"
-        rx="2"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <path
-        d="M7 11V7a5 5 0 0110 0v4"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
+    <div>
+      <img src={lockIcon} alt="" className='cnp-card-lock-icon' />
+    </div>
   );
 }
 
@@ -187,7 +169,24 @@ function CreateNewPasswordForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
-  const [showToast, setShowToast] = useState(false);
+  const [toast, setToast] = useState({
+      show: false,
+      title: "",
+      message: "",
+    });
+
+
+  const showToastMessage = (title, message) => {
+    setToast({
+      show: true,
+      title,
+      message,
+    });
+
+    setTimeout(() => {
+      setToast((prev) => ({ ...prev, show: false }));
+    }, 4000);
+  };
 
   const strength = useMemo(() => getPasswordStrength(password), [password]);
 
@@ -202,22 +201,39 @@ function CreateNewPasswordForm() {
 
     let hasError = false;
 
-    if (strength.level !== 'Strong') {
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 4000);
-      hasError = true;
-    }
+    // Weak password
+    if (strength.level !== "Strong") {
+      setPasswordError(
+        "Password must contain at least 8 characters, uppercase, lowercase, number and special character."
+      );
 
-    if (confirmPassword !== password) {
-      setConfirmPasswordError('Passwords do not match');
+      showToastMessage(
+        "Weak Password",
+        "Your password is too weak. Please follow the password requirements shown above."
+      );
+
       hasError = true;
     } else {
-      setConfirmPasswordError('');
+      setPasswordError("");
+    }
+
+    // Password mismatch
+    if (password !== confirmPassword) {
+      setConfirmPasswordError("Passwords do not match");
+
+      showToastMessage(
+        "Password Mismatch",
+        "Please enter the same password in both fields."
+      );
+
+      hasError = true;
+    } else {
+      setConfirmPasswordError("");
     }
 
     if (hasError) return;
 
-    navigate('/password-reset-success', { replace: true });
+    navigate("/password-reset-success", { replace: true });
   };
 
   const strengthColors = { Weak: '#EF4444', Fair: '#F97316', Good: '#EAB308', Strong: '#22C55E' };
@@ -225,16 +241,16 @@ function CreateNewPasswordForm() {
 
   return (
     <div className="cnp-container">
-      {showToast && (
+      {toast.show && (
         <div className="cnp-toast">
           <div className="cnp-toast-icon">
-            <img src={warningImg} alt="warning" style={{ width: 35, height: 35 }} />
+            <img src={warningImg} alt="warning" style={{ width: 45, height: 45 }} />
           </div>
           <div className="cnp-toast-body">
-            <p className="cnp-toast-title">Weak Password</p>
-            <p className="cnp-toast-message">Your password is too weak. Please follow the password requirements shown above.</p>
+            <p className="cnp-toast-title">{toast.title}</p>
+            <p className="cnp-toast-message">{toast.message}</p>
           </div>
-          <button className="cnp-toast-close" onClick={() => setShowToast(false)}>×</button>
+          <button className="cnp-toast-close" onClick={() => setToast((prev) => ({ ...prev, show: false }))}>×</button>
         </div>
       )}
 
