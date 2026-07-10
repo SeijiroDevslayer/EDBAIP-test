@@ -25,7 +25,7 @@ import closeRedIcon from "../../../assets/negative-state/close-red-icon.png";
 import infoIcon from "../../../assets/negative-state/info-icon.png";
 import redInfoIcon from "../../../assets/negative-state/red-info-icon.png";
 import carbonCloseIcon from "../../../assets/negative-state/carbon_close.png";
-import verifiedTickIcon from "../../../assets/negative-state/vector-tick.png";
+import verifiedTickIcon from "../../../assets/negative-state/Vector-tick.png";
 
 import { verifyEmail } from "../api/mockForgotPasswordApi";
 import { verifyMobile } from "../api/mockForgetPasswordMobile";
