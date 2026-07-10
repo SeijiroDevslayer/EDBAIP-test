@@ -338,7 +338,7 @@ function CreateNewPasswordForm() {
                   )}
                 </div>
 
-                <>
+                <div className={`cnp-password-meta${password ? ' cnp-password-meta--visible' : ''}`}>
                     <div className="cnp-strength-row">
                       <div className="cnp-strength-bar">
                         {[1, 2, 3, 4, 5].map((seg) => (
@@ -370,7 +370,7 @@ function CreateNewPasswordForm() {
                         </div>
                       ))}
                     </div>
-                </>
+                </div>
 
                 {passwordError && (
                   <p className="cnp-field-error">
