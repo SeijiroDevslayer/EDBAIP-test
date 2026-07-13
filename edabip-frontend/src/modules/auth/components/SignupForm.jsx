@@ -281,7 +281,7 @@ function SignupForm() {
                     />
                   )}
                 </div>
-                {errors.fullName && <span className="su-field-error">{errors.fullName}</span>}
+                <span className="su-field-error">{errors.fullName}</span>
               </div>
 
               <div className="su-form-group">
@@ -308,7 +308,7 @@ function SignupForm() {
                     />
                   )}
                 </div>
-                {errors.email && <span className="su-field-error">{errors.email}</span>}
+                <span className="su-field-error">{errors.email}</span>
               </div>
 
               <div className="su-form-group">
@@ -336,7 +336,7 @@ function SignupForm() {
                     />
                   )}
                 </div>
-                {errors.mobileNumber && <span className="su-field-error">{errors.mobileNumber}</span>}
+                <span className="su-field-error">{errors.mobileNumber}</span>
               </div>
 
               <div className="su-form-group">
@@ -370,15 +370,9 @@ function SignupForm() {
                   >
                     {showPassword ? <EyeClosed /> : <EyeOpen />}
                   </button>
-                  {/* {errors.email && (
-                    <img
-                      src={checkIcon}
-                      alt="error"
-                      className="su-check-icon"
-                    />
-                  )} */}
+                  
                 </div>
-                {errors.password && <span className="su-field-error">{errors.password}</span>}
+                <span className="su-field-error">{errors.password}</span>
               </div>
 
               <div className="su-form-group">
@@ -414,7 +408,7 @@ function SignupForm() {
                   </button>
 
                 </div>
-                {errors.confirmPassword && <span className="su-field-error">{errors.confirmPassword}</span>}
+                <span className="su-field-error">{errors.confirmPassword}</span>
               </div>
 
               <div className="su-form-group su-terms-group">
@@ -431,7 +425,7 @@ function SignupForm() {
                     <a href="#" className="su-terms-link">Terms &amp; Conditions</a>
                   </span>
                 </label>
-                {errors.agreeToTerms && <span className="su-field-error">{errors.agreeToTerms}</span>}
+                <span className="su-field-error">{errors.agreeToTerms}</span>
               </div>
 
               <button type="submit" className="su-submit-btn">Create Account</button>
