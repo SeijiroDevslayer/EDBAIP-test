@@ -206,10 +206,11 @@
   font-family: "DM Sans", Inter, sans-serif;
   font-size: 65px;
   font-weight: 400;
-  letter-spacing: -1.42px; 
-  line-height: 1;          
-  width: 736px;
-  height: 184px;
+  letter-spacing: -1.42px;
+  line-height: 1;
+  width: 100%;
+  max-width: 736px;
+  height: auto;
 }
 
 .hero-bullets {
@@ -252,13 +253,14 @@
   backdrop-filter: blur(24.3px);
   background: rgba(16, 17, 19, 0.79);
   border: 0.5px solid rgba(60, 60, 60, 0.6);
-  border-radius: 16px;            
-  height: 343px;                   
+  border-radius: 16px;
+  height: 343px;
   padding: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; 
+  justify-content: flex-end;
   gap: 12px;
+  overflow: hidden;
 }
 
 .hero-panel.large {
@@ -275,8 +277,10 @@
 }
 
 .panel-widget {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
+  max-height: 190px;
   object-fit: contain;
   border-radius: 12px;
 }
@@ -320,14 +324,14 @@
   left: 0;
   top: 0;
   width: 370px;
-  z-index: -1;
+  z-index: 0;
 }
 
 .trusted-right {
   right: 0;
   top: 0;
   width: 395px;
-  z-index: -1;
+  z-index: 0;
 }
 
 .trusted h5 {
@@ -338,6 +342,8 @@
   margin: 0 0 16px;
   font-family: "DM Sans", sans-serif;
   text-align: center;
+  position: relative;
+  z-index: 2;
 }
 
 .trusted h5 span {
@@ -349,23 +355,28 @@
   font-size: 16px;
   font-weight: 400;
   line-height: 181%;
-  margin: 0 auto 40px;  
+  margin: 0 auto 40px;
   width: 480px;
   text-align: center;
+  position: relative;
+  z-index: 2;
   font-family: "Inter", sans-serif;
 }
 
 .trusted-strip {
   align-items: center;
   background: #fff;
-  border-radius: 20px;
+  border-radius: 15px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
   display: grid;
   gap: 0;
   grid-template-columns: repeat(6, 1fr);
   margin: 0 auto;
-  max-width: 1100px;
+  width: 1286px;
+  max-width: 100%;
+  height: 136px;
   padding: 24px;
+  opacity: 1;
   position: relative;
   z-index: 2;
 }
@@ -383,7 +394,7 @@
 }
 
 .trusted-logo img {
-  max-height: 40px;
+  max-height: 56px;
   max-width: 100%;
   object-fit: contain;
 }
@@ -514,6 +525,8 @@
 .section-title {
   text-align: center;
   margin-bottom: 48px;
+  position: relative;
+  z-index: 2;
 }
 
 .section-title small {
@@ -525,6 +538,8 @@
   display: block;
   margin-bottom: 12px;
   font-family: "Inter", sans-serif;
+  position: relative;
+  z-index: 1;
 }
 
 .section-title h2 {
@@ -533,6 +548,8 @@
   font-weight: 600;
   margin: 0;
   font-family: "DM Sans", sans-serif;
+  position: relative;
+  z-index: 1;
 }
 
 .section-title h2 .title-dot {
@@ -614,7 +631,6 @@
   width: 429px;
 }
 
-.section-title,
 .dashboard-grid {
   position: relative;
   z-index: 1;
@@ -692,10 +708,9 @@
   position: absolute;
   z-index: 0;
 }
-.section-title,
 .steps-grid {
   position: relative;
-  z-index: 1;             
+  z-index: 1;
 }
 .how-left {
   left: 11px;
@@ -839,6 +854,29 @@
   line-height: 120%;
 }
 
+.cta-banner {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.cta-banner-frame {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+.cta-banner-btn-overlay {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  height: 20.3%;
+  left: 74.7%;
+  position: absolute;
+  top: 36%;
+  width: 17.6%;
+}
+
 .landing-footer {
   background: #f8fafc;
   padding: 64px 80px 32px;
@@ -968,6 +1006,7 @@
   .hero-panel.medium,
   .hero-panel.small {
     width: 100%;
+    max-width: none;
   }
 
   .trusted-strip {
@@ -1047,6 +1086,9 @@
   .hero-bullets {
     display: grid;
     grid-template-columns: 1fr;
+    width: 100%;
+    height: auto;
+    gap: 12px;
     margin-bottom: 24px;
   }
 
