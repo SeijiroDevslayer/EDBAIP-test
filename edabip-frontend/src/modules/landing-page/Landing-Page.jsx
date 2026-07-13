@@ -15,12 +15,12 @@ import HeroAbstractLeft from "../../assets/landing-page/subbg.png";
 import HeroAbstractRight from "../../assets/landing-page/subbg.png";
 
 // Trusted Section Assets
-import TrustedTopLeft from "../../assets/landing-page/graph5.png";
-import TrustedTopRight from "../../assets/landing-page/dataimg6.png";
+import TrustedTopLeft from "../../assets/landing-page/trend-graph.png";
+import TrustedTopRight from "../../assets/landing-page/trusted-right.png";
 import TrustedBottomPattern from "../../assets/landing-page/trustedbg2.png";
 import AxisLogo from "../../assets/landing-page/axis.png";
 import HDFCLogo from "../../assets/landing-page/hdfc.png";
-import RelianceLogo from "../../assets/landing-page/reliance.png";
+import RelianceLogo from "../../assets/landing-page/relianceee.png";
 import DmartLogo from "../../assets/landing-page/Dmart.png";
 import TataLogo from "../../assets/landing-page/tata.png";
 import DHLLogo from "../../assets/landing-page/dhl.png";
@@ -76,6 +76,9 @@ import StatIconUptime from "../../assets/landing-page/Time-stat.png";
 import StatIconData from "../../assets/landing-page/db-stat.png";
 import StatIconResources from "../../assets/landing-page/work-stat.png";
 import StatIconSupport from "../../assets/landing-page/speaker-stat.png";
+
+// CTA Section Assets
+import CTAFrame from "../../assets/landing-page/ctaframe.png";
 
 // Footer Assets
 import FooterLogoMark from "../../assets/landing-page/IconE.png";
@@ -386,6 +389,18 @@ export default function LandingPage() {
               </article>
             ))}
           </section>
+
+      <section className="cta-banner">
+        <img
+          className="cta-banner-frame"
+          src={CTAFrame}
+          alt="Ready to Transform Your Data Strategy? Join hundreds of enterprises who trust EDABIP to power their data-driven decisions."
+        />
+        <button
+          className="cta-banner-btn-overlay"
+          aria-label="Book a Demo"
+        />
+      </section>
 
       <footer className="landing-footer">
         <div className="footer-top">
