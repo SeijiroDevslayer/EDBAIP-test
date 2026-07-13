@@ -142,7 +142,6 @@ function ClockIcon() {
 function ForgotPasswordForm() {
   const navigate = useNavigate();
   const otpInputRefs = useRef([]);
-  const toastRef = useRef(null);
 
   const [method, setMethod] = useState("email");
   const [step, setStep] = useState("request");
@@ -177,14 +176,6 @@ function ForgotPasswordForm() {
     document.body.scrollTop = 0;
   }, []);
 
-  useEffect(() => {
-  if (toast && toastRef.current) {
-    toastRef.current.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
-  }
-}, [toast]);
 
   const selectMethod = (nextMethod) => {
     setMethod(nextMethod);
@@ -429,11 +420,10 @@ setTimeout(() => {
           </div>
         </div>
 
-        <div className="fp-right-section">
+        <div className={`fp-right-section ${toast ? "fp-right-section--toast" : ""}`}>
           <div className="fp-card-wrapper">
             {toast && (
               <div
-  ref={toastRef}
   className={`fp-toast fp-toast-${toast.type || "success"}`}
   role="status"
 >
