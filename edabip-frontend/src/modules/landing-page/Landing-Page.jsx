@@ -1,7 +1,7 @@
 import "./Landing-Page.css";
-
+import { Link } from "react-router-dom";
 // Hero Section Assets
-import HeroCheck from "../../assets/landing-page/tick.png";
+import HeroCheck from "../../assets/landing-page/tick1.png";
 import Widget1 from "../../assets/landing-page/widget1.png";
 import Widget2 from "../../assets/landing-page/widget2.png";
 import Widget3 from "../../assets/landing-page/widget3.png";
@@ -10,9 +10,10 @@ import iconH from "../../assets/landing-page/iconH.png";
 import iconS from "../../assets/landing-page/iconS.png";
 import iconP from "../../assets/landing-page/iconP.png";
 import iconA from "../../assets/landing-page/iconA.png";
-import brandbadge from "../../assets/landing-page/IconE.png";
+import brandbadge from "../../assets/landing-page/logo.png";
 import HeroAbstractLeft from "../../assets/landing-page/subbg.png";
 import HeroAbstractRight from "../../assets/landing-page/subbg.png";
+import HeroBg from "../../assets/landing-page/hero-bg.png";
 
 // Trusted Section Assets
 import TrustedTopLeft from "../../assets/landing-page/trend-graph.png";
@@ -81,7 +82,7 @@ import StatIconSupport from "../../assets/landing-page/speaker-stat.png";
 import CTAFrame from "../../assets/landing-page/ctaframe.png";
 
 // Footer Assets
-import FooterLogoMark from "../../assets/landing-page/IconE.png";
+import FooterLogoMark from "../../assets/landing-page/logo.png";
 import Location from "../../assets/landing-page/location_on.png";
 import Email from "../../assets/landing-page/email.png";
 import Call from "../../assets/landing-page/call.png";
@@ -203,72 +204,122 @@ export default function LandingPage() {
   return (
     <main className="landing-page">
       <section className="hero">
-        <img className="hero-abstract hero-abstract-left" src={HeroAbstractLeft} alt="" />
-        <img className="hero-abstract hero-abstract-right" src={HeroAbstractRight} alt="" />
+  <img
+    className="hero-background-image"
+    src={HeroBg}
+    alt=""
+    aria-hidden="true"
+  />
 
-        <header className="hero-nav-wrap">
-          <div className="brand-pill">
-            <img className="brand-badge" src={brandbadge} alt="E" />
-            <span className="brand-name">EDABIP</span>
-          </div>
-          <nav className="hero-nav">
-            <div className="hero-nav-links">
-            <a href="#!" className="hero-nav-link hero-nav-link-home">
-              Home <img src={iconH} alt="" />
-            </a>
-            <a href="#!" className="hero-nav-link hero-nav-link-feat">
-              Features <img src={iconF} alt="" />
-            </a>
-            <a href="#!" className="hero-nav-link hero-nav-link-services">
-              Services <img src={iconS} alt="" />
-            </a>
-            <a href="#!" className="hero-nav-link hero-nav-link-price">
-              Pricing <img src={iconP} alt="" />
-            </a>
-            <a href="#!" className="hero-nav-link hero-nav-link-about">
-              About Us <img src={iconA} alt="" />
-            </a>
-            </div>
-          </nav>
-          <button className="primary-btn small">Book a Demo</button>
-        </header>
+  <header className="hero-nav-wrap">
+    <a href="#home" className="brand-pill" aria-label="EDABIP home">
+      <img className="brand-badge" src={brandbadge} alt="" />
+      <span className="brand-name">EDABIP</span>
+    </a>
 
-        <div className="hero-content">
-          <h1>
-            Transform Enterprise Data into Actionable
-          </h1>
-          <div className="hero-bullets">
-            {[
-              "Real-Time KPI Monitoring",
-              "AI-Powered Business Insights",
-              "Advanced Analytics & Reporting",
-            ].map((text, index) => (
-              <div key={index} className="hero-bullet">
-                <img src={HeroCheck} alt="" />
-                <span>{text}</span>
-              </div>
-            ))}
-          </div>
-          <button className="primary-btn">Explore Platform</button>
+    <nav className="hero-nav" aria-label="Main navigation">
+      <a href="#home" className="hero-nav-link active">
+        Home
+      </a>
+
+      <a href="#features" className="hero-nav-link">
+        Features
+      </a>
+
+      <a href="#services" className="hero-nav-link">
+        Services
+      </a>
+
+      <a href="#pricing" className="hero-nav-link">
+        Pricing
+      </a>
+
+      <a href="#about" className="hero-nav-link">
+        About Us
+      </a>
+    </nav>
+
+    <div className="hero-nav-actions">
+      <Link to="/login" className="nav-login-btn">
+        Login
+      </Link>
+
+      <Link to="/signup" className="nav-signup-btn">
+        Sign Up
+      </Link>
+      </div>
+  </header>
+
+  <div className="hero-content">
+    <h1>
+      <span className="hero-title-main">
+        Transform Enterprise Data
+      </span>
+
+      <span className="hero-title-accent">
+        into Actionable
+      </span>
+    </h1>
+
+    <div className="hero-bullets">
+      {[
+        "Real-Time KPI Monitoring",
+        "AI-Powered Business Insights",
+        "Advanced Analytics & Reporting",
+      ].map((text) => (
+        <div key={text} className="hero-bullet">
+          <img src={HeroCheck} alt="" />
+          <span>{text}</span>
         </div>
-        <div className="hero-panels">
-            <article className="hero-panel large">
-              <img src={Widget1} alt="Executive Analytics" className="panel-widget" />
-              <h4>Executive Analytics</h4>
-              <p>Gain complete visibility into business performance</p>
-            </article>
-            <article className="hero-panel medium">
-              <img src={Widget2} alt="AI Predictive" className="panel-widget" />
-              <h4>AI Predictive Intelligence</h4>
-              <p>Predict revenue, customer behavior</p>
-            </article>
-            <article className="hero-panel small"> 
-              <img src={Widget3} alt="Revenue Performance" className="panel-widget" />
-              <h4>Revenue Performance</h4>
-                <p>Monitor revenue streams, profitability</p>
-              </article>
-            </div>
-      </section>
+      ))}
+    </div>
+
+    <button type="button" className="primary-btn hero-explore-btn">
+      Explore Platform
+    </button>
+  </div>
+
+  <div className="hero-panels">
+    <article className="hero-panel hero-panel-large">
+      <img
+        src={Widget1}
+        alt="Executive analytics report"
+        className="panel-widget"
+      />
+
+      <div className="hero-panel-copy">
+        <h4>Executive Analytics</h4>
+        <p>Gain complete visibility into business performance</p>
+      </div>
+    </article>
+
+    <article className="hero-panel hero-panel-medium">
+      <img
+        src={Widget2}
+        alt="AI predictive intelligence"
+        className="panel-widget"
+      />
+
+      <div className="hero-panel-copy">
+        <h4>AI Predictive Intelligence</h4>
+        <p>Predict revenue, customer behavior</p>
+      </div>
+    </article>
+
+    <article className="hero-panel hero-panel-small">
+      <img
+        src={Widget3}
+        alt="Revenue performance"
+        className="panel-widget"
+      />
+
+      <div className="hero-panel-copy">
+        <h4>Revenue Performance</h4>
+        <p>Monitor revenue streams, profitability</p>
+      </div>
+    </article>
+  </div>
+</section>
 
       <section className="trusted">
         <img className="trusted-bg trusted-left" src={TrustedTopLeft} alt="" />

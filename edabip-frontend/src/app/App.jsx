@@ -18,7 +18,8 @@ function App() {
       <AuthProvider>
         <SessionTimeout>
           <Routes>
-            <Route path="/" element={<LoginPage />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/create-new-password" element={<CreateNewPasswordPage />} />
