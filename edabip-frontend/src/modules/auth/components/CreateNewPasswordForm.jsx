@@ -300,7 +300,7 @@ function CreateNewPasswordForm() {
         </div>
 
         <div className="cnp-right-section">
-          <div className="cnp-card">
+          <div className={`cnp-card${password ? ' cnp-card--filled' : ' cnp-card--empty'}`}>
             <CardLogo />
 
             <h2 className="cnp-title">
@@ -354,7 +354,7 @@ function CreateNewPasswordForm() {
                   )}
                 </div>
 
-                <div className={`cnp-password-meta${password ? ' cnp-password-meta--visible' : ''}`}>
+                <div className="cnp-password-meta" style={{ visibility: password ? 'visible' : 'hidden' }}>
                     <div className="cnp-strength-row">
                       <div className="cnp-strength-bar">
                         {[1, 2, 3, 4, 5].map((seg) => (
