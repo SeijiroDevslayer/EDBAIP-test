@@ -392,7 +392,7 @@ export default function LandingPage() {
         <div className="section-title">
           <small>HOW IT WORKS</small>
           <h2>
-            from data to decisions in <span>4 simple steps</span>
+            FROM DATA TO DECISIONS IN <span>4 SIMPLE STEPS</span>
           </h2>
         </div>
         <div className="steps-grid">
