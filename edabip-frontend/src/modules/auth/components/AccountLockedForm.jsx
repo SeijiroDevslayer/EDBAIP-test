@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import backgroundImg  from "../../../assets/login/auth_background.png";
 import logoImg        from "../../../assets/login/logo.png";
 import lockIconImg    from "../../../assets/login/lock_icon.png";
-import secureIcon     from "../../../assets/login/feature-security.png";
-import protectIcon    from "../../../assets/login/feature-analytics.png";
-import quickEasyIcon  from "../../../assets/login/feature-scalable.png";
+import secureIcon     from "../../../assets/login/secure.svg";
+import protectIcon    from "../../../assets/login/protect.svg";
+import quickEasyIcon  from "../../../assets/login/quick-easy.svg";
 import refreshIcon    from "../../../assets/login/refresh_icon.png";
 import footerLockIcon from "../../../assets/login/material-symbols_lock-outline.png";
 import infoBoxIcon    from "../../../assets/login/Vector.png";
@@ -36,13 +36,20 @@ function AccountLockedForm() {
   const navigate = useNavigate();
 
   const [scale, setScale] = useState(() =>
-    Math.min(1, window.innerWidth / 1536, (window.innerHeight - 30) / 883)
+    window.innerWidth > 768
+      ? Math.min(1, window.innerWidth / 1536, (window.innerHeight - 30) / 883)
+      : 1
   );
 
   useEffect(() => {
     const computeScale = () =>
-      setScale(Math.min(1, window.innerWidth / 1536, (window.innerHeight - 30) / 883));
+      setScale(
+        window.innerWidth > 768
+          ? Math.min(1, window.innerWidth / 1536, (window.innerHeight - 30) / 883)
+          : 1
+      );
     window.addEventListener("resize", computeScale);
+    computeScale();
     return () => window.removeEventListener("resize", computeScale);
   }, []);
 
@@ -63,7 +70,11 @@ function AccountLockedForm() {
     >
       <div
         className="al-row"
-        style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}
+        style={
+          window.innerWidth > 768
+            ? { transform: `scale(${scale})`, transformOrigin: "top center" }
+            : undefined
+        }
       >
         {/* ── LEFT ── */}
         <div className="al-left">
