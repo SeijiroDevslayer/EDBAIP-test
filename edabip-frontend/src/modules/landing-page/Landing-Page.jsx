@@ -5,14 +5,7 @@ import HeroCheck from "../../assets/landing-page/tick1.png";
 import Widget1 from "../../assets/landing-page/widget1.png";
 import Widget2 from "../../assets/landing-page/widget2.png";
 import Widget3 from "../../assets/landing-page/widget3.png";
-import iconF from "../../assets/landing-page/iconF.png";
-import iconH from "../../assets/landing-page/iconH.png";
-import iconS from "../../assets/landing-page/iconS.png";
-import iconP from "../../assets/landing-page/iconP.png";
-import iconA from "../../assets/landing-page/iconA.png";
 import brandbadge from "../../assets/landing-page/logo.png";
-import HeroAbstractLeft from "../../assets/landing-page/subbg.png";
-import HeroAbstractRight from "../../assets/landing-page/subbg.png";
 import HeroBg from "../../assets/landing-page/hero-bg.png";
 
 // Trusted Section Assets
@@ -46,8 +39,6 @@ import PlatformOverviewCenter from "../../assets/landing-page/barimg.png";
 // Dashboard Showcase Assets
 import DashboardBGLeft from "../../assets/landing-page/dataimg3.png";
 import DashboardBGRight from "../../assets/landing-page/piegraph1.png";
-import DashboardBGBottom from "../../assets/landing-page/bg2.png";
-import DashboardBGBottomRight from "../../assets/landing-page/subright.png";
 import Dashboard1 from "../../assets/landing-page/gradient3.png";
 import Dashboard2 from "../../assets/landing-page/gradient2.png";
 import Dashboard3 from "../../assets/landing-page/gradient1.png";
@@ -71,7 +62,6 @@ import Illustration3 from "../../assets/landing-page/dataimg2.png";
 import Illustration4 from "../../assets/landing-page/graph3.png";
 
 // Stats Section Assets
-import StatIcon from "../../assets/landing-page/Ellipse 2026.png";
 import StatIconUsers from "../../assets/landing-page/People-stat.png";
 import StatIconUptime from "../../assets/landing-page/Time-stat.png";
 import StatIconData from "../../assets/landing-page/db-stat.png";
@@ -394,8 +384,6 @@ export default function LandingPage() {
             </article>
           ))}
         </div>
-        <img className="dash-bg dash-left" src={DashboardBGLeft} alt="" />
-        <img className="dash-bg dash-right" src={DashboardBGRight} alt="" />
       </section>
 
       <section className="how-it-works">
