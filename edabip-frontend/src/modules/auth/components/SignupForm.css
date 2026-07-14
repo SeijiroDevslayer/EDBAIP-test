@@ -1,89 +1,106 @@
-
-
 .su-container {
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   position: relative;
   overflow: hidden;
   background: #ffffff;
+  box-sizing: border-box;
 }
 
 .su-background {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
+  outline: 2px solid red;
 }
 
 .su-background-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  transform: scale(1.08) translateY(-5%);
+  transform-origin: center;
 }
 
 .su-content {
-  position: relative;
-  z-index: 1;
-  width: 1535px;
-  max-width: 1535px;
-  height: 1024px;
-  min-height: 1024px;
-  margin: 0 auto;
-  display: block;
-  transform-origin: top center;
+  display: grid;
+
+  width: min(95rem, 100%);
+  margin-inline: auto;
+
+
+  grid-template-columns: 30% 70%;
+
+
+  justify-content: flex-start;
+  padding: 20px 24px 40px;
+
+  column-gap: 4.5rem;
+
 }
 
-
-
 .su-left {
-  position: absolute;
-  left: 100px;
-  top: 86px;
-  width: 420px;
+  position: relative;
+  width: 100%;
+  max-width: 26.25rem;
+  margin: 0;
   min-height: auto;
-  padding: 0;
-  display: block;
+  padding: 0.5rem 3rem 0;
+  margin-top: clamp(2rem, 3vh, 2rem);
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
   overflow: visible;
+  justify-self: start;
 }
 
 .su-brand-logo {
-  width: 193.16px;
-  height: 70.2px;
+  width: 100%;
+  max-width: 12rem;
+  height: auto;
   margin: 0;
+  margin-bottom: 2rem;
   object-fit: contain;
   object-position: left center;
   display: block;
 }
 
 .su-heading {
-  position: absolute;
-  left: 0;
-  top: 105px;
-  width: 360px;
+
+  position: relative;
+  width: 100%;
+  max-width: 22.5rem;
   height: auto;
-  margin: 0;
+  margin: 0 0 1rem;
   color: #343495;
   font-family: 'Inter', sans-serif;
   font-size: 30px;
   font-weight: 600;
-  line-height: 36px;
+  line-height: 1.2;
   letter-spacing: 0;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .su-subheading {
-  position: absolute;
-  left: 0;
-  top: 157px;
-  width: 278px;
-  height: 50px;
-  margin: 0;
+
+  position: relative;
+  width: 100%;
+  max-width: 17.375rem;
+  height: auto;
+  margin: 0 0 2.5rem;
   color: #343495;
   font-family: 'Inter', sans-serif;
   font-size: 18px;
   font-weight: 400;
-  line-height: 25px;
+  line-height: 1.5;
   letter-spacing: 0;
 }
 
@@ -92,53 +109,29 @@
   font-weight: 600;
 }
 
-
-
 .su-features {
-  position: absolute;
-  left: 0;
-  top: 255px;
-  width: 341px;
-  height: 357px;
-  display: block;
+  position: relative;
+  width: 100%;
+  max-width: 21.3125rem;
+  height: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
 }
 
 .su-feature-item {
-  position: absolute;
-  left: 1px;
+
+  position: static;
   display: flex;
-  align-items: center;
-  gap: 24px;
+  align-items: flex-start;
+  gap: 1.5rem;
   margin: 0;
 }
 
-.su-feature-item:nth-child(1) {
-  top: 0;
-  width: 340px;
-  height: 63px;
-}
-
-.su-feature-item:nth-child(2) {
-  top: 100px;
-  width: 280px;
-  height: 62px;
-}
-
-.su-feature-item:nth-child(3) {
-  top: 199px;
-  width: 340px;
-  height: 60px;
-}
-
-.su-feature-item:nth-child(4) {
-  top: 296px;
-  width: 340px;
-  height: 61px;
-}
-
 .su-feature-icon {
-  width: 52px;
-  height: 52px;
+  width: clamp(2.5rem, 3vw, 3.25rem);
+  height: auto;
   object-fit: contain;
   flex-shrink: 0;
   margin: 0;
@@ -153,9 +146,9 @@
 .su-feature-title {
   color: #343495;
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
+  font-size:15px;
   font-weight: 700;
-  line-height: 18px;
+  line-height: 1.3;
 }
 
 .su-feature-desc {
@@ -163,29 +156,34 @@
   font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 400;
-  line-height: 16px;
+  line-height: 1.4;
   max-width: 260px;
 }
 
-
 .su-right {
-  position: absolute;
-  left: 526px;
-  top: 67px;
-  width: 483px;
+  position: relative;
+  width: 100%;
+  max-width: 30.1875rem;
+  margin: 0;
   min-height: auto;
   padding: 0;
-  display: block;
+  display: flex;
+  align-items: start;
+  justify-content: left;
   overflow: visible;
+  justify-self: left;
+  margin-top: clamp(2rem, 4vh, 4rem);
+
 }
 
 .su-card {
-  width: 483px;
-  max-width: 483px;
-  min-height: 850px;
+
+  width: 100%;
+  max-width: 30.1875rem;
+  margin: 0 auto;
   background: #2f2f9a;
   border-radius: 20px;
-  padding: 36px 56px 28px;
+  padding: 2.25rem 3.5rem 1.75rem;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
 }
 
@@ -200,7 +198,7 @@
   text-align: left;
   font-size: 30px;
   font-weight: 700;
-  line-height: 36px;
+  line-height: 1.2;
   font-family: 'Inter', sans-serif;
 }
 
@@ -209,8 +207,8 @@
   padding: 0;
   color: rgba(255, 255, 255, 0.72);
   text-align: left;
-  font-size: 13px;
-  line-height: 20px;
+  font-size:13px;
+  line-height: 1.5;
   font-family: 'Inter', sans-serif;
 }
 
@@ -224,13 +222,13 @@
 .su-form {
   display: flex;
   flex-direction: column;
-  gap: 13px;
+  gap: 0.8125rem;
 }
 
 .su-form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.375rem;
 }
 
 .su-form-group label {
@@ -248,23 +246,36 @@
 
 .su-input-icon {
   position: absolute;
-  left: 14px;
-  color: rgba(255, 255, 255, 0.45);
+  left: 1rem;
+  color: #ffffff;
   pointer-events: none;
-  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
 }
 
 .su-input-wrapper input {
   width: 100%;
-  padding: 12px 44px 12px 44px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 0.75rem 3rem 0.75rem 3rem;
+  border: 1px solid #ffffff;
+  border-radius: 5px;
+  font-size:11px;
+  line-height: 1.5;
   outline: none;
   background: rgba(20, 28, 100, 0.55);
   color: #ffffff;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   font-family: 'Inter', sans-serif;
+}
+
+.su-check-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.875rem;
+  height: 0.875rem;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .su-input-wrapper input::placeholder {
@@ -278,10 +289,10 @@
 
 .su-pw-toggle {
   position: absolute;
-  right: 12px;
+  right: 1rem;
   background: none;
   border: none;
-  padding: 4px;
+  padding: 0.5rem;
   cursor: pointer;
   color: rgba(255, 255, 255, 0.4);
   display: flex;
@@ -289,25 +300,32 @@
   justify-content: center;
 }
 
+.su-pw-toggle-error {
+  right: 1.875rem;
+}
+
 .su-field-error {
   font-size: 12px;
-  color: #ff6b6b;
+  display: block;
+  min-height: 1rem;
+  line-height: 1.25rem;
+  color: #f8404D;
   font-weight: 400;
-  margin-top: -2px;
+  margin-top: 0.25rem;
   font-family: 'Inter', sans-serif;
 }
 
 
 
 .su-terms-group {
-  gap: 5px;
-  margin-top: -1px;
+  gap: 0.3125rem;
+  margin-top: 0;
 }
 
 .su-terms-label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   cursor: pointer;
   font-size: 12.5px;
   color: rgba(255, 255, 255, 0.7);
@@ -317,9 +335,9 @@
 .su-terms-checkbox {
   appearance: none;
   -webkit-appearance: none;
-  width: 15px;
-  height: 15px;
-  min-width: 15px;
+  width: 1rem;
+  height: 1rem;
+  min-width: 1rem;
   margin: 0;
   border: 1.5px solid rgba(255, 255, 255, 0.5);
   border-radius: 4px;
@@ -356,7 +374,7 @@
 
 .su-submit-btn {
   width: 100%;
-  padding: 13px;
+  padding: 0.875rem;
   background: #ffffff;
   color: #2b3499;
   border: none;
@@ -364,17 +382,18 @@
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 4px;
+  margin-top: 0.25rem;
   font-family: 'Inter', sans-serif;
 }
 
 .su-divider {
   display: flex;
   align-items: center;
-  margin: 16px 0;
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 12px;
+  margin: 0.625rem 0;
+  color: #ffffff;
+  font-size: 8px;
   font-weight: 500;
+
 }
 
 .su-divider::before,
@@ -382,15 +401,15 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: rgba(255, 255, 255, 0.15);
+  background: #8F90BA;
 }
 
 .su-divider span {
-  padding: 0 14px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0 0.5rem;
+  border: 1px solid #8F90BA;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 1.25rem;
+  height: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -399,19 +418,25 @@
 
 .su-sso-btn {
   width: 100%;
-  padding: 11px;
+  padding: 0.75rem;
   background: #0a0a0a;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  font-size: 13.5px;
+  font-size:14px;
+  line-height: 24px;
   font-weight: 500;
   color: #ffffff;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 0.625rem;
   font-family: 'Inter', sans-serif;
+}
+
+.su-sso-icon {
+  width: 1.25rem;
+  height: auto;
 }
 
 .su-btn-icon {
@@ -420,7 +445,7 @@
 
 .su-signin-text {
   text-align: center;
-  margin-top: 16px;
+  margin-top: 0.5rem;
   font-size: 12.5px;
   color: rgba(255, 255, 255, 0.65);
   font-family: 'Inter', sans-serif;
@@ -435,28 +460,30 @@
 /* ─── Negative State Notification ───────────────────────────────── */
 
 .su-error-notification {
+
   position: absolute;
-  top: 67px;
-  left: 1083px;
-  width: 415px;
-  height: 85px;
-  border-radius: 5px;
+  top: 3.25rem;
+  right: 1.25rem;
+  width: clamp(20rem, 36vw, 26rem);
+  height: auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.3125rem;
   border: 0.2px solid rgba(0, 0, 0, 0.65);
-  background: linear-gradient(
-    90deg,
-    rgba(255, 211, 211, 0.2) 0%,
-    rgba(66, 138, 249, 0.05) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 211, 211, 0.2) 0%,
+      rgba(66, 138, 249, 0.05) 100%);
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   z-index: 9999;
 }
 
 .su-error-icon {
-  position: absolute;
-  left: 35px;
-  top: 27px;
-  width: 31px;
-  height: 31px;
+
+  position: relative;
+  width: 2rem;
+  height: 2rem;
   border-radius: 50%;
   background: #ff3131;
   display: flex;
@@ -465,11 +492,10 @@
 }
 
 .su-error-message {
-  position: absolute;
-  top: 21.5px;
-  left: 94px;
-  width: 234px;
-  height: 43px;
+  position: relative;
+  width: auto;
+  height: auto;
+  margin: 0;
 }
 
 .su-error-message h4 {
@@ -478,39 +504,310 @@
   font-family: 'Inter', sans-serif;
   font-size: 16px;
   font-weight: 400;
-  line-height: 20px;
+  line-height: 1.4;
 }
 
 .su-error-message p {
   margin: 0;
   color: #000000;
   font-family: 'Inter', sans-serif;
-  font-size: 12px;
+  font-size:12px;
   font-weight: 400;
-  line-height: 19px;
-  letter-spacing: -0.11px;
+  line-height: 1.5;
+  letter-spacing: normal;
 }
 
 .su-error-close {
   position: absolute;
-  top: 14px;
-  right: 18px;
-  width: 16px;
-  height: 16px;
+  top: 1rem;
+  right: 1rem;
+  width: auto;
+  height: auto;
   border: none;
   background: transparent;
   color: #6b7280;
   font-size: 24px;
   font-weight: 300;
-  line-height: 16px;
+  line-height: 1;
   cursor: pointer;
   padding: 0;
 }
 
 
 
-@media (max-width: 1535px), (max-height: 1024px) {
-  .su-content {
-    transform: scale(min(calc(100vw / 1535), calc(100vh / 1024)));
+
+
+@media (max-width:1024px) {
+
+  .su-container {
+    overflow-y: auto;
   }
+
+  .su-content {
+
+    transform: none !important;
+
+    width: 100%;
+    min-height: auto;
+    height: auto;
+
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+
+    padding: 20px 20px 40px;
+
+    position: relative;
+  }
+
+  .su-left,
+  .su-right {
+
+    position: relative;
+
+    left: auto;
+    right: auto;
+    top: auto;
+
+    width: 100%;
+  }
+
+  .su-left {
+
+    text-align: flex-start;
+    margin-bottom: 20px;
+    padding: 0.5rem 1rem 0;
+
+  }
+
+
+  .su-heading,
+  .su-subheading,
+  .su-features {
+
+    position: static;
+  }
+
+  .su-heading {
+
+    width: 100%;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    white-space: normal;
+  }
+
+  .su-subheading {
+
+    width: 100%;
+    height: auto;
+    margin-bottom: 35px;
+  }
+
+  .su-features {
+
+    width: 100%;
+    height: auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .su-feature-item {
+
+    position: static;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .su-card {
+
+    width: 100%;
+    max-width: 480px;
+    margin: auto;
+  }
+
+  .su-error-notification {
+
+    position: fixed;
+
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 92%;
+    max-width: 430px;
+
+    z-index: 9999;
+  }
+
+}
+
+
+
+@media (max-width:768px) {
+
+  .su-content {
+
+    padding: 24px 18px 40px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .su-brand-logo {
+
+    width: 160px;
+    height: auto;
+  }
+
+  .su-heading {
+
+    font-size: 26px;
+    line-height: 34px;
+  }
+
+  .su-subheading {
+
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .su-card {
+
+    padding: 28px 22px;
+    border-radius: 18px;
+  }
+
+  .su-card-title {
+
+    font-size: 26px;
+    line-height: 32px;
+  }
+
+  .su-card-subtitle {
+
+    font-size: 13px;
+  }
+
+  .su-input-wrapper input {
+
+    padding: 12px 44px 12px 42px;
+  }
+
+  .su-submit-btn {
+
+    font-size: 14px;
+  }
+
+  .su-sso-btn {
+
+    font-size: 13px;
+  }
+
+  .su-error-notification {
+
+    height: auto;
+    min-height: 80px;
+    padding: 16px;
+  }
+
+  .su-error-icon {
+
+    left: 16px;
+    top: 0px;
+  }
+
+  .su-error-message {
+
+    position: relative;
+
+    left: 60px;
+    top: 0;
+
+    width: calc(100% - 80px);
+    height: auto;
+  }
+
+  .su-error-close {
+
+    top: 12px;
+    right: 14px;
+  }
+
+}
+
+
+
+@media (max-width:480px) {
+
+  .su-content {
+
+    padding: 20px 14px 35px;
+  }
+
+  .su-brand-logo {
+
+    width: 140px;
+  }
+
+  .su-heading {
+
+    font-size: 22px;
+    line-height: 30px;
+  }
+
+  .su-subheading {
+
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  .su-feature-icon {
+
+    width: 42px;
+    height: 42px;
+  }
+
+  .su-feature-title {
+
+    font-size: 14px;
+  }
+
+  .su-feature-desc {
+
+    font-size: 11px;
+  }
+
+  .su-card {
+
+    padding: 22px 18px;
+  }
+
+  .su-card-title {
+
+    font-size: 22px;
+    line-height: 28px;
+  }
+
+  .su-form {
+
+    gap: 12px;
+  }
+
+  .su-form-group label {
+
+    font-size: 12px;
+  }
+
+  .su-input-wrapper input {
+
+    font-size: 12px;
+  }
+
+  .su-submit-btn {
+
+    padding: 12px;
+  }
+
 }

@@ -6,6 +6,16 @@ import featureAnalytics from '../../../assets/login/feature-analytics.png';
 import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
+import emailicon from '../../../assets/login/line-email.png';
+import phoneicon from '../../../assets/login/phone-icon.png';
+import lockicon from '../../../assets/login/lock.png';
+import usericon from '../../../assets/login/user-icon.png';
+import checkIcon from '../../../assets/login/checkcircle.png';
+import googleicon from '../../../assets/login/google-icon.png';
+
+
+
+
 import './SignupForm.css';
 
 const FEATURES = [
@@ -130,11 +140,12 @@ function SignupForm() {
     setSubmitted(true);
     const newErrors = getErrors(formData);
     setErrors(newErrors);
-    if (Object.values(newErrors).some((m) => m !== ''))    {
-      setShowCreateErrorNotice(true); return; }
+    if (Object.values(newErrors).some((m) => m !== '')) {
+      setShowCreateErrorNotice(true); return;
+    }
 
-     // Hide notification when the form is valid
-     setShowCreateErrorNotice(false);
+    // Hide notification when the form is valid
+    setShowCreateErrorNotice(false);
 
     console.log('Signup form submitted:', {
       fullName: formData.fullName,
@@ -168,47 +179,47 @@ function SignupForm() {
       </div>
 
       {/* Negative-state notification shown only when signup validation fails */}
-  {showCreateErrorNotice && (
-    <div className="su-error-notification" role="alert">
-    <div className="su-error-icon">
-  <svg
-    width="19"
-    height="19"
-    viewBox="0 0 24 24"
-    fill="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M12 3L22 20H2L12 3Z"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M12 9V13"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-    <circle cx="12" cy="17" r="1" fill="white" />
-  </svg>
-</div>
+      {showCreateErrorNotice && (
+        <div className="su-error-notification" role="alert">
+          <div className="su-error-icon">
+            <svg
+              width="19"
+              height="19"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M12 3L22 20H2L12 3Z"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12 9V13"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <circle cx="12" cy="17" r="1" fill="white" />
+            </svg>
+          </div>
 
-      <div className="su-error-message">
-        <h4>Unable to create account</h4>
-        <p>Please fix the errors below and try again</p>
-      </div>
+          <div className="su-error-message">
+            <h4>Unable to create account</h4>
+            <p>Please fix the errors below and try again</p>
+          </div>
 
-      <button
-        type="button"
-        className="su-error-close"
-        onClick={() => setShowCreateErrorNotice(false)}
-        aria-label="Close notification"
-      >
-        ×
-      </button>
-    </div>
-  )}
+          <button
+            type="button"
+            className="su-error-close"
+            onClick={() => setShowCreateErrorNotice(false)}
+            aria-label="Close notification"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       <div className="su-content">
         {/* Left Info Section */}
@@ -236,7 +247,7 @@ function SignupForm() {
         {/* Right Card Section */}
         <div className="su-right">
           <div className="su-card">
-            
+
 
             <h2 className="su-card-title">Create your Account</h2>
             <p className="su-card-subtitle">
@@ -248,10 +259,11 @@ function SignupForm() {
               <div className="su-form-group">
                 <label htmlFor="su-fullName">Full Name</label>
                 <div className="su-input-wrapper">
-                  <svg className="su-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.5" />
-                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
+                  <img
+                    src={usericon}
+                    alt="user"
+                    className="su-input-icon"
+                  />
                   <input
                     type="text"
                     id="su-fullName"
@@ -261,17 +273,25 @@ function SignupForm() {
                     placeholder="Enter your full name"
                     maxLength={80}
                   />
+                  {errors.mobileNumber && (
+                    <img
+                      src={checkIcon}
+                      alt="error"
+                      className="su-check-icon"
+                    />
+                  )}
                 </div>
-                {errors.fullName && <span className="su-field-error">{errors.fullName}</span>}
+                <span className="su-field-error">{errors.fullName}</span>
               </div>
 
               <div className="su-form-group">
                 <label htmlFor="su-email">Email ID</label>
                 <div className="su-input-wrapper">
-                  <svg className="su-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
-                    <path d="M2 6l10 7 10-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
+                  <img
+                    src={emailicon}
+                    alt="email"
+                    className="su-input-icon"
+                  />
                   <input
                     type="email"
                     id="su-email"
@@ -280,17 +300,25 @@ function SignupForm() {
                     onChange={handleChange}
                     placeholder="Enter your email"
                   />
+                  {errors.email && (
+                    <img
+                      src={checkIcon}
+                      alt="error"
+                      className="su-check-icon"
+                    />
+                  )}
                 </div>
-                {errors.email && <span className="su-field-error">{errors.email}</span>}
+                <span className="su-field-error">{errors.email}</span>
               </div>
 
               <div className="su-form-group">
                 <label htmlFor="su-mobileNumber">Mobile Number</label>
                 <div className="su-input-wrapper">
-                  <svg className="su-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <rect x="5" y="2" width="14" height="20" rx="3" stroke="currentColor" strokeWidth="1.5" />
-                    <circle cx="12" cy="18" r="1" fill="currentColor" />
-                  </svg>
+                  <img
+                    src={phoneicon}
+                    alt="phone"
+                    className="su-input-icon"
+                  />
                   <input
                     type="tel"
                     id="su-mobileNumber"
@@ -300,17 +328,25 @@ function SignupForm() {
                     placeholder="Enter your mobile number"
                     maxLength={15}
                   />
+                  {errors.mobileNumber && (
+                    <img
+                      src={checkIcon}
+                      alt="error"
+                      className="su-check-icon"
+                    />
+                  )}
                 </div>
-                {errors.mobileNumber && <span className="su-field-error">{errors.mobileNumber}</span>}
+                <span className="su-field-error">{errors.mobileNumber}</span>
               </div>
 
               <div className="su-form-group">
                 <label htmlFor="su-password">Password</label>
                 <div className="su-input-wrapper">
-                  <svg className="su-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.5" />
-                    <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
+                  <img
+                    src={lockicon}
+                    alt="password"
+                    className="su-input-icon"
+                  />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     id="su-password"
@@ -319,25 +355,34 @@ function SignupForm() {
                     onChange={handleChange}
                     placeholder="Create a password"
                   />
+                  {errors.password && (
+                    <img
+                      src={checkIcon}
+                      alt="error"
+                      className="su-check-icon"
+                    />
+                  )}
                   <button
                     type="button"
-                    className="su-pw-toggle"
+                    className={`su-pw-toggle ${errors.password ? 'su-pw-toggle-error' : ''}`}
                     onClick={() => setShowPassword((p) => !p)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeClosed /> : <EyeOpen />}
                   </button>
+                  
                 </div>
-                {errors.password && <span className="su-field-error">{errors.password}</span>}
+                <span className="su-field-error">{errors.password}</span>
               </div>
 
               <div className="su-form-group">
                 <label htmlFor="su-confirmPassword">Confirm Password</label>
                 <div className="su-input-wrapper">
-                  <svg className="su-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.5" />
-                    <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
+                  <img
+                    src={lockicon}
+                    alt="password"
+                    className="su-input-icon"
+                  />
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     id="su-confirmPassword"
@@ -346,16 +391,24 @@ function SignupForm() {
                     onChange={handleChange}
                     placeholder="Confirm your password"
                   />
+                  {errors.confirmPassword && (
+                    <img
+                      src={checkIcon}
+                      alt="error"
+                      className="su-check-icon"
+                    />
+                  )}
                   <button
                     type="button"
-                    className="su-pw-toggle"
+                    className={`su-pw-toggle ${errors.confirmPassword ? 'su-pw-toggle-error' : ''}`}
                     onClick={() => setShowConfirmPassword((p) => !p)}
                     aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                   >
                     {showConfirmPassword ? <EyeClosed /> : <EyeOpen />}
                   </button>
+
                 </div>
-                {errors.confirmPassword && <span className="su-field-error">{errors.confirmPassword}</span>}
+                <span className="su-field-error">{errors.confirmPassword}</span>
               </div>
 
               <div className="su-form-group su-terms-group">
@@ -372,7 +425,7 @@ function SignupForm() {
                     <a href="#" className="su-terms-link">Terms &amp; Conditions</a>
                   </span>
                 </label>
-                {errors.agreeToTerms && <span className="su-field-error">{errors.agreeToTerms}</span>}
+                <span className="su-field-error">{errors.agreeToTerms}</span>
               </div>
 
               <button type="submit" className="su-submit-btn">Create Account</button>
@@ -383,12 +436,11 @@ function SignupForm() {
             </div>
 
             <button type="button" className="su-sso-btn">
-              <svg className="su-btn-icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-              </svg>
+              <img
+                src={googleicon}
+                alt="google"
+                className="su-sso-icon"
+              />
               Sign in with Google
             </button>
 
