@@ -67,7 +67,7 @@ function SessionExpiredForm() {
   const navigate = useNavigate();
 
   const handleStartAgain = () => {
-    navigate('/');
+    navigate('/login');
   };
 
   const handleBackToSignIn = () => {
