@@ -41,11 +41,10 @@
 /* ─── Left Section ───────────────────────────────────────────────── */
 .se-left-section {
   flex: 0 0 28%;
-  padding: 60px 32px 60px 32px;
+  padding: 60px 32px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow-y: auto;
   min-height: 100vh;
 }
 
@@ -364,41 +363,40 @@
 }
 
 /* ─── Responsive ─────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .se-content {
-    flex-direction: column;
-  }
+/* ─── Responsive ─────────────────────────────────────────────────── */
 
-  .se-left-section {
-    display: none;
-  }
-
-  .se-right-section {
-    width: 100%;
-    min-height: 100vh;
-    padding: 48px 20px;
-  }
-
-  .se-card {
-    width: 100%;
-    max-width: 480px;
-    margin: auto;
-  }
-}
-
+/* Smaller laptops and DevTools-open view */
 @media (max-width: 1100px) {
+  .se-content {
+    max-width: 100%;
+  }
+
   .se-left-section {
-    flex: 0 0 32%;
-    padding: 48px 28px 48px 28px;
+    flex: 0 0 42%;
+    padding: 48px 24px;
   }
 
   .se-right-section {
-    flex: 0 0 48%;
+    flex: 1;
     padding: 40px 24px;
   }
 
   .se-welcome-heading {
-    font-size: 30px;
+    font-size: 28px;
+    white-space: normal;
+  }
+
+  .se-welcome-description {
+    font-size: 15px;
+    max-width: 100%;
+  }
+
+  .se-feature-label {
+    font-size: 15px;
+  }
+
+  .se-feature-description {
+    font-size: 13px;
   }
 
   .se-card {
@@ -406,42 +404,20 @@
   }
 }
 
-@media (max-width: 480px) {
-  .se-welcome-heading {
-    font-size: 22px;
-    white-space: nowrap;
-  }
-
-  .se-welcome-description {
-    max-width: 100%;
-  }
-
-  .se-card {
-    padding: 24px 20px 20px;
-  }
-}
-
-@media (max-width: 768px) {
-
-  .se-feature-description {
-    max-width: 200px;
-    white-space: normal;
-    word-break: normal;
-  }
-
+/* Tablet layout: show left section above the card */
+@media (max-width: 900px) {
   .se-container {
-    position: relative;
     min-height: 100vh;
     height: auto;
-    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
+
   .se-background {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: fixed;
+    inset: 0;
     width: 100%;
-    height: 100%;
-    z-index: 0;
+    height: 100vh;
   }
 
   .se-background-image {
@@ -452,92 +428,186 @@
   }
 
   .se-content {
-      position: relative;
-    z-index: 1;
+    width: 100%;
+    min-height: 100vh;
+    max-width: 100%;
+    flex-direction: column;
+    align-items: center;
   }
 
   .se-left-section {
     display: flex;
-    order: 1;
-    flex: 0 0 auto;
+    flex: none;
+    flex-direction: column;
+    justify-content: center;
     width: 100%;
+    max-width: 600px;
     min-height: auto;
-    padding: 32px 24px 20px;
-    overflow-y: visible;
+    padding: 40px 32px 24px;
+    overflow: visible;
+  }
 
+  .se-brand-logo {
+    height: 52px;
+    margin-bottom: 24px;
+  }
+
+  .se-welcome-heading {
+    font-size: 30px;
+    white-space: normal;
+    margin-bottom: 12px;
+  }
+
+  .se-welcome-description {
+    max-width: 520px;
+    margin-bottom: 28px;
+  }
+
+  .se-features-container {
+    width: 100%;
+    gap: 20px;
+  }
+
+  .se-feature-description {
+    max-width: none;
+    white-space: normal;
   }
 
   .se-right-section {
-    order: 2;
-    flex: 0 0 auto;
+    flex: none;
     width: 100%;
     min-height: auto;
-    padding: 32px 20px 40px;
-    overflow-y: visible;
+    padding: 24px 24px 48px;
+    overflow: visible;
   }
 
   .se-card {
-    width: 100%;
+    width: min(100%, 480px);
     max-width: 480px;
     min-height: auto;
     margin: 0 auto;
   }
+}
 
-  /* visible scrollbar */
-  .se-container::-webkit-scrollbar {
-    width: 8px;
+/* Mobile */
+@media (max-width: 600px) {
+  .se-left-section {
+    padding: 32px 20px 20px;
   }
-  .se-container::-webkit-scrollbar-track {
-    background: transparent;
+
+  .se-right-section {
+    padding: 20px 16px 36px;
   }
-  .se-container::-webkit-scrollbar-thumb {
-    background: #9CA3AF;
-    border-radius: 4px;
+
+  .se-brand-logo {
+    height: 46px;
+    margin-bottom: 20px;
   }
-  .se-container {
-    scrollbar-width: thin;
-    scrollbar-color: #9CA3AF transparent;
+
+  .se-welcome-heading {
+    font-size: 25px;
+  }
+
+  .se-welcome-description {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .se-feature-icon-wrapper {
+    width: 50px;
+    height: 52px;
+    min-width: 50px;
+  }
+
+  .se-feature-svg-badge {
+    width: 30px;
+    height: 30px;
+  }
+
+  .se-feature-label {
+    font-size: 14px;
+  }
+
+  .se-feature-description {
+    font-size: 12px;
+  }
+
+  .se-card {
+    padding: 32px 24px 24px;
+  }
+
+  .se-card-logo-icon-outerline {
+    width: 120px;
+    height: 117px;
+  }
+
+  .se-card-logo-icon-innerline {
+    width: 102px;
+    height: 90px;
+    margin-left: -100px;
+  }
+
+  .se-title {
+    font-size: 24px;
+  }
+
+  .se-info-box,
+  .se-primary-btn,
+  .se-secondary-btn,
+  .se-support-container {
+    max-width: 100%;
   }
 }
 
 @media (max-width: 425px) {
   .se-left-section {
-    padding: 28px 20px 16px;
+    padding: 28px 18px 18px;
   }
+
   .se-right-section {
-    padding: 28px 16px 32px;
+    padding: 18px 14px 32px;
   }
 
   .se-welcome-heading {
     font-size: 22px;
-    white-space: normal;
-  }
-
-  .se-welcome-description {
-    font-size: 14px;
-    max-width: 100%;
   }
 
   .se-card {
-    padding: 28px 20px 20px;
+    padding: 28px 18px 22px;
+    border-radius: 16px;
+  }
+
+  .se-info-box {
+    padding: 12px;
+  }
+
+  .se-support-text {
+    align-items: flex-start;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .se-lock-icon {
+    width: 20px;
+    height: 20px;
   }
 }
 
 @media (max-width: 375px) {
   .se-left-section {
-    padding: 24px 16px 12px;
+    padding: 24px 16px 16px;
   }
 
   .se-right-section {
-    padding: 24px 16px 28px;
+    padding: 16px 12px 28px;
   }
 
   .se-welcome-heading {
     font-size: 20px;
   }
 
-  .se-welcome-description {
-    font-size: 13px;
+  .se-feature-item {
+    gap: 10px;
   }
 
   .se-feature-icon-wrapper {
@@ -552,16 +622,28 @@
   }
 
   .se-card {
-    padding: 24px 16px 16px;
+    padding: 24px 16px 20px;
+  }
+
+  .se-card-logo-icon-outerline {
+    width: 105px;
+    height: 103px;
+  }
+
+  .se-card-logo-icon-innerline {
+    width: 90px;
+    height: 78px;
+    margin-left: -88px;
   }
 }
 
 @media (max-width: 320px) {
   .se-left-section {
-    padding: 20px 12px 10px;
+    padding: 20px 12px 14px;
   }
+
   .se-right-section {
-    padding: 20px 12px 24px;
+    padding: 14px 10px 24px;
   }
 
   .se-welcome-heading {
@@ -581,7 +663,7 @@
   }
 
   .se-card {
-    padding: 20px 12px 14px;
+    padding: 20px 12px 18px;
   }
 
   .se-primary-btn,

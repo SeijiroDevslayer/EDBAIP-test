@@ -1580,3 +1580,21 @@
     height: 68px;
   }
 }
+
+/* Keep the visible section stable while DevTools changes viewport width. */
+html {
+  overflow-anchor: auto;
+  scroll-behavior: auto;
+}
+
+.landing-page {
+  width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.landing-page > section,
+.landing-page > footer {
+  overflow-anchor: auto;
+  contain: layout paint;
+}

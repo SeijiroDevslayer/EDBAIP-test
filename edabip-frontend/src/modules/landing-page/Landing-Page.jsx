@@ -192,137 +192,78 @@ const stats = [
   { value: "24/7", label: "Monitoring & Support", icon: StatIconSupport },
 ];
 export default function LandingPage() {
-  const pageRef = useRef(null);
-  const ctaRef = useRef(null);
+  const viewportAnchorRef = useRef({ element: null, top: 0 });
 
   useLayoutEffect(() => {
-    const pageEl = pageRef.current;
-    const desktopBreakpoint = 861;
-    let desktopLockedWidth = 0;
+    const getPageSections = () =>
+      Array.from(
+        document.querySelectorAll(
+          ".landing-page > section, .landing-page > footer"
+        )
+      );
 
-    const updateDesktopWidthLock = () => {
-      if (!pageEl) {
-        return;
-      }
+    const rememberVisibleSection = () => {
+      const sections = getPageSections();
+      if (!sections.length) return;
 
-      if (window.innerWidth < desktopBreakpoint) {
-        pageEl.style.minWidth = "";
-        desktopLockedWidth = 0;
-        return;
-      }
+      const viewportTarget = window.innerHeight * 0.35;
+      let closestSection = sections[0];
+      let closestDistance = Number.POSITIVE_INFINITY;
 
-      if (!desktopLockedWidth) {
-        desktopLockedWidth = Math.round(pageEl.getBoundingClientRect().width);
-      }
+      sections.forEach((section) => {
+        const rect = section.getBoundingClientRect();
+        const sectionTarget = Math.min(
+          Math.max(viewportTarget, rect.top),
+          rect.bottom
+        );
+        const distance = Math.abs(sectionTarget - viewportTarget);
 
-      pageEl.style.minWidth = `${desktopLockedWidth}px`;
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestSection = section;
+        }
+      });
+
+      viewportAnchorRef.current = {
+        element: closestSection,
+        top: closestSection.getBoundingClientRect().top,
+      };
     };
 
-    updateDesktopWidthLock();
+    let resizeFrame = 0;
 
-    let isLocking = false;
-    let anchorTop = 0;
-    let settleTimer = null;
-    let rafId = 0;
-    let previousWidth = window.innerWidth;
+    const keepSectionInPlace = () => {
+      cancelAnimationFrame(resizeFrame);
 
-    const isCtaVisible = () => {
-      if (!ctaRef.current) {
-        return false;
-      }
-
-      const rect = ctaRef.current.getBoundingClientRect();
-      return rect.bottom > 0 && rect.top < window.innerHeight;
-    };
-
-    const applyCorrection = () => {
-      rafId = 0;
-
-      if (!isLocking || !ctaRef.current) {
-        return;
-      }
-
-      const delta = ctaRef.current.getBoundingClientRect().top - anchorTop;
-      if (Math.abs(delta) > 1) {
-        window.scrollBy({ top: delta, left: 0, behavior: "auto" });
-      }
-    };
-
-    const scheduleCorrection = () => {
-      if (!rafId) {
-        rafId = window.requestAnimationFrame(applyCorrection);
-      }
-    };
-
-    const finishStabilization = () => {
-      if (rafId) {
-        window.cancelAnimationFrame(rafId);
-        rafId = 0;
-      }
-
-      applyCorrection();
-      isLocking = false;
-      anchorTop = 0;
-      settleTimer = null;
-    };
-
-    const onResize = () => {
-      const widthDelta = Math.abs(window.innerWidth - previousWidth);
-      previousWidth = window.innerWidth;
-
-      if (widthDelta < 1) {
-        return;
-      }
-
-      updateDesktopWidthLock();
-
-      if (!isLocking) {
-        if (!isCtaVisible()) {
+      resizeFrame = requestAnimationFrame(() => {
+        const { element, top } = viewportAnchorRef.current;
+        if (!element || !document.body.contains(element)) {
+          rememberVisibleSection();
           return;
         }
 
-        isLocking = true;
-        anchorTop = ctaRef.current.getBoundingClientRect().top;
-      }
+        const newTop = element.getBoundingClientRect().top;
+        const shift = newTop - top;
 
-      scheduleCorrection();
-
-      if (settleTimer) {
-        window.clearTimeout(settleTimer);
-      }
-
-      settleTimer = window.setTimeout(finishStabilization, 220);
+        if (Math.abs(shift) > 1) {
+          window.scrollBy({ top: shift, left: 0, behavior: "auto" });
+        }
+      });
     };
 
-    window.addEventListener("resize", onResize, { passive: true });
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", onResize, { passive: true });
-    }
+    rememberVisibleSection();
+    window.addEventListener("scroll", rememberVisibleSection, { passive: true });
+    window.addEventListener("resize", keepSectionInPlace, { passive: true });
 
     return () => {
-      window.removeEventListener("resize", onResize);
-
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener("resize", onResize);
-      }
-
-      if (settleTimer) {
-        window.clearTimeout(settleTimer);
-      }
-
-      if (rafId) {
-        window.cancelAnimationFrame(rafId);
-      }
-
-      if (pageEl) {
-        pageEl.style.minWidth = "";
-      }
+      cancelAnimationFrame(resizeFrame);
+      window.removeEventListener("scroll", rememberVisibleSection);
+      window.removeEventListener("resize", keepSectionInPlace);
     };
   }, []);
 
   return (
-    <main className="landing-page" ref={pageRef}>
+    <main className="landing-page">
       <section className="hero">
   <img
     className="hero-background-image"
@@ -559,7 +500,7 @@ export default function LandingPage() {
             ))}
           </section>
 
-      <section className="cta-banner" ref={ctaRef}>
+      <section className="cta-banner">
         <img
           className="cta-banner-frame"
           src={CTAFrame}
