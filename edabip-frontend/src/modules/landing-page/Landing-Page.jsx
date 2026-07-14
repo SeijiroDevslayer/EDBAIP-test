@@ -1,4 +1,5 @@
 import "./Landing-Page.css";
+import { useLayoutEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 // Hero Section Assets
 import HeroCheck from "../../assets/landing-page/tick1.png";
@@ -191,8 +192,137 @@ const stats = [
   { value: "24/7", label: "Monitoring & Support", icon: StatIconSupport },
 ];
 export default function LandingPage() {
+  const pageRef = useRef(null);
+  const ctaRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const pageEl = pageRef.current;
+    const desktopBreakpoint = 861;
+    let desktopLockedWidth = 0;
+
+    const updateDesktopWidthLock = () => {
+      if (!pageEl) {
+        return;
+      }
+
+      if (window.innerWidth < desktopBreakpoint) {
+        pageEl.style.minWidth = "";
+        desktopLockedWidth = 0;
+        return;
+      }
+
+      if (!desktopLockedWidth) {
+        desktopLockedWidth = Math.round(pageEl.getBoundingClientRect().width);
+      }
+
+      pageEl.style.minWidth = `${desktopLockedWidth}px`;
+    };
+
+    updateDesktopWidthLock();
+
+    let isLocking = false;
+    let anchorTop = 0;
+    let settleTimer = null;
+    let rafId = 0;
+    let previousWidth = window.innerWidth;
+
+    const isCtaVisible = () => {
+      if (!ctaRef.current) {
+        return false;
+      }
+
+      const rect = ctaRef.current.getBoundingClientRect();
+      return rect.bottom > 0 && rect.top < window.innerHeight;
+    };
+
+    const applyCorrection = () => {
+      rafId = 0;
+
+      if (!isLocking || !ctaRef.current) {
+        return;
+      }
+
+      const delta = ctaRef.current.getBoundingClientRect().top - anchorTop;
+      if (Math.abs(delta) > 1) {
+        window.scrollBy({ top: delta, left: 0, behavior: "auto" });
+      }
+    };
+
+    const scheduleCorrection = () => {
+      if (!rafId) {
+        rafId = window.requestAnimationFrame(applyCorrection);
+      }
+    };
+
+    const finishStabilization = () => {
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+
+      applyCorrection();
+      isLocking = false;
+      anchorTop = 0;
+      settleTimer = null;
+    };
+
+    const onResize = () => {
+      const widthDelta = Math.abs(window.innerWidth - previousWidth);
+      previousWidth = window.innerWidth;
+
+      if (widthDelta < 1) {
+        return;
+      }
+
+      updateDesktopWidthLock();
+
+      if (!isLocking) {
+        if (!isCtaVisible()) {
+          return;
+        }
+
+        isLocking = true;
+        anchorTop = ctaRef.current.getBoundingClientRect().top;
+      }
+
+      scheduleCorrection();
+
+      if (settleTimer) {
+        window.clearTimeout(settleTimer);
+      }
+
+      settleTimer = window.setTimeout(finishStabilization, 220);
+    };
+
+    window.addEventListener("resize", onResize, { passive: true });
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", onResize, { passive: true });
+    }
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener("resize", onResize);
+      }
+
+      if (settleTimer) {
+        window.clearTimeout(settleTimer);
+      }
+
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
+      }
+
+      if (pageEl) {
+        pageEl.style.minWidth = "";
+      }
+    };
+  }, []);
+
   return (
-    <main className="landing-page">
+    <main className="landing-page" ref={pageRef}>
       <section className="hero">
   <img
     className="hero-background-image"
@@ -429,7 +559,7 @@ export default function LandingPage() {
             ))}
           </section>
 
-      <section className="cta-banner">
+      <section className="cta-banner" ref={ctaRef}>
         <img
           className="cta-banner-frame"
           src={CTAFrame}
