@@ -559,7 +559,8 @@ setTimeout(() => {
                             </span>
 
                             <p className="fp-helper-text">
-                              We&apos;ll send a secure reset link to this address. It will expire in
+                              We&apos;ll send a secure reset link to this address. It will
+                              expire in
                               5 minutes.
                             </p>
                           </div>
