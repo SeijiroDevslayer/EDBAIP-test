@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import backgroundImg from '../../../assets/login/background.png';
 import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
@@ -446,7 +447,7 @@ function SignupForm() {
 
             <p className="su-signin-text">
               Already have an account?{' '}
-              <a href="/" className="su-signin-link">Sign in</a>
+              <a href="/login" className="su-signin-link">Sign in</a>
             </p>
           </div>
         </div>
