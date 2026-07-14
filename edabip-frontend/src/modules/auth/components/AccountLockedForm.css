@@ -26,12 +26,13 @@
 ══════════════════════════════ */
 .al-left {
   position: absolute;
-  left: 109px;
+  left: 6px;
   top: 197px;
   width: 375px;
   height: 514px;
   display: flex;
   flex-direction: column;
+  text-align: left;
 }
 
 .al-logo {
@@ -44,12 +45,13 @@
 
 .al-heading {
   font-family: "Inter", sans-serif;
-  font-size: 30px;
+  font-size: 38px;
   font-weight: 600;
   color: #343495;
   line-height: 1;
-  margin: 0 0 16px;
+  margin: 0 0 20px;
   letter-spacing: 0;
+  white-space: nowrap;   
 }
 
 .al-heading-accent {
@@ -63,11 +65,11 @@
 .al-desc {
   font-family: "Inter", sans-serif;
   font-weight: 400;
-  font-size: 18px;
+  font-size: 20px;
   line-height: 25px;
   letter-spacing: 0;
   color: #343495;
-  margin: 0 0 34px;
+  margin: 0 0 40px;
 }
 
 /* ── Feature list ── */
@@ -75,7 +77,7 @@
   display: flex;
   flex-direction: column;
   width: 341px;
-  gap: 37px;
+  gap: 42px;
 }
 
 .al-feature {
@@ -86,14 +88,14 @@
 
 .al-feat-icon {
   flex-shrink: 0;
-  width: 50px;
-  height: 52px;
+  width: 64px;
+  height: 62px;
   object-fit: contain;
 }
 
 .al-feat-title {
   font-family: "Inter", sans-serif;
-  font-size: 16px;
+  font-size: 19px;
   font-weight: 600;
   color: #333395;
   line-height: 1;
@@ -103,7 +105,7 @@
 
 .al-feat-desc {
   font-family: "Inter", sans-serif;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 400;
   color: #343495;
   line-height: 20px;
@@ -116,9 +118,9 @@
 ══════════════════════════════ */
 .al-card-col {
   position: absolute;
-  /* left: 34.2%; */
+  left: 34.2%; 
   left: 526px;
-  /* top: 13.7%; */
+  top: 13.7%; 
   top: 140px;
 }
 
@@ -324,6 +326,8 @@
 /* ══════════════════════════════
    Responsive
 ══════════════════════════════ */
+
+/* ── Tablet (≤1200px) ── */
 @media (max-width: 1200px) {
   .al-left {
     left: 4%;
@@ -338,27 +342,260 @@
   }
 }
 
+
+/* ── Tablet / stacked layout (≤768px) ── */
 @media (max-width: 768px) {
+  .al-page {
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+
   .al-row {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
+    max-width: 100%;
     padding: 32px 20px 48px;
-    gap: 28px;
+    gap: 10px;
     height: auto;
+    min-height: 100%;
   }
+
+  .al-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .al-background-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
   .al-left {
     position: static;
     transform: none;
     width: 100%;
+    max-width: 650px;
   }
+
+  .al-heading {
+    font-size: 28px;
+    margin: 0 0 10px;
+  }
+
+  .al-desc {
+    font-size: 15px;
+    line-height: 22px;
+    margin: 0 0 32px;
+    max-width: 300px;
+  }
+
+  .al-features {
+    gap: 24px;
+  }
+
+  .al-feature {
+    gap: 10px;
+  }
+
+  .al-feat-icon {
+    width: 44px;
+    height: 46px;
+  }
+
+  .al-feat-title {
+    font-size: 16px;
+    margin: 0 0 1px;
+  }
+
+  .al-feat-desc {
+    font-size: 12.5px;
+    line-height: 16px;
+  }
+
   .al-card-col {
     position: static;
     transform: none;
     width: 100%;
+    display: flex;
+    justify-content: center;
   }
+
   .al-card {
     width: 100%;
+    max-width: 483px;
     padding: 28px 24px 24px;
   }
 }
+/* ── Mobile (≤480px) ── */
+@media (max-width: 480px) {
+  .al-page {
+    height: 100vh;
+    overflow-y: auto;      /* was overflow: visible — now scrolls instead of just growing */
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;   /* smooth momentum scroll on iOS */
+  }
+
+
+  .al-row {
+    gap: 12px;   /* tightened from 28px to pull the card up closer to the features list */
+  }
+
+  .al-left {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+
+  .al-logo {
+    width: 130px;
+    height: 47px;
+    margin-bottom: 16px;
+  }
+
+  .al-heading {
+    font-size: 24px;
+    white-space: normal;   /* allow wrapping — nowrap was too wide for small screens */
+    line-height: 1.2;
+    margin: 0 0 10px;
+  }
+
+  .al-desc {
+    font-size: 14px;
+    line-height: 20px;
+    margin: 0 0 20px;
+  }
+
+  .al-features {
+    width: 100%;
+    max-width: 100%;
+    gap: 18px;
+  }
+
+  .al-feature {
+    gap: 10px;
+  }
+
+  .al-feat-icon {
+    width: 40px;
+    height: 42px;
+  }
+
+  .al-feat-title {
+    font-size: 15px;
+    margin: 0 0 2px;
+  }
+
+  .al-feat-desc {
+    font-size: 12px;
+    line-height: 17px;
+  }
+
+  .al-card-col {
+    margin-top: 0;
+  }
+
+  .al-btn,
+  .al-info,
+  .al-footer {
+    width: 100%;   /* these are hardcoded to 346px in the base styles — overflow on 320px screens */
+  }
+} 
+
+/* ── Mobile M (≤375px) — card content ── */
+@media (max-width: 375px) {
+  .al-row {
+    padding: 20px 12px 32px;   
+  }
+  .al-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 24px 14px 20px;
+    box-sizing: hidden;
+  }
+
+  .al-card-inner {
+    width: 100%;
+    max-width: 100%;
+    gap: 16px;   /* was 22px */
+  }
+
+  .al-lock-circle {
+    width: 120px;    /* was 166px */
+    height: 120px;
+  }
+
+  .al-lock-img {
+    width: 110px;    /* was 153px */
+    height: 110px;
+  }
+
+  .al-title {
+    font-size: 22px;   /* was 28px */
+  }
+
+  .al-error {
+    font-size: 16px;   /* was 20px */
+    line-height: 22px;
+  }
+
+  .al-sub {
+    font-size: 13px;   /* was 14px */
+    line-height: 19px;
+  }
+
+  .al-info {
+    width: 100%;       /* was fixed 346px — overflowed the card */
+    max-width: 100%;
+    padding: 10px 8px;
+    box-sizing: border-box;
+  }
+
+  .al-info-icon,
+  .al-info-icon img {
+    width: 22px;       /* was 27.72px */
+    height: 22px;
+  }
+
+  .al-info-title {
+    font-size: 13px;
+  }
+
+  .al-info-desc {
+    font-size: 11px;
+    line-height: 17px;
+  }
+
+  .al-btn {
+    width: 100%;       
+    font-size: 13px;
+    padding: 10px 8px;
+    box-sizing: border-box;
+  }
+
+  .al-footer {
+    width: 100%;
+    max-width: 100%;
+    font-size: 11px;
+    line-height: 17px;
+    box-sizing: border-box;
+    flex-wrap: wrap;   
+  }
+
+  .al-contact {
+    font-size: 11px;
+  }
+} 
