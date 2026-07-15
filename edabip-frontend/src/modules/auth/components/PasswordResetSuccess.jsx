@@ -6,6 +6,7 @@ import featureAnalytics from '../../../assets/login/feature-analytics.png';
 import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
+import { Link } from "react-router-dom";
 import './PasswordResetSuccess.css';
 
 const FEATURES = [
@@ -83,10 +84,10 @@ function PasswordResetSuccess() {
               using your new password.
             </p>
 
-            <a href="/" className="prs-signin-btn">
-              Go to Sign in
-              <ArrowRightIcon />
-            </a>
+             <Link to="/login" className="prs-signin-btn">
+               Go to Sign in
+               <ArrowRightIcon />
+              </Link>
 
             <p className="prs-support-text">
               Need help ?{' '}

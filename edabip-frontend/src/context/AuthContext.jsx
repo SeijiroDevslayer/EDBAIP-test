@@ -1,77 +1,111 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback } from "react";
 
 const AuthContext = createContext(null);
 
 // ---- MOCK BACKEND ----
-const MOCK_USER = { email: 'test@gmail.com', password: 'pass12345' };
 let mockAttemptsUsed = 0;
 const MAX_ATTEMPTS = 5;
 
-function mockLoginRequest(credentials) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      if (mockAttemptsUsed >= MAX_ATTEMPTS) {
-        resolve({ success: false, locked: true, message: 'Account temporarily locked' });
-        return;
-      }
-
-      if (
-        credentials.email === MOCK_USER.email &&
-        credentials.password === MOCK_USER.password
-      ) {
-        mockAttemptsUsed = 0; // resetting the attempts on successful login
-        resolve({ success: true, user: { email: credentials.email }, token: 'mock-token-123' });
-      } else {
-        mockAttemptsUsed += 1;
-        const attemptsRemaining = MAX_ATTEMPTS - mockAttemptsUsed;
-        resolve({
-          success: false,
-          locked: attemptsRemaining <= 0,
-          attemptsRemaining,
-          message: 'Invalid email or password',
-        });
-      }
-    }, 600); // simulate network delay
-  });
-}
-//
-
 export function AuthProvider({ children }) {
+  // Mock user with persistent password
+  const [mockUser, setMockUser] = useState(() => ({
+    email: "test@gmail.com",
+    password: localStorage.getItem("mockPassword") || "pass12345",
+  }));
+
   const [isAuthenticated, setIsAuthenticated] = useState(
-  () => !!localStorage.getItem('authToken')
-);
+    () => !!localStorage.getItem("authToken")
+  );
+
   const [user, setUser] = useState(null);
 
   // Reset last activity timestamp
   const resetSession = useCallback(() => {
-    // This is intentionally empty for now - SessionTimeout handles the actual tracking
+    // This is intentionally empty for now
   }, []);
 
-  // Check if session is expired (placeholder)
+  // Check if session is expired
   const isSessionExpired = useCallback(() => {
     return false;
   }, []);
 
+  // Update password
+  const updatePassword = useCallback(
+    (newPassword) => {
+      const updatedUser = {
+        ...mockUser,
+        password: newPassword,
+      };
+
+      setMockUser(updatedUser);
+
+      // Save new password so it survives refresh
+      localStorage.setItem("mockPassword", newPassword);
+    },
+    [mockUser]
+  );
+
   // Login function
-  const login = useCallback(async (credentials) => {
-    const data = await mockLoginRequest(credentials);
+  const login = useCallback(
+    async (credentials) => {
+      const data = await new Promise((resolve) => {
+        setTimeout(() => {
+          if (mockAttemptsUsed >= MAX_ATTEMPTS) {
+            resolve({
+              success: false,
+              locked: true,
+              message: "Account temporarily locked",
+            });
+            return;
+          }
 
-    if (!data.success) {
-      return data; // { success: false, attemptsRemaining, locked, message }
-    }
+          if (
+            credentials.email === mockUser.email &&
+            credentials.password === mockUser.password
+          ) {
+            mockAttemptsUsed = 0;
 
-    setUser(data.user);
-    setIsAuthenticated(true);
-    localStorage.setItem('authToken', data.token);
+            resolve({
+              success: true,
+              user: {
+                email: credentials.email,
+              },
+              token: "mock-token-123",
+            });
+          } else {
+            mockAttemptsUsed++;
 
-    return { success: true };
-  }, []);
+            resolve({
+              success: false,
+              locked: mockAttemptsUsed >= MAX_ATTEMPTS,
+              attemptsRemaining: MAX_ATTEMPTS - mockAttemptsUsed,
+              message: "Invalid email or password",
+            });
+          }
+        }, 600);
+      });
+
+      if (!data.success) {
+        return data;
+      }
+
+      setUser(data.user);
+      setIsAuthenticated(true);
+
+      localStorage.setItem("authToken", data.token);
+
+      return {
+        success: true,
+      };
+    },
+    [mockUser]
+  );
 
   // Logout function
   const logout = useCallback(() => {
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem('authToken');
+    localStorage.removeItem("authToken");
   }, []);
 
   return (
@@ -81,6 +115,7 @@ export function AuthProvider({ children }) {
         user,
         login,
         logout,
+        updatePassword,
         resetSession,
         isSessionExpired,
       }}
