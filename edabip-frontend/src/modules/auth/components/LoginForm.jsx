@@ -234,7 +234,7 @@ const { login } = useAuthContext();
             <h2 className="card-welcome">
               Welcome{' '}
               <span className="card-welcome-accent">
-                Back!
+                Back !
               </span>
             </h2>
 

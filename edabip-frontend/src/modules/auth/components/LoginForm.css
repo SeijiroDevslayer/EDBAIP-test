@@ -136,7 +136,7 @@
   border-radius: 20px;
   width: 100%;
   max-width:483px;
-  max-height:658px;
+  min-height:658px;
   margin-top:42px;
   margin-right:450px;
   border-radius:18px;
@@ -190,7 +190,7 @@
   line-height: 24px;
   margin-bottom: 14px;
   padding: 0 8px;
-  margin-top: 10px;
+  margin-top: 18px;
   max-width: 220px;
   max-height: 48px;
   /* font-family: Inter; */
@@ -398,7 +398,7 @@
 .divider {
   display: flex;
   align-items: center;
-  margin: 12px 0;
+  margin: 15px 0;
   color: rgba(255, 255, 255, 0.45);
   font-size: 12px;
   font-weight: 500;
@@ -691,6 +691,7 @@
   color: #EF4444;
   margin-top: 0px;
   min-height: 0px;
+  margin-bottom: -10px;
   display: block;
   visibility: hidden;
 }
@@ -699,6 +700,7 @@
   visibility: visible;
   margin-top: 6px;
   min-height: 18px;
+  margin-bottom: 0;
   animation: slideDown 0.2s ease;
 }
  
