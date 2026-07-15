@@ -228,7 +228,8 @@ const { login } = useAuthContext();
 
         <div className="right-section">
           <div className="login-card">
-            <CardLogo />
+            <div className="card-content">
+              <CardLogo />
 
             <h2 className="card-welcome">
               Welcome{' '}
@@ -247,8 +248,8 @@ const { login } = useAuthContext();
               noValidate
             >
               <div className="form-group">
-                <label htmlFor="email">
-                  Email
+                <label htmlFor="email" className='emailclass'>
+                  Email ID
                 </label>
 
                 <div className={`input-wrapper ${errors.email ? 'error' : ''}`}>
@@ -323,67 +324,67 @@ const { login } = useAuthContext();
                   >
                     
                     {showPassword ? (
-  // 👁 OPEN EYE (password is visible)
+                  // 👁 OPEN EYE (password is visible)
 
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M1 12.5C2.73 8.11 7 5 12 5s9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S2.73 16.89 1 12.5z"
-      stroke="currentColor"
-      strokeWidth="1.5"
-    />
-    <circle
-      cx="12"
-      cy="12.5"
-      r="3"
-      stroke="currentColor"
-      strokeWidth="1.5"
-    />
-  </svg>
-) : (
-  // 🚫 EYE-OFF (password is hidden)
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M1 12.5C2.73 8.11 7 5 12 5s9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S2.73 16.89 1 12.5z"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                    <circle
+                      cx="12"
+                      cy="12.5"
+                      r="3"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    />
+                  </svg>
+                ) : (
+                  // 🚫 EYE-OFF (password is hidden)
 
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M3 3l18 18"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    />
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3 3l18 18"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
 
-    <path
-      d="M10.58 10.58A2 2 0 0012 15a2 2 0 001.41-.59"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    />
+                    <path
+                      d="M10.58 10.58A2 2 0 0012 15a2 2 0 001.41-.59"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
 
-    <path
-      d="M9.88 5.09A10.94 10.94 0 0112 5c5 0 9.27 3.11 11 7.5a11.6 11.6 0 01-2.12 3.17"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    />
+                    <path
+                      d="M9.88 5.09A10.94 10.94 0 0112 5c5 0 9.27 3.11 11 7.5a11.6 11.6 0 01-2.12 3.17"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
 
-    <path
-      d="M6.12 6.12A11.6 11.6 0 001 12.5C2.73 16.89 7 20 12 20a10.94 10.94 0 003.12-.46"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    />
-  </svg>
-)}
+                    <path
+                      d="M6.12 6.12A11.6 11.6 0 001 12.5C2.73 16.89 7 20 12 20a10.94 10.94 0 003.12-.46"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                )}
                   </button>
 
                   {errors.password && (
@@ -477,6 +478,7 @@ const { login } = useAuthContext();
                 Sign up
               </a>
             </p>
+            </div>
           </div>
         </div>
       </div>
