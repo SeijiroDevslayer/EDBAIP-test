@@ -157,7 +157,7 @@ function ContactSupportForm() {
   };
 
   const handleBackToSignIn = () => {
-    navigate('/');
+    navigate('/login');
   };
 
   return (

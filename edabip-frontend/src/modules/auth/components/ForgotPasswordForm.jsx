@@ -465,7 +465,7 @@ setTimeout(() => {
             )}
 
             <div className={`fp-card ${step === "verify" ? "fp-card--verify" : ""}`}>
-              <a href="/" className="fp-back-link">
+              <a href="/" className="fp-back-link" onClick={(e) => { e.preventDefault(); navigate(-1); }}>
                 <span className="fp-back-icon-circle">
                   <ArrowLeftIcon />
                 </span>
@@ -635,7 +635,7 @@ setTimeout(() => {
                   </form>
 
                   <p className="fp-support-text">
-                    Need help ? <span className="fp-support-link">Contact Support</span>
+                    Need help ? <span className="fp-support-link" onClick={()=>navigate('/contact-support')}>Contact Support</span>
                   </p>
                 </>
               )}
