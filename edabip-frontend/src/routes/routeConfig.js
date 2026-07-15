@@ -1,14 +1,14 @@
 import { createElement } from 'react';
 import LandingPage from '../modules/landing-page/Landing-Page.jsx';
-import LoginPage from '../modules/auth/pages/LoginPage.jsx';
-import SignupPage from '../modules/auth/pages/SignupPage.jsx';
-import ForgotPasswordPage from '../modules/auth/pages/ForgotPasswordPage.jsx';
-import CreateNewPasswordPage from '../modules/auth/pages/CreateNewPasswordPage.jsx';
-import PasswordResetSuccessPage from '../modules/auth/pages/PasswordResetSuccessPage.jsx';
-import SessionExpiredPage from '../modules/auth/pages/SessionExpiredPage.jsx';
+import LoginForm from '../modules/auth/components/LoginForm.jsx';
+import SignupForm from '../modules/auth/components/SignupForm.jsx';
+import ForgotPasswordForm from '../modules/auth/components/ForgotPasswordForm.jsx';
+import CreateNewPasswordForm from '../modules/auth/components/CreateNewPasswordForm.jsx';
+import PasswordResetSuccess from '../modules/auth/components/PasswordResetSuccess.jsx';
+import SessionExpiredForm from '../modules/auth/components/SessionExpiredForm.jsx';
 import DashboardPage from '../modules/dashboard/pages/DashboardPage.jsx';
-import AccountLockedPage from '../modules/auth/pages/AccountLockedPage.jsx';
-import ContactSupportPage from '../modules/auth/pages/ContactSupportPage.jsx';
+import AccountLockedForm from '../modules/auth/components/AccountLockedForm.jsx';
+import ContactSupportForm from '../modules/auth/components/ContactSupportForm.jsx';
 
 export const routes = [
   {
@@ -23,32 +23,32 @@ export const routes = [
   },
   {
     path: '/login',
-    element: createElement(LoginPage),
+    element: createElement(LoginForm),
     protected: false,
   },
   {
     path: '/signup',
-    element: createElement(SignupPage),
+    element: createElement(SignupForm),
     protected: false,
   },
   {
     path: '/forgot-password',
-    element: createElement(ForgotPasswordPage),
+    element: createElement(ForgotPasswordForm),
     protected: false,
   },
   {
     path: '/create-new-password',
-    element: createElement(CreateNewPasswordPage),
+    element: createElement(CreateNewPasswordForm),
     protected: false,
   },
   {
     path: '/password-reset-success',
-    element: createElement(PasswordResetSuccessPage),
+    element: createElement(PasswordResetSuccess),
     protected: false,
   },
   {
     path: '/session-expired',
-    element: createElement(SessionExpiredPage),
+    element: createElement(SessionExpiredForm),
     protected: false,
   },
   {
@@ -58,12 +58,12 @@ export const routes = [
   },
   {
     path: '/account-locked',
-    element: createElement(AccountLockedPage),
+    element: createElement(AccountLockedForm),
     protected: false,
   },
   {
     path: '/contact-support',
-    element: createElement(ContactSupportPage),
+    element: createElement(ContactSupportForm),
     protected: false,
   },
 ];
