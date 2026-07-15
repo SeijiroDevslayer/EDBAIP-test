@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import backgroundImg from '../../../assets/temp-block/contact-support-bg.png';
+import backgroundImg from '../../../assets/temp-block/contact-support-bg.jpg';
 import logoImg from '../../../assets/login/logo.png';
 import headsetIcon from '../../../assets/temp-block/HeadsetIcon.png';
 import sendIcon from '../../../assets/temp-block/SendIcon.png';

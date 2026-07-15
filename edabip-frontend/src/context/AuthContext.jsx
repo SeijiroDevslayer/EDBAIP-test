@@ -37,7 +37,9 @@ function mockLoginRequest(credentials) {
 //
 
 export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+  () => !!localStorage.getItem('authToken')
+);
   const [user, setUser] = useState(null);
 
   // Reset last activity timestamp

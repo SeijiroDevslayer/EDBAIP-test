@@ -7,7 +7,7 @@ import Widget1 from "../../assets/landing-page/widget1.png";
 import Widget2 from "../../assets/landing-page/widget2.png";
 import Widget3 from "../../assets/landing-page/widget3.png";
 import brandbadge from "../../assets/landing-page/logo.png";
-import HeroBg from "../../assets/landing-page/hero-bg.png";
+import HeroBg from "../../assets/landing-page/hero-bg.jpg";
 
 // Trusted Section Assets
 import TrustedTopLeft from "../../assets/landing-page/trend-graph.png";
