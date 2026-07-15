@@ -218,23 +218,51 @@
 .input-wrapper input {
   width: 100%;
   max-width: 346px;
-  height:44px;
-  padding-left:48px;
-  padding-right:44px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  height: 44px;
+  padding-left: 48px;
+  padding-right: 44px;
+  border: 1px solid #ffffff;
   border-radius: 6px;
   font-size: 14px;
   outline: none;
   background: rgba(47, 47, 154, 1);
-  color: #ffffff;
+  color: #AEB7D0;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
- 
+
+.input-wrapper input::placeholder {
+  color: #AEB7D0;
+  opacity: 1;
+}
+
 .input-wrapper input:focus {
-  border-color: rgba(92, 225, 230, 0.6);
-  box-shadow: 0 0 0 3px rgba(92, 225, 230, 0.12);
+  color: #FFFFFF;
 }
  
+.input-wrapper input {
+  color: #ffffff;
+  caret-color: #ffffff;
+}
+
+.input-wrapper input::placeholder {
+  color: #AEB7D0;
+  opacity: 1;
+}
+
+.input-wrapper input:-webkit-autofill,
+.input-wrapper input:-webkit-autofill:hover,
+.input-wrapper input:-webkit-autofill:focus,
+.input-wrapper input:-webkit-autofill:active {
+  -webkit-text-fill-color: #FFFFFF !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(47,47,154,1) inset !important;
+  box-shadow: 0 0 0 1000px rgba(47,47,154,1) inset !important;
+}
+
+.input-wrapper input:autofill {
+  color: #AEB7D0 !important;
+}
+
+
 .password-toggle {
   position: absolute;
   right: 14px;
