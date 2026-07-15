@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 import backgroundImg from "../../../assets/login/background.jpg";
 import logoImg from "../../../assets/login/logo.png";
 import logoCardImg from "../../../assets/login/logoc.png";
@@ -30,7 +29,6 @@ import verifiedTickIcon from "../../../assets/negative-state/Vector-tick.png";
 import { verifyEmail } from "../api/mockForgotPasswordApi";
 import { verifyMobile } from "../api/mockForgetPasswordMobile";
 import { sendMockOtp, verifyMockOtp } from "../api/mockOtpApi";
-
 
 import "./ForgotPasswordForm.css";
 
@@ -121,12 +119,20 @@ function HelperInfoIcon() {
   return <img src={infoIcon} alt="" className="fp-info-img-icon" />;
 }
 function VerifiedToastIcon() {
-  return <img src={verifiedTickIcon} alt="" className="fp-verified-toast-icon" />;
+  return (
+    <img src={verifiedTickIcon} alt="" className="fp-verified-toast-icon" />
+  );
 }
 
 function ClockIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
       <path
         d="M12 7v5l3.5 2"
@@ -175,7 +181,6 @@ function ForgotPasswordForm() {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, []);
-
 
   const selectMethod = (nextMethod) => {
     setMethod(nextMethod);
@@ -331,38 +336,10 @@ function ForgotPasswordForm() {
     });
   };
 
- const handleVerifyOtp = async (e) => {
-  e.preventDefault();
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
 
-  if (otp.length !== 4) {
-    setOtpError("Invalid OTP");
-
-    setToast({
-      type: "otp-error",
-      title: "OTP Verified Unsuccessfully",
-      message:
-        "We couldn't verify the OTP you entered.\nPlease check the code and try again.",
-    });
-
-    return;
-  }
-
-  const verifyResponse = await verifyMockOtp(otp);
-
-  if (!verifyResponse.success) {
-    if (verifyResponse.reason === "OTP_EXPIRED") {
-      setOtpError("Invalid OTP");
-
-      setToast({
-        type: "expired",
-        title: "OTP Expired",
-        message: "Your verification code has expired.\nPlease request a new OTP.",
-      });
-
-      return;
-    }
-
-    if (verifyResponse.reason === "INVALID_OTP") {
+    if (otp.length !== 4) {
       setOtpError("Invalid OTP");
 
       setToast({
@@ -375,27 +352,58 @@ function ForgotPasswordForm() {
       return;
     }
 
-    setOtpError("Invalid OTP");
-    return;
-  }
+    const verifyResponse = await verifyMockOtp(otp);
 
-  setOtpError("");
+    if (!verifyResponse.success) {
+      if (verifyResponse.reason === "OTP_EXPIRED") {
+        setOtpError("Invalid OTP");
 
- setToast({
-  type: "verified",
-  title: "OTP Verified Successfully !",
-  message: "You will be redirected to create a new password",
-});
+        setToast({
+          type: "expired",
+          title: "OTP Expired",
+          message:
+            "Your verification code has expired.\nPlease request a new OTP.",
+        });
 
-setTimeout(() => {
-  navigate("/create-new-password", {
-    state: { otpVerified: true, destination, method },
-  });
-}, 1500);
-};
+        return;
+      }
+
+      if (verifyResponse.reason === "INVALID_OTP") {
+        setOtpError("Invalid OTP");
+
+        setToast({
+          type: "otp-error",
+          title: "OTP Verified Unsuccessfully",
+          message:
+            "We couldn't verify the OTP you entered.\nPlease check the code and try again.",
+        });
+
+        return;
+      }
+
+      setOtpError("Invalid OTP");
+      return;
+    }
+
+    setOtpError("");
+
+    setToast({
+      type: "verified",
+      title: "OTP Verified Successfully !",
+      message: "You will be redirected to create a new password",
+    });
+
+    setTimeout(() => {
+      navigate("/create-new-password", {
+        state: { otpVerified: true, destination, method },
+      });
+    }, 1500);
+  };
 
   return (
-    <div className={`fp-container ${step === "verify" ? "fp-container--verify" : ""}`}>
+    <div
+      className={`fp-container ${step === "verify" ? "fp-container--verify" : ""}`}
+    >
       <div className="fp-background">
         <img src={backgroundImg} alt="" className="fp-background-image" />
       </div>
@@ -404,39 +412,48 @@ setTimeout(() => {
         <div className="fp-left-section">
           <img src={logoImg} alt="EDABIP" className="fp-brand-logo" />
 
-          <h1 className="fp-welcome-heading">Welcome to your Analytics Dashboard</h1>
+          <h1 className="fp-welcome-heading">
+            Welcome to your Analytics Dashboard
+          </h1>
 
           <p className="fp-welcome-description">
-            Track performance, analyze data, and make smarter business decisions in real-time.
+            Track performance, analyze data, and make smarter business decisions
+            in real-time.
           </p>
 
           <div className="fp-features-container">
             {FEATURES.map((feature) => (
               <div key={feature.alt} className="fp-feature-item">
-                <img src={feature.src} alt={feature.alt} className="fp-feature-badge" />
+                <img
+                  src={feature.src}
+                  alt={feature.alt}
+                  className="fp-feature-badge"
+                />
                 <span className="fp-feature-label">{feature.label}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className={`fp-right-section ${toast ? "fp-right-section--toast" : ""}`}>
+        <div
+          className={`fp-right-section ${toast ? "fp-right-section--toast" : ""}`}
+        >
           <div className="fp-card-wrapper">
             {toast && (
               <div
-  className={`fp-toast fp-toast-${toast.type || "success"}`}
-  role="status"
->
+                className={`fp-toast fp-toast-${toast.type || "success"}`}
+                role="status"
+              >
                 <span className="fp-toast-icon">
-                 {toast.type === "expired" ? (
-  <ExpiredIcon />
-) : toast.type === "error" || toast.type === "otp-error" ? (
-  <ErrorToastIcon />
-) : toast.type === "verified" ? (
-  <VerifiedToastIcon />
-) : (
-  <SuccessToastIcon />
-)}
+                  {toast.type === "expired" ? (
+                    <ExpiredIcon />
+                  ) : toast.type === "error" || toast.type === "otp-error" ? (
+                    <ErrorToastIcon />
+                  ) : toast.type === "verified" ? (
+                    <VerifiedToastIcon />
+                  ) : (
+                    <SuccessToastIcon />
+                  )}
                 </span>
 
                 <div className="fp-toast-content">
@@ -447,7 +464,9 @@ setTimeout(() => {
                     {toast.destination && (
                       <>
                         <br />
-                        <strong className="fp-toast-destination">{toast.destination}</strong>
+                        <strong className="fp-toast-destination">
+                          {toast.destination}
+                        </strong>
                       </>
                     )}
                   </p>
@@ -464,8 +483,17 @@ setTimeout(() => {
               </div>
             )}
 
-            <div className={`fp-card ${step === "verify" ? "fp-card--verify" : ""}`}>
-              <a href="/" className="fp-back-link">
+            <div
+              className={`fp-card ${step === "verify" ? "fp-card--verify" : ""}`}
+            >
+              <a
+                href="/"
+                className="fp-back-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(-1);
+                }}
+              >
                 <span className="fp-back-icon-circle">
                   <ArrowLeftIcon />
                 </span>
@@ -479,20 +507,21 @@ setTimeout(() => {
                   <h2 className="fp-title">Forgot password</h2>
 
                   <p className="fp-subtitle">
-                    Choose how you&apos;d like to receive your reset instructions.
+                    Choose how you&apos;d like to receive your reset
+                    instructions.
                   </p>
 
                   <div className="fp-method-toggle" role="tablist">
-                  <button
-  type="button"
-  role="tab"
-  aria-selected={method === "email"}
-  className={`fp-method-btn ${method === "email" ? "active" : ""}`}
-  onClick={() => selectMethod("email")}
->
-  <MailIcon />
-  Reset via Email
-</button>
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={method === "email"}
+                      className={`fp-method-btn ${method === "email" ? "active" : ""}`}
+                      onClick={() => selectMethod("email")}
+                    >
+                      <MailIcon />
+                      Reset via Email
+                    </button>
                     <button
                       type="button"
                       role="tab"
@@ -535,7 +564,8 @@ setTimeout(() => {
                         {emailError ? (
                           <>
                             <p className="fp-field-error">
-                              We couldn&apos;t find an account with this email address.
+                              We couldn&apos;t find an account with this email
+                              address.
                             </p>
 
                             <div className="fp-error-info-banner">
@@ -559,9 +589,8 @@ setTimeout(() => {
                             </span>
 
                             <p className="fp-helper-text">
-                              We&apos;ll send a secure reset link to this address. It will
-                              expire in
-                              5 minutes.
+                              We&apos;ll send a secure reset link to this
+                              address. It will expire in 5 minutes.
                             </p>
                           </div>
                         )}
@@ -597,7 +626,8 @@ setTimeout(() => {
                         {mobileError ? (
                           <>
                             <p className="fp-field-error">
-                              We couldn&apos;t find an account with this mobile number
+                              We couldn&apos;t find an account with this mobile
+                              number
                             </p>
 
                             <div className="fp-error-info-banner">
@@ -621,8 +651,8 @@ setTimeout(() => {
                             </span>
 
                             <p className="fp-helper-text">
-                              We&apos;ll send a secure reset link to this address. It will expire in
-                              5 minutes.
+                              We&apos;ll send a secure reset link to this
+                              address. It will expire in 5 minutes.
                             </p>
                           </div>
                         )}
@@ -635,7 +665,8 @@ setTimeout(() => {
                   </form>
 
                   <p className="fp-support-text">
-                    Need help ? <span className="fp-support-link">Contact Support</span>
+                    Need help ?{" "}
+                    <span className="fp-support-link">Contact Support</span>
                   </p>
                 </>
               )}
@@ -649,7 +680,10 @@ setTimeout(() => {
                     <strong className="fp-subtitle-dest">{destination}</strong>
                   </p>
 
-                  <form onSubmit={handleVerifyOtp} className="fp-form fp-verify-form">
+                  <form
+                    onSubmit={handleVerifyOtp}
+                    className="fp-form fp-verify-form"
+                  >
                     <div className="fp-otp-boxes">
                       {[0, 1, 2, 3].map((index) => (
                         <input
@@ -660,7 +694,9 @@ setTimeout(() => {
                           type="tel"
                           inputMode="numeric"
                           className={`fp-otp-box ${otpError ? "fp-otp-box--error" : "fp-otp-box--success"}`}
-                          value={otp[index] && otp[index] !== " " ? otp[index] : ""}
+                          value={
+                            otp[index] && otp[index] !== " " ? otp[index] : ""
+                          }
                           onChange={(e) => handleOtpBoxChange(index, e)}
                           onKeyDown={(e) => handleOtpBoxKeyDown(index, e)}
                           maxLength={1}
