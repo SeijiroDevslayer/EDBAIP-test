@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
+import { useAuthContext } from "../../../context/AuthContext";
 import { useLocation, useNavigate } from 'react-router-dom';
 import backgroundImg from "../../../assets/login/background.jpg";
 import warningImg from '../../../assets/login/warning.png';
@@ -162,6 +163,7 @@ function PasswordToggleIcon({ visible }) {
 function CreateNewPasswordForm() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { updatePassword } = useAuthContext();
 
   const resetPassword = location.state?.resetPassword;
 const destination = location.state?.destination;
@@ -237,7 +239,13 @@ const method = location.state?.method;
 
     if (hasError) return;
 
-    navigate("/password-reset-success", { replace: true });
+    // Save new password
+    updatePassword(password);
+
+    // Go to success page
+     navigate("/password-reset-success", {
+     replace: true,
+   });
   };
 
   const strengthColors = { Weak: '#EF4444', Fair: '#F97316', Good: '#EAB308', Strong: '#22C55E' };
