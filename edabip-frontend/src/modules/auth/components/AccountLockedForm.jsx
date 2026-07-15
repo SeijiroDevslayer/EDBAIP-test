@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import backgroundImg from "../../../assets/login/auth_background.jpg";
 import logoImg        from "../../../assets/login/logo.png";
@@ -35,22 +35,32 @@ const SUPPORT_EMAIL = "support@edabip.com";
 function AccountLockedForm() {
   const navigate = useNavigate();
 
-  const [scale, setScale] = useState(() =>
-    window.innerWidth > 768
-      ? Math.min(1, window.innerWidth / 1536, (window.innerHeight - 30) / 883)
-      : 1
-  );
+  // Scale the design canvas to fit, then center the leftover vertical space.
+  // The canvas narrows with the viewport (down to 1100px) before any scaling
+  // kicks in — the content only spans ~973px, so laptops keep a full-size
+  // card instead of paying a shrink penalty for the empty right third.
+  const computeLayout = () => {
+    if (window.innerWidth <= 768) return { scale: 1, marginTop: 0, rowWidth: null };
+    const rowWidth = Math.min(1536, Math.max(1100, window.innerWidth));
+    const scale = Math.min(
+      1,
+      window.innerWidth / rowWidth,
+      (window.innerHeight - 30) / 883
+    );
+    return {
+      scale,
+      marginTop: Math.max(0, (window.innerHeight - 1024 * scale) / 2),
+      rowWidth,
+    };
+  };
+
+  const [{ scale, marginTop, rowWidth }, setLayout] = useState(computeLayout);
 
   useEffect(() => {
-    const computeScale = () =>
-      setScale(
-        window.innerWidth > 768
-          ? Math.min(1, window.innerWidth / 1536, (window.innerHeight - 30) / 883)
-          : 1
-      );
-    window.addEventListener("resize", computeScale);
-    computeScale();
-    return () => window.removeEventListener("resize", computeScale);
+    const onResize = () => setLayout(computeLayout());
+    window.addEventListener("resize", onResize);
+    onResize();
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   const handleTryAgain = () => {
@@ -72,7 +82,12 @@ function AccountLockedForm() {
         className="al-row"
         style={
           window.innerWidth > 768
-            ? { transform: `scale(${scale})`, transformOrigin: "top center" }
+            ? {
+                width: `${rowWidth}px`,
+                transform: `scale(${scale})`,
+                transformOrigin: "top center",
+                marginTop: `${marginTop}px`,
+              }
             : undefined
         }
       >
@@ -154,11 +169,9 @@ function AccountLockedForm() {
                 <img src={footerLockIcon} alt="" width="23.45" height="23.45" style={{ flexShrink: 0 }} />
                 <span>
                   If you continue to have trouble, please try again later or{" "}
-                  <span
-                    className="al-contact"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => navigate("/contact-support")}
-                  >contact support</span>{" "}
+                  <Link className="al-contact" to="/contact-support">
+                    contact support
+                  </Link>{" "}
                   for assistance
                 </span>
               </p>

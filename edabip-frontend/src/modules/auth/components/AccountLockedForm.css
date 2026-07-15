@@ -26,10 +26,11 @@
 ══════════════════════════════ */
 .al-left {
   position: absolute;
-  left: 6px;
+  left: 64px;
   top: 197px;
-  width: 375px;
-  height: 514px;
+  /* wide enough for the one-line heading; card starts at 490 */
+  width: 420px;
+  height: auto;
   display: flex;
   flex-direction: column;
   text-align: left;
@@ -48,10 +49,11 @@
   font-size: 38px;
   font-weight: 600;
   color: #343495;
-  line-height: 1;
+  line-height: 1.1;
   margin: 0 0 20px;
   letter-spacing: 0;
-  white-space: nowrap;   
+  /* no nowrap: if fonts render wider, the heading wraps instead of
+     painting underneath the card */
 }
 
 .al-heading-accent {
@@ -70,6 +72,8 @@
   letter-spacing: 0;
   color: #343495;
   margin: 0 0 40px;
+  /* keep the original line breaks after widening .al-left */
+  max-width: 375px;
 }
 
 /* ── Feature list ── */
@@ -118,9 +122,9 @@
 ══════════════════════════════ */
 .al-card-col {
   position: absolute;
-  left: 34.2%; 
-  left: 526px;
-  top: 13.7%; 
+  left: 34.2%;
+  left: 490px;
+  top: 13.7%;
   top: 140px;
 }
 
@@ -160,7 +164,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 357px;
+  width: 100%;
+  max-width: 357px;
+  box-sizing: border-box;
   gap: 22px;
 }
 
@@ -321,32 +327,24 @@
   font-size: 14px;
   letter-spacing: -0.011em;
   cursor: pointer;
+  text-decoration: none;
+}
+
+.al-contact:focus-visible {
+  outline: 2px solid #11d3d0;
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* ══════════════════════════════
    Responsive
 ══════════════════════════════ */
 
-/* ── Tablet (≤1200px) ── */
-@media (max-width: 1200px) {
-  .al-left {
-    left: 4%;
-    width: 300px;
-  }
-  .al-card-col {
-    left: 32%;
-  }
-  .al-card {
-    width: 420px;
-    padding: 44px 48px 44px;
-  }
-}
-
-
 /* ── Tablet / stacked layout (≤768px) ── */
 @media (max-width: 768px) {
   .al-page {
     height: 100vh;
+    height: 100dvh; /* track the real visible height when mobile URL bars show/hide */
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
@@ -364,23 +362,6 @@
     gap: 10px;
     height: auto;
     min-height: 100%;
-  }
-
-  .al-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  .al-background-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
   }
 
   .al-left {
@@ -443,6 +424,7 @@
 @media (max-width: 480px) {
   .al-page {
     height: 100vh;
+    height: 100dvh;
     overflow-y: auto;      /* was overflow: visible — now scrolls instead of just growing */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;   /* smooth momentum scroll on iOS */
@@ -524,7 +506,7 @@
     width: 100%;
     max-width: 100%;
     padding: 24px 14px 20px;
-    box-sizing: hidden;
+    box-sizing: border-box;
   }
 
   .al-card-inner {
