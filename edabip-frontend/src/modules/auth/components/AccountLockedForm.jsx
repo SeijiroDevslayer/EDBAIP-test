@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import backgroundImg  from "../../../assets/login/auth_background.png";
+import backgroundImg from "../../../assets/login/auth_background.jpg";
 import logoImg        from "../../../assets/login/logo.png";
 import lockIconImg    from "../../../assets/login/lock_icon.png";
 import secureIcon     from "../../../assets/login/secure.svg";

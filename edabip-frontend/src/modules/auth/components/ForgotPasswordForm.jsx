@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
-import backgroundImg from "../../../assets/login/background.png";
+import backgroundImg from "../../../assets/login/background.jpg";
 import logoImg from "../../../assets/login/logo.png";
 import logoCardImg from "../../../assets/login/logoc.png";
 
