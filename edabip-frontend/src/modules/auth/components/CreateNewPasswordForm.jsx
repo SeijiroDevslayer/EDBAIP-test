@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import backgroundImg from '../../../assets/login/background.png';
+import backgroundImg from "../../../assets/login/background.jpg";
 import warningImg from '../../../assets/login/warning.png';
 import warningFieldImg from '../../../assets/login/Vectorplaceholder.png';
 import logoImg from '../../../assets/login/logo.png';

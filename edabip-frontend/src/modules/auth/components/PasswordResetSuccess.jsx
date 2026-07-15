@@ -1,4 +1,4 @@
-import backgroundImg from '../../../assets/login/background.png';
+import backgroundImg from "../../../assets/login/background.jpg";
 import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
 import successIconImg from '../../../assets/login/success-icon.png';

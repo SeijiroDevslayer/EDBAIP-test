@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import backgroundImg from '../../../assets/login/background.png';
+import backgroundImg from "../../../assets/login/background.jpg";
 import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
 import featureAnalytics from '../../../assets/login/feature-analytics.png';
