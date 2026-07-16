@@ -63,22 +63,6 @@ function WarningIcon() {
   );
 }
 
-function ToastWarningIcon() {
-  return (
-    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="12" r="12" fill="#EF4444" />
-      <path
-        d="M12 6.5L18 17H6L12 6.5z"
-        stroke="#fff"
-        strokeWidth="1.4"
-        strokeLinejoin="round"
-        fill="none"
-      />
-      <path d="M12 10v3.2" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
-      <circle cx="12" cy="15.3" r="0.9" fill="#fff" />
-    </svg>
-  );
-}
 
 function CheckIcon() {
   return (
@@ -197,7 +181,18 @@ const method = location.state?.method;
       title: "",
       message: "",
     });
+  
+  useEffect(() => {
+  if (toast.show) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
 
+  return () => {
+    document.body.style.overflow = '';
+  };
+}, [toast.show]);
 
   const showToastMessage = (title, message) => {
     setToast({
@@ -273,7 +268,7 @@ const method = location.state?.method;
       {toast.show && (
         <div className="cnp-toast">
           <div className="cnp-toast-icon">
-            <ToastWarningIcon />
+            <img src={warningImg} alt="warning" style={{ width: 36, height: 36 }} />
           </div>
           <div className="cnp-toast-body">
             <p className="cnp-toast-title">{toast.title}</p>
@@ -291,7 +286,7 @@ const method = location.state?.method;
         />
       </div>
 
-      <div className="cnp-content">
+      <div className={`cnp-content${toast.show ? ' cnp-content--toast-open' : ''}`}>
         <div className="cnp-left-section">
           <img
             src={logoImg}
