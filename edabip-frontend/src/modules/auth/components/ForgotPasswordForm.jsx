@@ -59,6 +59,7 @@ const FEATURES = [
 
 const INDIA_MOBILE_REGEX = /^[6-9]\d{9}$/;
 const RESEND_SECONDS = 30;
+const TOAST_DISMISS_MS = 5000;
 
 function CardLogo() {
   return (
@@ -175,6 +176,16 @@ function ForgotPasswordForm() {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, []);
+
+  useEffect(() => {
+    if (!toast) return undefined;
+
+    const timer = setTimeout(() => {
+      setToast(null);
+    }, TOAST_DISMISS_MS);
+
+    return () => clearTimeout(timer);
+  }, [toast]);
 
 
   const selectMethod = (nextMethod) => {
