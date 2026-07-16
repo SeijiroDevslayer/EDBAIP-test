@@ -51,6 +51,7 @@ function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 const [errors, setErrors] = useState({
   email: '',
   password: '',
@@ -92,7 +93,7 @@ const { login } = useAuthContext();
     }
 
     try {
-      const result = await login({ email, password });
+      const result = await login({ email, password }, rememberMe);
 
       if (result.success) {
         setFailedAttempts(0);
@@ -406,7 +407,10 @@ const { login } = useAuthContext();
 
               <div className="form-options">
                 <label className="remember-me">
-                  <input type="checkbox" />
+                  <input type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)} 
+                  />
                   <span>Remember me</span>
                 </label>
 

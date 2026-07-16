@@ -30,8 +30,6 @@ export function AuthProvider({ children }) {
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    // Development-only mock authentication. Browser storage is not trusted
-    // authentication and must never be treated as proof of identity.
     const session = isMockAuthEnabled ? readMockSession() : null;
 
     if (!isMockAuthEnabled) {
@@ -46,33 +44,20 @@ export function AuthProvider({ children }) {
     setIsInitializing(false);
   }, []);
 
-  // Reset last activity timestamp
   const resetSession = useCallback(() => {
     // This is intentionally empty for now
   }, []);
 
-  // Check if session is expired
   const isSessionExpired = useCallback(() => {
     return false;
   }, []);
 
-  // Update password
-  const updatePassword = useCallback(
-    (newPassword) => {
-      const updatedUser = {
-        ...mockUser,
-        password: newPassword,
-      };
+  const updatePassword = useCallback((newPassword) => {
+    setMockUser((prev) => ({ ...prev, password: newPassword }));
+  }, []);
 
-      setMockUser(updatedUser);
-
-    },
-    [mockUser]
-  );
-
-  // Login function
   const login = useCallback(
-    async (credentials) => {
+    async (credentials, rememberMe = false) => {
       const data = await new Promise((resolve) => {
         setTimeout(() => {
           if (mockAttemptsUsed >= MAX_ATTEMPTS) {
@@ -89,17 +74,13 @@ export function AuthProvider({ children }) {
             credentials.password === mockUser.password
           ) {
             mockAttemptsUsed = 0;
-
             resolve({
               success: true,
-              user: {
-                email: credentials.email,
-              },
+              user: { email: credentials.email },
               token: "mock-token-123",
             });
           } else {
             mockAttemptsUsed++;
-
             resolve({
               success: false,
               locked: mockAttemptsUsed >= MAX_ATTEMPTS,
@@ -117,14 +98,22 @@ export function AuthProvider({ children }) {
       setUser(data.user);
       setIsAuthenticated(true);
 
-      return {
-        success: true,
-      };
+
+      if (isMockAuthEnabled) {
+        const session = createMockSession(data.user, {
+          rememberMe,
+          provider: "mock-credentials",
+        });
+        saveMockSession(session);
+      }
+
+      return { success: true };
     },
     [mockUser]
   );
 
-  const loginWithGoogleMock = useCallback((googleUser) => {
+  const loginWithGoogleMock = useCallback((googleUser, rememberMe = true) => {
+
     if (!isMockAuthEnabled) {
       throw new Error(MOCK_AUTH_UNAVAILABLE_MESSAGE);
     }
@@ -139,17 +128,16 @@ export function AuthProvider({ children }) {
       throw new Error("Google returned an incomplete user profile.");
     }
 
-    const session = createMockSession(googleUser);
+    const session = createMockSession(googleUser, {
+      rememberMe,
+      provider: "google",
+    });
 
-    // Development only: replace this mock session creation with a backend API
-    // exchange. The backend must verify Google identity and issue the real app
-    // session; the browser profile alone is not trusted authentication.
     saveMockSession(session);
     setUser(googleUser);
     setIsAuthenticated(true);
   }, []);
 
-  // Logout function
   const logout = useCallback(() => {
     clearMockSession();
     setUser(null);
