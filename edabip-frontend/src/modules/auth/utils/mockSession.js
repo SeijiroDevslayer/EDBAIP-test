@@ -2,20 +2,34 @@ export const MOCK_AUTH_STORAGE_KEY = "edabip_mock_auth";
 export const MOCK_AUTH_UNAVAILABLE_MESSAGE =
   "Authentication service is not available yet.";
 
-const MOCK_SESSION_DURATION_MS = 60 * 60 * 1000;
+const MOCK_SESSION_DURATION_MS = 60 * 60 * 1000; // 1 hour — used when NOT remembered
+// duration for a "remembered" session. Using 30 days as a placeholder.
+const MOCK_REMEMBERED_SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 
 export const isMockAuthEnabled =
   import.meta.env.DEV && import.meta.env.VITE_ENABLE_MOCK_AUTH === "true";
 
-export function createMockSession(user) {
+function getMockStorage(rememberMe) {
+  return rememberMe ? window.localStorage : window.sessionStorage;
+}
+
+function getOtherMockStorage(rememberMe) {
+  return rememberMe ? window.sessionStorage : window.localStorage;
+}
+
+export function createMockSession(user, { rememberMe = false, provider = "google" } = {}) {
   const authenticatedAt = Date.now();
+  const duration = rememberMe
+    ? MOCK_REMEMBERED_SESSION_DURATION_MS
+    : MOCK_SESSION_DURATION_MS;
 
   return {
     user,
-    provider: "google",
+    provider,
     isMock: true,
+    rememberMe,
     authenticatedAt,
-    expiresAt: authenticatedAt + MOCK_SESSION_DURATION_MS,
+    expiresAt: authenticatedAt + duration,
   };
 }
 
@@ -39,13 +53,16 @@ export function readMockSession() {
   }
 
   try {
-    const storedSession = window.sessionStorage.getItem(MOCK_AUTH_STORAGE_KEY);
 
-    if (!storedSession) {
+    const raw =
+      window.localStorage.getItem(MOCK_AUTH_STORAGE_KEY) ||
+      window.sessionStorage.getItem(MOCK_AUTH_STORAGE_KEY);
+
+    if (!raw) {
       return null;
     }
 
-    const session = JSON.parse(storedSession);
+    const session = JSON.parse(raw);
 
     if (!isValidMockSession(session)) {
       clearMockSession();
@@ -64,10 +81,11 @@ export function saveMockSession(session) {
     throw new Error("Browser session storage is unavailable.");
   }
 
-  window.sessionStorage.setItem(
-    MOCK_AUTH_STORAGE_KEY,
-    JSON.stringify(session)
-  );
+  const active = getMockStorage(session.rememberMe);
+  const stale = getOtherMockStorage(session.rememberMe);
+
+  stale.removeItem(MOCK_AUTH_STORAGE_KEY);
+  active.setItem(MOCK_AUTH_STORAGE_KEY, JSON.stringify(session));
 }
 
 export function clearMockSession() {
@@ -76,6 +94,7 @@ export function clearMockSession() {
   }
 
   try {
+    window.localStorage.removeItem(MOCK_AUTH_STORAGE_KEY);
     window.sessionStorage.removeItem(MOCK_AUTH_STORAGE_KEY);
   } catch {
     // Storage may be unavailable; React authentication state is still cleared.
