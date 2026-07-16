@@ -670,8 +670,11 @@ setTimeout(() => {
                           }}
                           type="tel"
                           inputMode="numeric"
-                          className={`fp-otp-box ${otpError ? "fp-otp-box--error" : "fp-otp-box--success"}`}
-                          value={otp[index] && otp[index] !== " " ? otp[index] : ""}
+                          className={`fp-otp-box ${otpError
+                            ? "fp-otp-box--error"
+                            : (otp.trim().length === 4 ? "fp-otp-box--success" : "")
+                            }`}
+                             value={otp[index] && otp[index] !== " " ? otp[index] : ""}
                           onChange={(e) => handleOtpBoxChange(index, e)}
                           onKeyDown={(e) => handleOtpBoxKeyDown(index, e)}
                           maxLength={1}
@@ -693,7 +696,7 @@ setTimeout(() => {
 
                       <button
                         type="button"
-                        className="fp-resend-link"
+                        className={`fp-resend-link ${resendSeconds > 0 ? "disabled" : ""}`}
                         onClick={handleResendOtp}
                         disabled={resendSeconds > 0}
                       >
