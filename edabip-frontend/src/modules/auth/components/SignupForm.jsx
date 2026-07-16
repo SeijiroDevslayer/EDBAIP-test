@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import backgroundImg from "../../../assets/login/background.jpg";
 import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
@@ -13,10 +12,7 @@ import lockicon from '../../../assets/login/lock.png';
 import usericon from '../../../assets/login/user-icon.png';
 import checkIcon from '../../../assets/login/checkcircle.png';
 import googleicon from '../../../assets/login/google-icon.png';
-
-
-
-
+import SSOButton from './SSOButton.jsx';
 import './SignupForm.css';
 
 const FEATURES = [
@@ -436,14 +432,15 @@ function SignupForm() {
               <span>OR</span>
             </div>
 
-            <button type="button" className="su-sso-btn">
-              <img
+            <SSOButton
+              provider="google"
+              className="su-sso-btn"
+              icon={<img
                 src={googleicon}
-                alt="google"
+                alt=""
                 className="su-sso-icon"
-              />
-              Sign in with Google
-            </button>
+              />}
+            />
 
             <p className="su-signin-text">
               Already have an account?{' '}
