@@ -1,12 +1,16 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContext.jsx';
 
 function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuthContext();
-  const location = useLocation();
+  const { isAuthenticated, isInitializing } = useAuthContext();
+
+  if (isInitializing) {
+    return null;
+  }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} />;
+    // This is frontend route protection only, not real authorization.
+    return <Navigate to="/login" replace />;
   }
 
   return children;

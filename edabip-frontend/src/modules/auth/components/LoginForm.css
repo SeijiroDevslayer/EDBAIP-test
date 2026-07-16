@@ -445,6 +445,20 @@
 .sso-btn:hover {
   background: #1a1a1a;
 }
+
+.sso-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.sso-error {
+  width: 100%;
+  max-width: 346px;
+  margin: 8px auto 0;
+  color: #ff8a8a;
+  font-size: 12px;
+  text-align: center;
+}
  
 .btn-icon {
   flex-shrink: 0;

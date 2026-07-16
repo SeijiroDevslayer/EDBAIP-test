@@ -1,4 +1,18 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import {
+  clearMockSession,
+  createMockSession,
+  isMockAuthEnabled,
+  MOCK_AUTH_UNAVAILABLE_MESSAGE,
+  readMockSession,
+  saveMockSession,
+} from "../modules/auth/utils/mockSession.js";
 
 const AuthContext = createContext(null);
 
@@ -7,17 +21,30 @@ let mockAttemptsUsed = 0;
 const MAX_ATTEMPTS = 5;
 
 export function AuthProvider({ children }) {
-  // Mock user with persistent password
-  const [mockUser, setMockUser] = useState(() => ({
+  const [mockUser, setMockUser] = useState({
     email: "test@gmail.com",
-    password: localStorage.getItem("mockPassword") || "pass12345",
-  }));
-
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    () => !!localStorage.getItem("authToken")
-  );
-
+    password: "pass12345",
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  useEffect(() => {
+    // Development-only mock authentication. Browser storage is not trusted
+    // authentication and must never be treated as proof of identity.
+    const session = isMockAuthEnabled ? readMockSession() : null;
+
+    if (!isMockAuthEnabled) {
+      clearMockSession();
+    }
+
+    if (session) {
+      setUser(session.user);
+      setIsAuthenticated(true);
+    }
+
+    setIsInitializing(false);
+  }, []);
 
   // Reset last activity timestamp
   const resetSession = useCallback(() => {
@@ -39,8 +66,6 @@ export function AuthProvider({ children }) {
 
       setMockUser(updatedUser);
 
-      // Save new password so it survives refresh
-      localStorage.setItem("mockPassword", newPassword);
     },
     [mockUser]
   );
@@ -92,8 +117,6 @@ export function AuthProvider({ children }) {
       setUser(data.user);
       setIsAuthenticated(true);
 
-      localStorage.setItem("authToken", data.token);
-
       return {
         success: true,
       };
@@ -101,19 +124,46 @@ export function AuthProvider({ children }) {
     [mockUser]
   );
 
+  const loginWithGoogleMock = useCallback((googleUser) => {
+    if (!isMockAuthEnabled) {
+      throw new Error(MOCK_AUTH_UNAVAILABLE_MESSAGE);
+    }
+
+    if (
+      !googleUser ||
+      typeof googleUser !== "object" ||
+      typeof googleUser.id !== "string" ||
+      typeof googleUser.email !== "string" ||
+      googleUser.provider !== "google"
+    ) {
+      throw new Error("Google returned an incomplete user profile.");
+    }
+
+    const session = createMockSession(googleUser);
+
+    // Development only: replace this mock session creation with a backend API
+    // exchange. The backend must verify Google identity and issue the real app
+    // session; the browser profile alone is not trusted authentication.
+    saveMockSession(session);
+    setUser(googleUser);
+    setIsAuthenticated(true);
+  }, []);
+
   // Logout function
   const logout = useCallback(() => {
+    clearMockSession();
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem("authToken");
   }, []);
 
   return (
     <AuthContext.Provider
       value={{
         isAuthenticated,
+        isInitializing,
         user,
         login,
+        loginWithGoogleMock,
         logout,
         updatePassword,
         resetSession,
