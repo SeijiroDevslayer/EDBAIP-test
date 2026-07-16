@@ -98,9 +98,7 @@ export function AuthProvider({ children }) {
       setUser(data.user);
       setIsAuthenticated(true);
 
-      // 🚩 Regular email/password login previously saved nothing to storage
-      // in Saleem's version — this now persists it too, gated the same way
-      // Google login already was. Confirm this is the intended behavior.
+
       if (isMockAuthEnabled) {
         const session = createMockSession(data.user, {
           rememberMe,
@@ -115,8 +113,7 @@ export function AuthProvider({ children }) {
   );
 
   const loginWithGoogleMock = useCallback((googleUser, rememberMe = true) => {
-    // 🚩 Defaulted Google login to rememberMe=true (Google sign-in is
-    // conventionally persistent) — confirm this matches the intended UX.
+
     if (!isMockAuthEnabled) {
       throw new Error(MOCK_AUTH_UNAVAILABLE_MESSAGE);
     }
