@@ -63,6 +63,7 @@ function WarningIcon() {
   );
 }
 
+
 function CheckIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -173,6 +174,7 @@ const method = location.state?.method;
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [toastClosing, setToastClosing] = useState(false);
   // const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [toast, setToast] = useState({
@@ -180,7 +182,18 @@ const method = location.state?.method;
       title: "",
       message: "",
     });
+  
+  useEffect(() => {
+  if (toast.show) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
 
+  return () => {
+    document.body.style.overflow = '';
+  };
+}, [toast.show]);
 
   const showToastMessage = (title, message) => {
     setToast({
@@ -188,9 +201,14 @@ const method = location.state?.method;
       title,
       message,
     });
+    setToastClosing(false);
 
     setTimeout(() => {
+      setToastClosing(true);
+      setTimeout(() => {
       setToast((prev) => ({ ...prev, show: false }));
+      setToastClosing(false);
+    }, 250);
     }, 4000);
   };
 
@@ -254,15 +272,26 @@ const method = location.state?.method;
   return (
     <div className="cnp-container">
       {toast.show && (
-        <div className="cnp-toast">
+        <div className={`cnp-toast${toastClosing ? ' cnp-toast--closing' : ''}`}>
           <div className="cnp-toast-icon">
-            <img src={warningImg} alt="warning" style={{ width: 45, height: 45 }} />
+            <img src={warningImg} alt="warning" style={{ width: 36, height: 36 }} />
           </div>
           <div className="cnp-toast-body">
             <p className="cnp-toast-title">{toast.title}</p>
             <p className="cnp-toast-message">{toast.message}</p>
           </div>
-          <button className="cnp-toast-close" onClick={() => setToast((prev) => ({ ...prev, show: false }))}>×</button>
+         <button
+            className="cnp-toast-close"
+            onClick={() => {
+              setToastClosing(true);
+              setTimeout(() => {
+                setToast((prev) => ({ ...prev, show: false }));
+                setToastClosing(false);
+              }, 250);
+            }}
+          >
+           ×
+          </button>
         </div>
       )}
 
@@ -274,7 +303,7 @@ const method = location.state?.method;
         />
       </div>
 
-      <div className="cnp-content">
+      <div className={`cnp-content${toast.show ? ' cnp-content--toast-open' : ''}`}>
         <div className="cnp-left-section">
           <img
             src={logoImg}
