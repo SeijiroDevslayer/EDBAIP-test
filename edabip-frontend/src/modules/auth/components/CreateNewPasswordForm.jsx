@@ -63,6 +63,23 @@ function WarningIcon() {
   );
 }
 
+function ToastWarningIcon() {
+  return (
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="12" fill="#EF4444" />
+      <path
+        d="M12 6.5L18 17H6L12 6.5z"
+        stroke="#fff"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <path d="M12 10v3.2" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="12" cy="15.3" r="0.9" fill="#fff" />
+    </svg>
+  );
+}
+
 function CheckIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -256,7 +273,7 @@ const method = location.state?.method;
       {toast.show && (
         <div className="cnp-toast">
           <div className="cnp-toast-icon">
-            <img src={warningImg} alt="warning" style={{ width: 45, height: 45 }} />
+            <ToastWarningIcon />
           </div>
           <div className="cnp-toast-body">
             <p className="cnp-toast-title">{toast.title}</p>
