@@ -12,6 +12,7 @@ import lockicon from '../../../assets/login/lock.png';
 import usericon from '../../../assets/login/user-icon.png';
 import checkIcon from '../../../assets/login/checkcircle.png';
 import googleicon from '../../../assets/login/google-icon.png';
+import EyeIcon from "../../../assets/login/eye-off.svg";
 import SSOButton from './SSOButton.jsx';
 import './SignupForm.css';
 
@@ -365,7 +366,8 @@ function SignupForm() {
                     onClick={() => setShowPassword((p) => !p)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? <EyeClosed /> : <EyeOpen />}
+                    {showPassword ?<EyeOpen />:<img src={EyeIcon} alt="Hide password" width="18" height="18" />
+                     }
                   </button>
                   
                 </div>
@@ -401,7 +403,8 @@ function SignupForm() {
                     onClick={() => setShowConfirmPassword((p) => !p)}
                     aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                   >
-                    {showConfirmPassword ? <EyeClosed /> : <EyeOpen />}
+                    {showConfirmPassword ? <EyeOpen />:<img src={EyeIcon} alt="Hide password" width="18" height="18" />
+                    }
                   </button>
 
                 </div>
