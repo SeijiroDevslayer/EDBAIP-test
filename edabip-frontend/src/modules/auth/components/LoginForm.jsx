@@ -351,41 +351,9 @@ const { login } = useAuthContext();
                 ) : (
                   // 🚫 EYE-OFF (password is hidden)
 
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M3 3l18 18"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
+                 
+                  <img src={EyeIcon} alt="Hide password" width="18" height="18" />
 
-                    <path
-                      d="M10.58 10.58A2 2 0 0012 15a2 2 0 001.41-.59"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-
-                    <path
-                      d="M9.88 5.09A10.94 10.94 0 0112 5c5 0 9.27 3.11 11 7.5a11.6 11.6 0 01-2.12 3.17"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-
-                    <path
-                      d="M6.12 6.12A11.6 11.6 0 001 12.5C2.73 16.89 7 20 12 20a10.94 10.94 0 003.12-.46"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
                 )}
                   </button>
 
