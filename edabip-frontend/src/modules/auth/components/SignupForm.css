@@ -261,7 +261,7 @@
   font-size:11px;
   line-height: 1.5;
   outline: none;
-  background: rgba(20, 28, 100, 0.55);
+  background: #2F2F9A;
   color: #ffffff;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   font-family: 'Inter', sans-serif;
@@ -464,9 +464,10 @@
 }
 
 .su-signin-link {
-  color: #5ce1e6;
+  color: #0EA5E9;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 12px;
 }
 
 /* ─── Negative State Notification ───────────────────────────────── */
