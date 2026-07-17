@@ -487,7 +487,10 @@ const method = location.state?.method;
             <div className='cnp-support-group'>
             <p className="cnp-support-text">
               Need help?{' '}
-              <span className="cnp-support-link">
+              <span className="cnp-support-link"
+                onClick={() => navigate("/contact-support")}
+                style={{ cursor: "pointer" }}
+              >
                 Contact Support
               </span>
             </p>
