@@ -263,8 +263,20 @@
   outline: none;
   background: #2F2F9A;
   color: #ffffff;
+  color-scheme: dark;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   font-family: 'Inter', sans-serif;
+}
+
+/* Autofill background input color for Full Name, Email ID, Mobile Number*/
+.su-input-wrapper input:-webkit-autofill,
+.su-input-wrapper input:-webkit-autofill:hover,
+.su-input-wrapper input:-webkit-autofill:focus,
+.su-input-wrapper input:-webkit-autofill:active {
+
+  -webkit-text-fill-color: #FFFFFF !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(47, 47, 154, 1) inset !important;
+   box-shadow: 0 0 0 1000px rgba(47, 47, 154, 1) inset !important;
 }
 
 .su-check-icon {
