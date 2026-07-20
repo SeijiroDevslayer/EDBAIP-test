@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import backgroundImg from "../../../assets/login/background.jpg";
 import logoImg from '../../../assets/login/logo.png';
 import logoImgc from '../../../assets/login/logoc.png';
@@ -14,6 +15,7 @@ import checkIcon from '../../../assets/login/checkcircle.png';
 import googleicon from '../../../assets/login/google-icon.png';
 import EyeIcon from "../../../assets/login/eye-off.svg";
 import SSOButton from './SSOButton.jsx';
+import { useAuthContext } from '../../../context/AuthContext.jsx';
 import './SignupForm.css';
 
 const FEATURES = [
@@ -63,6 +65,8 @@ const validateConfirmPassword = (p, c) => c.length > 0 && p === c;
 const validateTerms = (v) => v === true;
 
 function SignupForm() {
+  const navigate = useNavigate();
+  const { signup } = useAuthContext();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -86,6 +90,8 @@ function SignupForm() {
   const [submitted, setSubmitted] = useState(false);
 
   const [showCreateErrorNotice, setShowCreateErrorNotice] = useState(false);
+  const [createErrorMessage, setCreateErrorMessage] = useState('Please fix the errors below and try again');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -94,6 +100,7 @@ function SignupForm() {
     if (submitted) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
+    setShowCreateErrorNotice(false);
   };
 
   const getErrors = (data) => {
@@ -133,25 +140,50 @@ function SignupForm() {
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitted(true);
     const newErrors = getErrors(formData);
     setErrors(newErrors);
     if (Object.values(newErrors).some((m) => m !== '')) {
+      setCreateErrorMessage('Please fix the errors below and try again');
       setShowCreateErrorNotice(true); return;
     }
 
-    // Hide notification when the form is valid
     setShowCreateErrorNotice(false);
+    setIsSubmitting(true);
 
-    console.log('Signup form submitted:', {
-      fullName: formData.fullName,
-      email: formData.email,
-      mobileNumber: formData.mobileNumber,
-      password: formData.password,
-      agreeToTerms: formData.agreeToTerms,
-    });
+    try {
+      const result = await signup({
+        fullName: formData.fullName,
+        email: formData.email,
+        mobileNumber: formData.mobileNumber,
+        password: formData.password,
+      });
+
+      if (!result.success) {
+        if (result.error?.field === 'email') {
+          setErrors((prev) => ({ ...prev, email: result.error.message }));
+        }
+
+        setCreateErrorMessage(result.error?.message ?? 'Unable to create your account. Please try again.');
+        setShowCreateErrorNotice(true);
+        return;
+      }
+
+      navigate('/login', {
+        replace: true,
+        state: {
+          signupSuccess: true,
+          email: result.data.user.email,
+        },
+      });
+    } catch {
+      setCreateErrorMessage('Unable to create your account. Please try again.');
+      setShowCreateErrorNotice(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const EyeOpen = () => (
@@ -205,7 +237,7 @@ function SignupForm() {
 
           <div className="su-error-message">
             <h4>Unable to create account</h4>
-            <p>Please fix the errors below and try again</p>
+            <p>{createErrorMessage}</p>
           </div>
 
           <button
@@ -271,7 +303,7 @@ function SignupForm() {
                     placeholder="Enter your full name"
                     maxLength={80}
                   />
-                  {errors.mobileNumber && (
+                  {errors.fullName && (
                     <img
                       src={checkIcon}
                       alt="error"
@@ -428,7 +460,14 @@ function SignupForm() {
                 <span className="su-field-error">{errors.agreeToTerms}</span>
               </div>
 
-              <button type="submit" className="su-submit-btn">Create Account</button>
+              <button
+                type="submit"
+                className="su-submit-btn"
+                disabled={isSubmitting}
+                aria-busy={isSubmitting}
+              >
+                {isSubmitting ? 'Creating Account...' : 'Create Account'}
+              </button>
             </form>
 
             <div className="su-divider">

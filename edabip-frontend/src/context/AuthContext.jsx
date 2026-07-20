@@ -13,6 +13,12 @@ import {
   readMockSession,
   saveMockSession,
 } from "../modules/auth/utils/mockSession.js";
+import { signup as requestSignup } from "../modules/auth/api/authApi.js";
+import {
+  DEFAULT_MOCK_USER_EMAIL,
+  updateMockUserPassword,
+  validateMockCredentials,
+} from "../modules/auth/utils/mockUserRepository.js";
 
 const AuthContext = createContext(null);
 
@@ -21,10 +27,6 @@ let mockAttemptsUsed = 0;
 const MAX_ATTEMPTS = 5;
 
 export function AuthProvider({ children }) {
-  const [mockUser, setMockUser] = useState({
-    email: "test@gmail.com",
-    password: "pass12345",
-  });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -53,7 +55,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const updatePassword = useCallback((newPassword) => {
-    setMockUser((prev) => ({ ...prev, password: newPassword }));
+    updateMockUserPassword(DEFAULT_MOCK_USER_EMAIL, newPassword);
   }, []);
 
   const login = useCallback(
@@ -69,14 +71,16 @@ export function AuthProvider({ children }) {
             return;
           }
 
-          if (
-            credentials.email === mockUser.email &&
-            credentials.password === mockUser.password
-          ) {
+          const authenticatedUser = validateMockCredentials(
+            credentials.email,
+            credentials.password
+          );
+
+          if (authenticatedUser) {
             mockAttemptsUsed = 0;
             resolve({
               success: true,
-              user: { email: credentials.email },
+              user: authenticatedUser,
               token: "mock-token-123",
             });
           } else {
@@ -86,6 +90,7 @@ export function AuthProvider({ children }) {
               locked: mockAttemptsUsed >= MAX_ATTEMPTS,
               attemptsRemaining: MAX_ATTEMPTS - mockAttemptsUsed,
               message: "Invalid email or password",
+              error: { message: "Invalid email or password." },
             });
           }
         }, 600);
@@ -107,9 +112,12 @@ export function AuthProvider({ children }) {
         saveMockSession(session);
       }
 
-      return { success: true };
+      return {
+        success: true,
+        data: { user: data.user },
+      };
     },
-    [mockUser]
+    []
   );
 
   const loginWithGoogleMock = useCallback((googleUser, rememberMe = true) => {
@@ -138,6 +146,10 @@ export function AuthProvider({ children }) {
     setIsAuthenticated(true);
   }, []);
 
+  const signup = useCallback(async (payload) => {
+    return requestSignup(payload);
+  }, []);
+
   const logout = useCallback(() => {
     clearMockSession();
     setUser(null);
@@ -151,6 +163,7 @@ export function AuthProvider({ children }) {
         isInitializing,
         user,
         login,
+        signup,
         loginWithGoogleMock,
         logout,
         updatePassword,
