@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import backgroundImg from "../../../assets/login/background.jpg";
+import backgroundImg from '../../../assets/login/background.jpg';
 import logoImg from '../../../assets/login/logo.png';
-import logoImgc from '../../../assets/login/logoc.png';
 import featureAnalytics from '../../../assets/login/feature-analytics.png';
 import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
@@ -13,7 +12,9 @@ import lockicon from '../../../assets/login/lock.png';
 import usericon from '../../../assets/login/user-icon.png';
 import checkIcon from '../../../assets/login/checkcircle.png';
 import googleicon from '../../../assets/login/google-icon.png';
-import EyeIcon from "../../../assets/login/eye-off.svg";
+import EyeIcon from '../../../assets/login/eye-off.svg';
+import VerifiedIcon from '../../../assets/login/tick.png';
+import MailVerificationIcon from '../../../assets/login/mail-verify.svg'
 import SSOButton from './SSOButton.jsx';
 import { useAuthContext } from '../../../context/AuthContext.jsx';
 import './SignupForm.css';
@@ -45,28 +46,262 @@ const FEATURES = [
   },
 ];
 
-function CardLogo() {
+// Single OTP endpoint shape shared by email + mobile, distinguished by "channel".
+const SEND_OTP_ENDPOINT =
+  import.meta.env.VITE_SEND_OTP_ENDPOINT ?? '/api/auth/signup/send-otp';
+
+const VERIFY_OTP_ENDPOINT =
+  import.meta.env.VITE_VERIFY_OTP_ENDPOINT ?? '/api/auth/signup/verify-otp';
+
+const MOCK_OTP = '1234';
+
+const IS_MOCK_VERIFICATION_ENABLED =
+  String(
+    import.meta.env.VITE_ENABLE_MOCK_SIGNUP_OTP ??
+      import.meta.env.VITE_ENABLE_MOCK_EMAIL_VERIFICATION ??
+      import.meta.env.DEV,
+  ).toLowerCase() === 'true';
+
+const RESEND_COOLDOWN_SECONDS = 120;
+const OTP_LENGTH = 4;
+
+const formatOtpTimer = (seconds) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+};
+
+const formatOtpDestination = (channel, destination) => {
+  if (channel === 'email') return destination;
+
+  const compactDestination = destination.replace(/[\s-]/g, '');
+
+  if (compactDestination.startsWith('+91')) {
+    return `+91 ${compactDestination.slice(3)}`;
+  }
+
+  if (compactDestination.startsWith('91') && compactDestination.length > 10) {
+    return `+91 ${compactDestination.slice(2)}`;
+  }
+
+  return `+91 ${compactDestination}`;
+};
+
+const validateFullName = (value) => value.trim().length >= 2;
+const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+const validateMobileNumber = (value) => {
+  const compactValue = value.replace(/[\s-]/g, '');
+  return /^(\+91|91)?[6-9]\d{9}$/.test(compactValue);
+};
+const validatePassword = (value) => value.length >= 8;
+const validateConfirmPassword = (password, confirmation) =>
+  confirmation.length > 0 && password === confirmation;
+
+const createIdleVerification = () => ({
+  status: 'idle', // idle | sending | code-sent | verifying | verified | error
+  verifiedValue: '',
+  message: '',
+});
+
+function OtpSecurityIllustration() {
   return (
-    <div className="su-card-logo">
-      <img src={logoImgc} alt="" className="su-card-logo-icon" />
-      <span className="su-card-logo-text">EDABIP</span>
+    <div className="su-otp-illustration" aria-hidden="true">
+      <img src={MailVerificationIcon} alt="" className="su-otp-illustration-image" />
     </div>
   );
 }
 
-const validateFullName = (v) => v.trim().length >= 2;
-const validateEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-const validateMobileNumber = (v) => {
-  const c = v.replace(/[\s\-]/g, '');
-  return /^(\+91|91)?[6-9]\d{9}$/.test(c);
-};
-const validatePassword = (v) => v.length >= 8;
-const validateConfirmPassword = (p, c) => c.length > 0 && p === c;
-const validateTerms = (v) => v === true;
+function OtpModal({
+  channel,
+  destination,
+  otp,
+  sendStatus,
+  verifyStatus,
+  errorMessage,
+  resendSeconds,
+  onDigitChange,
+  onDigitKeyDown,
+  onDigitPaste,
+  onVerify,
+  onResend,
+  onClose,
+  inputRefs,
+}) {
+  const isVerifying = verifyStatus === 'verifying';
+  const canVerify = otp.every((digit) => digit !== '') && !isVerifying;
+  const formattedDestination = formatOtpDestination(channel, destination);
+
+  const handleOverlayClick = (event) => {
+    if (!isVerifying && event.target === event.currentTarget) {
+      onClose();
+    }
+  };
+
+  return (
+    <div className="su-modal-overlay" role="presentation" onClick={handleOverlayClick}>
+      <div
+  className="su-otp-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="su-otp-modal-title"
+  onClick={(event) => event.stopPropagation()}
+>
+  <button
+    type="button"
+    className="su-otp-modal-close"
+    onClick={onClose}
+    disabled={isVerifying}
+    aria-label="Close verification dialog"
+  >
+    <svg
+      className="su-otp-modal-close-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M6 6L18 18M18 6L6 18"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  </button>
+
+  <div className="su-otp-modal-content">
+    <OtpSecurityIllustration />
+
+    <div className="su-otp-copy">
+      <h2 id="su-otp-modal-title" className="su-otp-modal-title">
+        {channel === 'email'
+          ? 'Verify Your Email'
+          : 'Verify Your Mobile Number'}
+      </h2>
+
+      <p className="su-otp-modal-message">
+        We have sent {OTP_LENGTH}-digit verification code
+      </p>
+
+      <p className="su-otp-modal-destination">
+        <span>to </span>
+        <strong>{formattedDestination}</strong>
+      </p>
+    </div>
+
+    <div className="su-otp-input-section">
+      <div className="su-otp-boxes" onPaste={onDigitPaste}>
+        {otp.map((digit, index) => (
+          <input
+            key={index}
+            ref={(el) => {
+              inputRefs.current[index] = el;
+            }}
+            type="text"
+            inputMode="numeric"
+            maxLength={1}
+            value={digit}
+            autoComplete={index === 0 ? 'one-time-code' : 'off'}
+            readOnly={isVerifying}
+            onChange={(event) =>
+              onDigitChange(index, event.target.value)
+            }
+            onKeyDown={(event) => {
+              onDigitKeyDown(index, event);
+
+              if (
+                event.key === 'Enter' &&
+                index === OTP_LENGTH - 1 &&
+                canVerify
+              ) {
+                event.preventDefault();
+                onVerify();
+              }
+            }}
+            className={`su-otp-box ${
+              digit ? 'su-otp-box--filled' : ''
+            } ${errorMessage ? 'su-otp-box-error' : ''}`}
+            aria-label={`Digit ${index + 1} of ${OTP_LENGTH}`}
+            aria-invalid={Boolean(errorMessage)}
+          />
+        ))}
+      </div>
+
+      <p
+        className="su-otp-error"
+        role={errorMessage ? 'alert' : undefined}
+        aria-live="polite"
+      >
+        {errorMessage || '\u00A0'}
+      </p>
+
+      <div className="su-otp-meta-row">
+        <span className="su-otp-resend-label">Resend OTP</span>
+
+        <span className="su-otp-timer">
+          <svg
+            className="su-otp-timer-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M21 12A9 9 0 1 1 18.36 5.64"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+
+            <path
+              d="M18 2.75V6H21.25"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+
+          <span className="su-otp-timer-value">
+            {formatOtpTimer(resendSeconds)}
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <div className="su-otp-actions">
+      <button
+        type="button"
+        className="su-otp-verify-btn"
+        onClick={onVerify}
+        disabled={!canVerify}
+      >
+        {isVerifying ? 'Verifying...' : 'Verify & Continue'}
+      </button>
+
+      <button
+        type="button"
+        className="su-otp-resend-btn"
+        onClick={onResend}
+        disabled={
+          resendSeconds > 0 ||
+          sendStatus === 'sending'
+        }
+      >
+        {sendStatus === 'sending'
+          ? 'Sending...'
+          : 'Resend OTP'}
+      </button>
+    </div>
+  </div>
+</div>
+    </div>
+  );
+}
 
 function SignupForm() {
   const navigate = useNavigate();
   const { signup } = useAuthContext();
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -85,69 +320,389 @@ function SignupForm() {
     agreeToTerms: '',
   });
 
+  const [submitted, setSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
   const [showCreateErrorNotice, setShowCreateErrorNotice] = useState(false);
-  const [createErrorMessage, setCreateErrorMessage] = useState('Please fix the errors below and try again');
+  const [createErrorMessage, setCreateErrorMessage] = useState(
+    'Please fix the errors below and try again',
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const newValue = type === 'checkbox' ? checked : value;
-    setFormData((prev) => ({ ...prev, [name]: newValue }));
-    if (submitted) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+  // Per-channel verification state — same shape reused for email + mobile.
+  const [emailVerification, setEmailVerification] = useState(createIdleVerification);
+  const [mobileVerification, setMobileVerification] = useState(createIdleVerification);
+
+  // OTP modal state — one modal, reused for whichever channel is active.
+  const [activeOtpChannel, setActiveOtpChannel] = useState(null); // 'email' | 'mobile' | null
+  const [otpDestination, setOtpDestination] = useState('');
+  const [otpDigits, setOtpDigits] = useState(() => Array(OTP_LENGTH).fill(''));
+  const [otpError, setOtpError] = useState('');
+  const [otpVerifyStatus, setOtpVerifyStatus] = useState('idle'); // idle | verifying
+  const [resendSeconds, setResendSeconds] = useState(0);
+  const otpInputRefs = useRef([]);
+
+  const normalizedEmail = useMemo(
+    () => formData.email.trim().toLowerCase(),
+    [formData.email],
+  );
+  const normalizedMobile = useMemo(
+    () => formData.mobileNumber.trim(),
+    [formData.mobileNumber],
+  );
+
+  const isEmailVerified =
+    emailVerification.status === 'verified' &&
+    emailVerification.verifiedValue === normalizedEmail;
+  const isMobileVerified =
+    mobileVerification.status === 'verified' &&
+    mobileVerification.verifiedValue === normalizedMobile;
+
+  const canCreateAccount =
+    isEmailVerified && isMobileVerified && formData.agreeToTerms && !isSubmitting;
+
+  const resetVerification = useCallback((channel) => {
+    if (channel === 'email') {
+      setEmailVerification(createIdleVerification());
+    } else {
+      setMobileVerification(createIdleVerification());
     }
+  }, []);
+
+  // Countdown for the resend button inside the OTP modal.
+  useEffect(() => {
+    if (resendSeconds <= 0) return undefined;
+
+    const timer = window.setInterval(() => {
+      setResendSeconds((current) => Math.max(0, current - 1));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [resendSeconds]);
+
+  const handleChange = (event) => {
+    const { name, value, type, checked } = event.target;
+    const nextValue = type === 'checkbox' ? checked : value;
+
+    if (
+      name === 'email' &&
+      emailVerification.status === 'verified' &&
+      value.trim().toLowerCase() !== emailVerification.verifiedValue
+    ) {
+      resetVerification('email');
+    }
+    if (
+      name === 'mobileNumber' &&
+      mobileVerification.status === 'verified' &&
+      value.trim() !== mobileVerification.verifiedValue
+    ) {
+      resetVerification('mobile');
+    }
+
+    setFormData((previous) => ({ ...previous, [name]: nextValue }));
+
+    if (submitted) {
+      setErrors((previous) => ({ ...previous, [name]: '' }));
+    }
+
     setShowCreateErrorNotice(false);
   };
 
   const getErrors = (data) => {
-    const e = {};
+    const nextErrors = {};
 
-    e.fullName = !data.fullName.trim() || !validateFullName(data.fullName)
-      ? 'Please enter a valid full name'
-      : '';
+    nextErrors.fullName =
+      !data.fullName.trim() || !validateFullName(data.fullName)
+        ? 'Please enter a valid full name'
+        : '';
 
-    e.email = !data.email.trim() || !validateEmail(data.email)
-      ? 'Please enter a valid email address'
-      : '';
+    nextErrors.email =
+      !data.email.trim() || !validateEmail(data.email)
+        ? 'Please enter a valid email address'
+        : !isEmailVerified
+          ? 'Verify this email address before creating your account'
+          : '';
 
     if (!data.mobileNumber.trim()) {
-      e.mobileNumber = 'Mobile number is required';
+      nextErrors.mobileNumber = 'Mobile number is required';
     } else if (!validateMobileNumber(data.mobileNumber)) {
-      const digits = data.mobileNumber.replace(/[\s\-+]/g, '').replace(/^91/, '');
-      e.mobileNumber = digits.length !== 10
-        ? 'Mobile number must be 10 digits'
-        : 'Please enter a valid mobile number (+91 format)';
+      const digits = data.mobileNumber
+        .replace(/[\s\-+]/g, '')
+        .replace(/^91/, '');
+
+      nextErrors.mobileNumber =
+        digits.length !== 10
+          ? 'Mobile number must be 10 digits'
+          : 'Please enter a valid Indian mobile number';
+    } else if (!isMobileVerified) {
+      nextErrors.mobileNumber = 'Verify this mobile number before creating your account';
     } else {
-      e.mobileNumber = '';
+      nextErrors.mobileNumber = '';
     }
 
-    e.password = !data.password || !validatePassword(data.password)
-      ? 'Password must be at least 8 characters'
-      : '';
+    nextErrors.password =
+      !data.password || !validatePassword(data.password)
+        ? 'Password must be at least 8 characters'
+        : '';
 
-    e.confirmPassword = !data.confirmPassword || !validateConfirmPassword(data.password, data.confirmPassword)
-      ? 'Passwords do not match'
-      : '';
+    nextErrors.confirmPassword =
+      !data.confirmPassword ||
+      !validateConfirmPassword(data.password, data.confirmPassword)
+        ? 'Passwords do not match'
+        : '';
 
-    e.agreeToTerms = !validateTerms(data.agreeToTerms)
-      ? 'You must agree to Terms & Conditions'
-      : '';
+    nextErrors.agreeToTerms = data.agreeToTerms
+      ? ''
+      : 'You must agree to Terms & Conditions';
 
-    return e;
+    return nextErrors;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // ---- OTP send / verify -----------------------------------------------
+
+  const destinationFor = useCallback(
+    (channel) => (channel === 'email' ? normalizedEmail : normalizedMobile),
+    [normalizedEmail, normalizedMobile],
+  );
+
+  const isChannelValid = useCallback(
+    (channel) =>
+      channel === 'email' ? validateEmail(normalizedEmail) : validateMobileNumber(normalizedMobile),
+    [normalizedEmail, normalizedMobile],
+  );
+
+  const setVerification = useCallback((channel, updater) => {
+    const setter = channel === 'email' ? setEmailVerification : setMobileVerification;
+    setter((previous) => ({ ...previous, ...updater }));
+  }, []);
+
+  const requestOtp = useCallback(
+    async (channel) => {
+      if (!isChannelValid(channel)) {
+        setErrors((previous) => ({
+          ...previous,
+          [channel === 'email' ? 'email' : 'mobileNumber']:
+            channel === 'email'
+              ? 'Enter a valid email address before requesting a code'
+              : 'Enter a valid mobile number before requesting a code',
+        }));
+        return;
+      }
+
+      const destination = destinationFor(channel);
+
+      setErrors((previous) => ({
+        ...previous,
+        [channel === 'email' ? 'email' : 'mobileNumber']: '',
+      }));
+      setVerification(channel, { status: 'sending', message: '' });
+      setOtpError('');
+
+      try {
+        if (IS_MOCK_VERIFICATION_ENABLED) {
+            // Simulate the delay of a real send-OTP API request.
+            await new Promise((resolve) => window.setTimeout(resolve, 600));
+            console.info(
+              `[Mock signup OTP] ${channel} verification code for ${destination}: ${MOCK_OTP}`,
+            );
+          } else {
+          const response = await fetch(SEND_OTP_ENDPOINT, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+            body: JSON.stringify({ channel, destination }),
+          });
+
+          const result = await response.json().catch(() => ({}));
+
+          if (!response.ok) {
+            throw new Error(result.message ?? 'Unable to send the verification code.');
+          }
+        }
+
+        setVerification(channel, { status: 'code-sent', message: '' });
+        setResendSeconds(RESEND_COOLDOWN_SECONDS);
+        setOtpDigits(Array(OTP_LENGTH).fill(''));
+        setOtpDestination(destination);
+        setActiveOtpChannel(channel);
+        window.requestAnimationFrame(() => {
+          otpInputRefs.current[0]?.focus();
+        });
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Unable to send the verification code.';
+
+        setVerification(channel, {
+          status: 'error',
+          message,
+        });
+
+        if (activeOtpChannel === channel) {
+          setOtpError(message);
+        } else {
+          setErrors((previous) => ({
+            ...previous,
+            [channel === 'email' ? 'email' : 'mobileNumber']: message,
+          }));
+        }
+      }
+    },
+    [activeOtpChannel, destinationFor, isChannelValid, setVerification],
+  );
+
+  const closeOtpModal = useCallback(() => {
+    setActiveOtpChannel(null);
+    setOtpDestination('');
+    setOtpError('');
+    setOtpVerifyStatus('idle');
+  }, []);
+
+  useEffect(() => {
+    if (!activeOtpChannel) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    window.requestAnimationFrame(() => {
+      otpInputRefs.current[0]?.focus();
+    });
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [activeOtpChannel]);
+
+  useEffect(() => {
+    if (!activeOtpChannel) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && otpVerifyStatus !== 'verifying') {
+        closeOtpModal();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeOtpChannel, closeOtpModal, otpVerifyStatus]);
+
+  const handleOtpDigitChange = (index, rawValue) => {
+    const value = rawValue.replace(/\D/g, '').slice(-1);
+
+    setOtpDigits((previous) => {
+      const next = [...previous];
+      next[index] = value;
+      return next;
+    });
+    setOtpError('');
+
+    if (value && index < OTP_LENGTH - 1) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpDigitKeyDown = (index, event) => {
+    if (event.key === 'Backspace' && !otpDigits[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleOtpPaste = (event) => {
+    const pasted = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH);
+    if (!pasted) return;
+
+    event.preventDefault();
+    setOtpError('');
+    setOtpDigits(() => {
+      const next = Array(OTP_LENGTH).fill('');
+      pasted.split('').forEach((digit, index) => {
+        next[index] = digit;
+      });
+      return next;
+    });
+
+    const nextFocusIndex = Math.min(pasted.length, OTP_LENGTH - 1);
+    otpInputRefs.current[nextFocusIndex]?.focus();
+  };
+
+  const handleVerifyOtp = async () => {
+    const channel = activeOtpChannel;
+    if (!channel) return;
+
+    const code = otpDigits.join('');
+    const destination = otpDestination || destinationFor(channel);
+    if (code.length !== OTP_LENGTH) {
+      setOtpError(`Enter all ${OTP_LENGTH} digits.`);
+      return;
+    }
+
+    setOtpVerifyStatus('verifying');
+    setOtpError('');
+
+    try {
+      if (IS_MOCK_VERIFICATION_ENABLED) {
+          // Simulate the delay of a real verify-OTP API request.
+          await new Promise((resolve) => window.setTimeout(resolve, 500));
+
+          if (code !== MOCK_OTP) {
+            throw new Error(
+              `The verification code is incorrect. Use ${MOCK_OTP} in mock mode.`,
+            );
+          }
+        } else {
+        const response = await fetch(VERIFY_OTP_ENDPOINT, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            channel,
+            destination,
+            code,
+          }),
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok || result.verified !== true) {
+          throw new Error(result.message ?? 'That code didn\u2019t match. Try again.');
+        }
+      }
+
+      setVerification(channel, {
+        status: 'verified',
+        verifiedValue: destination,
+        message: '',
+      });
+      setOtpVerifyStatus('idle');
+      closeOtpModal();
+    } catch (error) {
+      setOtpVerifyStatus('idle');
+      setOtpError(
+        error instanceof Error ? error.message : 'That code didn\u2019t match. Try again.',
+      );
+    }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setSubmitted(true);
+
     const newErrors = getErrors(formData);
     setErrors(newErrors);
-    if (Object.values(newErrors).some((m) => m !== '')) {
-      setCreateErrorMessage('Please fix the errors below and try again');
-      setShowCreateErrorNotice(true); return;
+
+    if (Object.values(newErrors).some(Boolean)) {
+      setCreateErrorMessage(
+        !isEmailVerified || !isMobileVerified
+          ? 'Verify your email and mobile number before creating the account.'
+          : 'Please fix the errors below and try again.',
+      );
+      setShowCreateErrorNotice(true);
+      return;
     }
 
     setShowCreateErrorNotice(false);
@@ -155,18 +710,23 @@ function SignupForm() {
 
     try {
       const result = await signup({
-        fullName: formData.fullName,
-        email: formData.email,
-        mobileNumber: formData.mobileNumber,
+        fullName: formData.fullName.trim(),
+        email: normalizedEmail,
+        mobileNumber: formData.mobileNumber.trim(),
         password: formData.password,
       });
 
       if (!result.success) {
         if (result.error?.field === 'email') {
-          setErrors((prev) => ({ ...prev, email: result.error.message }));
+          setErrors((previous) => ({
+            ...previous,
+            email: result.error.message,
+          }));
         }
 
-        setCreateErrorMessage(result.error?.message ?? 'Unable to create your account. Please try again.');
+        setCreateErrorMessage(
+          result.error?.message ?? 'Unable to create your account. Please try again.',
+        );
         setShowCreateErrorNotice(true);
         return;
       }
@@ -188,49 +748,51 @@ function SignupForm() {
 
   const EyeOpen = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M1 12.5C2.73 8.11 7 5 12 5s9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S2.73 16.89 1 12.5z" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M1 12.5C2.73 8.11 7 5 12 5s9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S2.73 16.89 1 12.5z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
       <circle cx="12" cy="12.5" r="3" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   );
 
-  const EyeClosed = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M3 3l18 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M10.58 10.58A2 2 0 0012 15a2 2 0 001.41-.59" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M9.88 5.09A10.94 10.94 0 0112 5c5 0 9.27 3.11 11 7.5a11.6 11.6 0 01-2.12 3.17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M6.12 6.12A11.6 11.6 0 001 12.5C2.73 16.89 7 20 12 20a10.94 10.94 0 003.12-.46" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
+  const renderVerifyButton = (channel, isVerified) => {
+    const verification = channel === 'email' ? emailVerification : mobileVerification;
+
+    if (isVerified) {
+      return (
+        <span className="su-verified-pill">
+          <img src={VerifiedIcon} alt="" className="su-verified-pill-icon" />
+          Verified
+        </span>
+      );
+    }
+
+    return (
+      <button
+        type="button"
+        className="su-verify-btn"
+        onClick={() => requestOtp(channel)}
+        disabled={verification.status === 'sending'}
+      >
+        {verification.status === 'sending' ? 'Sending...' : 'Verify'}
+      </button>
+    );
+  };
 
   return (
     <div className="su-container">
-      <div className="su-background">
+      <div className="su-background" aria-hidden="true">
         <img src={backgroundImg} alt="" className="su-background-image" />
       </div>
 
-      {/* Negative-state notification shown only when signup validation fails */}
       {showCreateErrorNotice && (
         <div className="su-error-notification" role="alert">
-          <div className="su-error-icon">
-            <svg
-              width="19"
-              height="19"
-              viewBox="0 0 24 24"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M12 3L22 20H2L12 3Z"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M12 9V13"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
+          <div className="su-error-icon" aria-hidden="true">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3L22 20H2L12 3Z" stroke="white" strokeWidth="2" strokeLinejoin="round" />
+              <path d="M12 9V13" stroke="white" strokeWidth="2" strokeLinecap="round" />
               <circle cx="12" cy="17" r="1" fill="white" />
             </svg>
           </div>
@@ -251,49 +813,42 @@ function SignupForm() {
         </div>
       )}
 
-      <div className="su-content">
-        {/* Left Info Section */}
-        <div className="su-left">
+      <main className="su-content">
+        <section className="su-left" aria-label="EDABIP benefits">
           <img src={logoImg} alt="EDABIP" className="su-brand-logo" />
 
           <h1 className="su-heading">Create your Account</h1>
           <p className="su-subheading">
-            Start your analytics journey<br />with <strong>EDABIP</strong>
+            Start your analytics journey
+            <br />
+            with <strong>EDABIP</strong>
           </p>
 
           <div className="su-features">
-            {FEATURES.map((f) => (
-              <div key={f.alt} className="su-feature-item">
-                <img src={f.src} alt={f.alt} className="su-feature-icon" />
+            {FEATURES.map((feature) => (
+              <div key={feature.alt} className="su-feature-item">
+                <img src={feature.src} alt="" className="su-feature-icon" aria-hidden="true" />
                 <div className="su-feature-text">
-                  <span className="su-feature-title">{f.title}</span>
-                  <span className="su-feature-desc">{f.desc}</span>
+                  <span className="su-feature-title">{feature.title}</span>
+                  <span className="su-feature-desc">{feature.desc}</span>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* Right Card Section */}
-        <div className="su-right">
+        <section className="su-right">
           <div className="su-card">
-
-
             <h2 className="su-card-title">Create your Account</h2>
             <p className="su-card-subtitle">
               Start your analytics journey with <strong>EDABIP</strong>
             </p>
 
             <form onSubmit={handleSubmit} className="su-form" noValidate>
-
               <div className="su-form-group">
                 <label htmlFor="su-fullName">Full Name</label>
                 <div className="su-input-wrapper">
-                  <img
-                    src={usericon}
-                    alt="user"
-                    className="su-input-icon"
-                  />
+                  <img src={usericon} alt="" className="su-input-icon" />
                   <input
                     type="text"
                     id="su-fullName"
@@ -302,26 +857,21 @@ function SignupForm() {
                     onChange={handleChange}
                     placeholder="Enter your full name"
                     maxLength={80}
+                    autoComplete="name"
+                    aria-invalid={Boolean(errors.fullName)}
                   />
-                  {errors.fullName && (
-                    <img
-                      src={checkIcon}
-                      alt="error"
-                      className="su-check-icon"
-                    />
-                  )}
                 </div>
                 <span className="su-field-error">{errors.fullName}</span>
               </div>
 
               <div className="su-form-group">
                 <label htmlFor="su-email">Email ID</label>
-                <div className="su-input-wrapper">
-                  <img
-                    src={emailicon}
-                    alt="email"
-                    className="su-input-icon"
-                  />
+                <div
+                  className={`su-input-wrapper su-input-wrapper--with-action ${
+                    isEmailVerified ? 'su-input-wrapper--verified' : ''
+                  }`}
+                >
+                  <img src={emailicon} alt="" className="su-input-icon" />
                   <input
                     type="email"
                     id="su-email"
@@ -329,26 +879,23 @@ function SignupForm() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter your email"
+                    autoComplete="email"
+                    readOnly={isEmailVerified}
+                    aria-invalid={Boolean(errors.email)}
                   />
-                  {errors.email && (
-                    <img
-                      src={checkIcon}
-                      alt="error"
-                      className="su-check-icon"
-                    />
-                  )}
+                  {renderVerifyButton('email', isEmailVerified)}
                 </div>
                 <span className="su-field-error">{errors.email}</span>
               </div>
 
               <div className="su-form-group">
                 <label htmlFor="su-mobileNumber">Mobile Number</label>
-                <div className="su-input-wrapper">
-                  <img
-                    src={phoneicon}
-                    alt="phone"
-                    className="su-input-icon"
-                  />
+                <div
+                  className={`su-input-wrapper su-input-wrapper--with-action ${
+                    isMobileVerified ? 'su-input-wrapper--verified' : ''
+                  }`}
+                >
+                  <img src={phoneicon} alt="" className="su-input-icon" />
                   <input
                     type="tel"
                     id="su-mobileNumber"
@@ -356,91 +903,80 @@ function SignupForm() {
                     value={formData.mobileNumber}
                     onChange={handleChange}
                     placeholder="Enter your mobile number"
-                    maxLength={15}
+                    maxLength={10}
+                    inputMode="numeric"
+                    autoComplete="tel-national"
+                    className="su-mobile-input"
+                    readOnly={isMobileVerified}
+                    aria-invalid={Boolean(errors.mobileNumber)}
                   />
-                  {errors.mobileNumber && (
-                    <img
-                      src={checkIcon}
-                      alt="error"
-                      className="su-check-icon"
-                    />
-                  )}
+                  {renderVerifyButton('mobile', isMobileVerified)}
                 </div>
                 <span className="su-field-error">{errors.mobileNumber}</span>
               </div>
 
-              <div className="su-form-group">
-                <label htmlFor="su-password">Password</label>
-                <div className="su-input-wrapper">
-                  <img
-                    src={lockicon}
-                    alt="password"
-                    className="su-input-icon"
-                  />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    id="su-password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Create a password"
-                  />
-                  {errors.password && (
-                    <img
-                      src={checkIcon}
-                      alt="error"
-                      className="su-check-icon"
+              <div className="su-form-row">
+                <div className="su-form-group">
+                  <label htmlFor="su-password">Password</label>
+                  <div className="su-input-wrapper">
+                    <img src={lockicon} alt="" className="su-input-icon" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      id="su-password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Create a password"
+                      autoComplete="new-password"
+                      aria-invalid={Boolean(errors.password)}
                     />
-                  )}
-                  <button
-                    type="button"
-                    className={`su-pw-toggle ${errors.password ? 'su-pw-toggle-error' : ''}`}
-                    onClick={() => setShowPassword((p) => !p)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ?<EyeOpen />:<img src={EyeIcon} alt="Hide password" width="18" height="18" />
-                     }
-                  </button>
-                  
+                    <button
+                      type="button"
+                      className="su-pw-toggle"
+                      onClick={() => setShowPassword((current) => !current)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? (
+                        <EyeOpen />
+                      ) : (
+                        <img src={EyeIcon} alt="" width="18" height="18" aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
+                  <span className="su-field-error">{errors.password}</span>
                 </div>
-                <span className="su-field-error">{errors.password}</span>
-              </div>
 
-              <div className="su-form-group">
-                <label htmlFor="su-confirmPassword">Confirm Password</label>
-                <div className="su-input-wrapper">
-                  <img
-                    src={lockicon}
-                    alt="password"
-                    className="su-input-icon"
-                  />
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    id="su-confirmPassword"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    placeholder="Confirm your password"
-                  />
-                  {errors.confirmPassword && (
-                    <img
-                      src={checkIcon}
-                      alt="error"
-                      className="su-check-icon"
+                <div className="su-form-group">
+                  <label htmlFor="su-confirmPassword">Confirm Password</label>
+                  <div className="su-input-wrapper">
+                    <img src={lockicon} alt="" className="su-input-icon" />
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      id="su-confirmPassword"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      placeholder="Create a password"
+                      autoComplete="new-password"
+                      aria-invalid={Boolean(errors.confirmPassword)}
                     />
-                  )}
-                  <button
-                    type="button"
-                    className={`su-pw-toggle ${errors.confirmPassword ? 'su-pw-toggle-error' : ''}`}
-                    onClick={() => setShowConfirmPassword((p) => !p)}
-                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-                  >
-                    {showConfirmPassword ? <EyeOpen />:<img src={EyeIcon} alt="Hide password" width="18" height="18" />
-                    }
-                  </button>
-
+                    <button
+                      type="button"
+                      className="su-pw-toggle"
+                      onClick={() => setShowConfirmPassword((current) => !current)}
+                      aria-label={
+                        showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'
+                      }
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOpen />
+                      ) : (
+                        <img src={EyeIcon} alt="" width="18" height="18" aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
+                  <span className="su-field-error">{errors.confirmPassword}</span>
                 </div>
-                <span className="su-field-error">{errors.confirmPassword}</span>
               </div>
 
               <div className="su-form-group su-terms-group">
@@ -454,7 +990,13 @@ function SignupForm() {
                   />
                   <span>
                     I agree to the{' '}
-                    <a href="#" className="su-terms-link">Terms &amp; Conditions</a>
+                    <a
+                      href="/terms"
+                      className="su-terms-link"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      Terms &amp; Conditions
+                    </a>
                   </span>
                 </label>
                 <span className="su-field-error">{errors.agreeToTerms}</span>
@@ -463,8 +1005,13 @@ function SignupForm() {
               <button
                 type="submit"
                 className="su-submit-btn"
-                disabled={isSubmitting}
+                disabled={!canCreateAccount}
                 aria-busy={isSubmitting}
+                title={
+                  !isEmailVerified || !isMobileVerified
+                    ? 'Verify your email and mobile number to enable account creation'
+                    : undefined
+                }
               >
                 {isSubmitting ? 'Creating Account...' : 'Create Account'}
               </button>
@@ -477,20 +1024,39 @@ function SignupForm() {
             <SSOButton
               provider="google"
               className="su-sso-btn"
-              icon={<img
-                src={googleicon}
-                alt=""
-                className="su-sso-icon"
-              />}
+              icon={<img src={googleicon} alt="" className="su-sso-icon" />}
             />
 
             <p className="su-signin-text">
               Already have an account?{' '}
-              <a href="/login" className="su-signin-link">Sign in</a>
+              <a href="/login" className="su-signin-link">
+                Login
+              </a>
             </p>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
+
+      {activeOtpChannel && (
+        <OtpModal
+          channel={activeOtpChannel}
+          destination={otpDestination || destinationFor(activeOtpChannel)}
+          otp={otpDigits}
+          sendStatus={
+            activeOtpChannel === 'email' ? emailVerification.status : mobileVerification.status
+          }
+          verifyStatus={otpVerifyStatus}
+          errorMessage={otpError}
+          resendSeconds={resendSeconds}
+          onDigitChange={handleOtpDigitChange}
+          onDigitKeyDown={handleOtpDigitKeyDown}
+          onDigitPaste={handleOtpPaste}
+          onVerify={handleVerifyOtp}
+          onResend={() => requestOtp(activeOtpChannel)}
+          onClose={closeOtpModal}
+          inputRefs={otpInputRefs}
+        />
+      )}
     </div>
   );
 }
