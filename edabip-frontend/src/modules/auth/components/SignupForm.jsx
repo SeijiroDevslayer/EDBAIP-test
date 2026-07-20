@@ -59,7 +59,7 @@ const IS_MOCK_VERIFICATION_ENABLED =
   String(
     import.meta.env.VITE_ENABLE_MOCK_SIGNUP_OTP ??
       import.meta.env.VITE_ENABLE_MOCK_EMAIL_VERIFICATION ??
-      import.meta.env.DEV,
+      'true',
   ).toLowerCase() === 'true';
 
 const RESEND_COOLDOWN_SECONDS = 120;
