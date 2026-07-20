@@ -76,7 +76,7 @@ function PasswordResetSuccess() {
 
             <SuccessIcon />
 
-            <h2 className="prs-title">Password Reset Successsfully !</h2>
+            <h2 className="prs-title">Password Reset Successfully !</h2>
 
             <p className="prs-subtitle">
               Your password has been updated successfully.<br />
