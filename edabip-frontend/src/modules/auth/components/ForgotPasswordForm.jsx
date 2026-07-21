@@ -59,7 +59,7 @@ const FEATURES = [
 
 const INDIA_MOBILE_REGEX = /^[6-9]\d{9}$/;
 const RESEND_SECONDS = 30;
-const TOAST_DISMISS_MS = 5000;
+const TOAST_DISMISS_MS = 3000;
 
 function CardLogo() {
   return (
