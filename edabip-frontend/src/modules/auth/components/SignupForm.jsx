@@ -14,11 +14,20 @@ import checkIcon from '../../../assets/login/checkcircle.png';
 import googleicon from '../../../assets/login/google-icon.png';
 import EyeIcon from '../../../assets/login/eye-off.svg';
 import VerifiedIcon from '../../../assets/login/tick.png';
-import MailVerificationIcon from '../../../assets/login/mail-verify.svg'
+import MailVerificationIcon from '../../../assets/login/mail-verify.svg';
+import PhoneVerificationIcon from '../../../assets/login/phone-verify.svg';
 import SSOButton from './SSOButton.jsx';
 import { useAuthContext } from '../../../context/AuthContext.jsx';
 import './SignupForm.css';
 
+
+const readBooleanEnv = (value) =>
+  String(value ?? '')
+    .trim()
+    .replace(/^['"]|['"]$/g, '')
+    .toLowerCase() === 'true';
+
+    
 const FEATURES = [
   {
     src: featureAnalytics,
@@ -55,12 +64,24 @@ const VERIFY_OTP_ENDPOINT =
 
 const MOCK_OTP = '1234';
 
+// const IS_MOCK_VERIFICATION_ENABLED =
+//   String(
+//     import.meta.env.VITE_ENABLE_MOCK_SIGNUP_OTP ??
+//       import.meta.env.VITE_ENABLE_MOCK_EMAIL_VERIFICATION ??
+//       'true',
+//   ).toLowerCase() === 'true';
+const CURRENT_HOSTNAME =
+  typeof window !== 'undefined' ? window.location.hostname : '';
+
+const IS_TEST_DEPLOYMENT =
+  CURRENT_HOSTNAME === 'localhost' ||
+  CURRENT_HOSTNAME === '127.0.0.1' ||
+  CURRENT_HOSTNAME.endsWith('.vercel.app');
+
 const IS_MOCK_VERIFICATION_ENABLED =
-  String(
-    import.meta.env.VITE_ENABLE_MOCK_SIGNUP_OTP ??
-      import.meta.env.VITE_ENABLE_MOCK_EMAIL_VERIFICATION ??
-      'true',
-  ).toLowerCase() === 'true';
+  readBooleanEnv(import.meta.env.VITE_ENABLE_MOCK_SIGNUP_OTP) ||
+  readBooleanEnv(import.meta.env.VITE_ENABLE_MOCK_EMAIL_VERIFICATION) ||
+  IS_TEST_DEPLOYMENT;
 
 const RESEND_COOLDOWN_SECONDS = 120;
 const OTP_LENGTH = 4;
@@ -104,10 +125,16 @@ const createIdleVerification = () => ({
   message: '',
 });
 
-function OtpSecurityIllustration() {
+function OtpSecurityIllustration({ channel }) {
+  const isEmail = channel === 'email';
+
   return (
     <div className="su-otp-illustration" aria-hidden="true">
-      <img src={MailVerificationIcon} alt="" className="su-otp-illustration-image" />
+      <img
+        src={isEmail ? MailVerificationIcon : PhoneVerificationIcon}
+        alt=""
+        className="su-otp-illustration-image"
+      />
     </div>
   );
 }
@@ -170,7 +197,7 @@ function OtpModal({
   </button>
 
   <div className="su-otp-modal-content">
-    <OtpSecurityIllustration />
+    <OtpSecurityIllustration channel={channel} />
 
     <div className="su-otp-copy">
       <h2 id="su-otp-modal-title" className="su-otp-modal-title">
