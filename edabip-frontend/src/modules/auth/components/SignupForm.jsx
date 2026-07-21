@@ -115,7 +115,29 @@ const validateMobileNumber = (value) => {
   const compactValue = value.replace(/[\s-]/g, '');
   return /^(\+91|91)?[6-9]\d{9}$/.test(compactValue);
 };
-const validatePassword = (value) => value.length >= 8;
+const PASSWORD_MIN_LENGTH = 8;
+
+const getPasswordValidationError = (value) => {
+  if (!value) return 'Password is required';
+  if (value.length < PASSWORD_MIN_LENGTH) {
+    return `Password must be at least ${PASSWORD_MIN_LENGTH} characters`;
+  }
+  if (!/[A-Z]/.test(value)) {
+    return 'Password must contain at least one uppercase letter';
+  }
+  if (!/[a-z]/.test(value)) {
+    return 'Password must contain at least one lowercase letter';
+  }
+  if (!/\d/.test(value)) {
+    return 'Password must contain at least one number';
+  }
+  if (!/[^A-Za-z0-9]/.test(value)) {
+    return 'Password must contain at least one special character';
+  }
+  return '';
+};
+
+const validatePassword = (value) => getPasswordValidationError(value) === '';
 const validateConfirmPassword = (password, confirmation) =>
   confirmation.length > 0 && password === confirmation;
 
@@ -429,7 +451,25 @@ function SignupForm() {
     setFormData((previous) => ({ ...previous, [name]: nextValue }));
 
     if (submitted) {
-      setErrors((previous) => ({ ...previous, [name]: '' }));
+      setErrors((previous) => {
+        const nextErrors = { ...previous, [name]: '' };
+
+        if (name === 'password') {
+          nextErrors.password = getPasswordValidationError(value);
+
+          if (formData.confirmPassword) {
+            nextErrors.confirmPassword =
+              value === formData.confirmPassword ? '' : 'Passwords do not match';
+          }
+        }
+
+        if (name === 'confirmPassword') {
+          nextErrors.confirmPassword =
+            value === formData.password ? '' : 'Passwords do not match';
+        }
+
+        return nextErrors;
+      });
     }
 
     setShowCreateErrorNotice(false);
@@ -467,10 +507,7 @@ function SignupForm() {
       nextErrors.mobileNumber = '';
     }
 
-    nextErrors.password =
-      !data.password || !validatePassword(data.password)
-        ? 'Password must be at least 8 characters'
-        : '';
+    nextErrors.password = getPasswordValidationError(data.password);
 
     nextErrors.confirmPassword =
       !data.confirmPassword ||
@@ -955,6 +992,8 @@ function SignupForm() {
                       onChange={handleChange}
                       placeholder="Create a password"
                       autoComplete="new-password"
+                      minLength={PASSWORD_MIN_LENGTH}
+                      aria-describedby="su-password-error"
                       aria-invalid={Boolean(errors.password)}
                     />
                     <button
@@ -970,7 +1009,14 @@ function SignupForm() {
                       )}
                     </button>
                   </div>
-                  <span className="su-field-error">{errors.password}</span>
+                  <span
+                    id="su-password-error"
+                    className="su-field-error"
+                    role={errors.password ? 'alert' : undefined}
+                    aria-live="polite"
+                  >
+                    {errors.password}
+                  </span>
                 </div>
 
                 <div className="su-form-group">
