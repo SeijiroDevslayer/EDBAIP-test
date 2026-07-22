@@ -434,20 +434,17 @@ setTimeout(() => {
         <div className={`fp-right-section ${toast ? "fp-right-section--toast" : ""}`}>
           <div className="fp-card-wrapper">
             {toast && (
-              <div
-  className={`fp-toast fp-toast-${toast.type || "success"}`}
-  role="status"
->
-                <span className="fp-toast-icon">
-                 {toast.type === "expired" ? (
-  <ExpiredIcon />
-) : toast.type === "error" || toast.type === "otp-error" ? (
-  <ErrorToastIcon />
-) : toast.type === "verified" ? (
-  <VerifiedToastIcon />
-) : (
-  <SuccessToastIcon />
-)}
+              <div className={`fp-toast fp-toast-${toast.type || "success"}`} role="status">
+                  <span className="fp-toast-icon">
+                    {toast.type === "expired" ? (
+                        <ExpiredIcon />
+                      ) : toast.type === "error" || toast.type === "otp-error" ? (
+                        <ErrorToastIcon />
+                      ) : toast.type === "verified" ? (
+                        <VerifiedToastIcon />
+                      ) : (
+                        <SuccessToastIcon />
+                    )}
                 </span>
 
                 <div className="fp-toast-content">
@@ -494,16 +491,16 @@ setTimeout(() => {
                   </p>
 
                   <div className="fp-method-toggle" role="tablist">
-                  <button
-  type="button"
-  role="tab"
-  aria-selected={method === "email"}
-  className={`fp-method-btn ${method === "email" ? "active" : ""}`}
-  onClick={() => selectMethod("email")}
->
-  <MailIcon />
-  Reset via Email
-</button>
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={method === "email"}
+                      className={`fp-method-btn ${method === "email" ? "active" : ""}`}
+                      onClick={() => selectMethod("email")}
+                    >
+                      <MailIcon />
+                      Reset via Email
+                    </button>
                     <button
                       type="button"
                       role="tab"
