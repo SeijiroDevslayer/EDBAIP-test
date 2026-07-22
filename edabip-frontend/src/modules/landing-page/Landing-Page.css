@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@700&display=swap");
+
 :root {
   --lp-blue: #0758c9;
 }
@@ -97,11 +99,27 @@
 }
 
 .landing-nav {
+  position: relative;
   justify-self: center;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: clamp(22px, 2vw, 36px);
+}
+
+.landing-nav-indicator {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  border-radius: 999px;
+  background: #1f63cf;
+  transform: translateX(0);
+  transition:
+    transform 280ms cubic-bezier(0.65, 0, 0.35, 1),
+    width 280ms cubic-bezier(0.65, 0, 0.35, 1);
+  pointer-events: none;
+  will-change: transform, width;
 }
 
 .landing-nav-link {
@@ -139,8 +157,7 @@
   transition: transform 180ms ease;
 }
 
-.landing-nav-link:hover::after,
-.landing-nav-link--active::after {
+.landing-nav-link:hover::after {
   transform: scaleX(1);
 }
 
@@ -300,7 +317,6 @@
 
 .hero,
 .trusted,
-.platform-overview,
 .dashboard-showcase,
 .how-it-works,
 .stats-strip,
@@ -661,6 +677,14 @@
     width: 42px;
   }
 
+  .landing-nav-link--active::after {
+    transform: scaleX(1);
+  }
+
+  .landing-nav-indicator {
+    display: none;
+  }
+
   .landing-header-actions {
     justify-self: end;
   }
@@ -738,7 +762,6 @@
    ========================================================= */
 
 .trusted,
-.platform-overview,
 .why-edabip,
 .dashboard-showcase,
 .services-section,
@@ -775,10 +798,11 @@
   height: 100%;
 
   display: block;
-  object-fit: cover;
-  object-position: center;
+  object-fit: contain;
+  object-position: center top;
 
   opacity: 1;
+  filter: saturate(1.6) contrast(1.15);
 
   pointer-events: none;
   user-select: none;
@@ -1108,11 +1132,11 @@
 .services-header h2 {
   margin: 32px 0 14px;
   color: #111c2f;
-  font-family: "DM Sans", "Inter", sans-serif;
-  font-size: clamp(30px, 3vw, 44px);
-  line-height: 1.18;
+  font-family: "IBM Plex Sans", "DM Sans", "Inter", sans-serif;
+  font-size: 32px;
+  line-height: 40px;
   font-weight: 700;
-  letter-spacing: -1px;
+  letter-spacing: 0;
 }
 
 .services-header p {
@@ -1513,12 +1537,13 @@
   position: relative;
   min-width: 0;
   min-height: 510px;
-  padding: 34px 32px 30px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
+  gap: 20px;
   background: #ffffff;
   border: 1px solid #cfd9ea;
-  border-radius: 18px;
+  border-radius: 16px;
   box-shadow:
     0 6px 0 rgba(78, 92, 114, 0.22),
     0 16px 28px rgba(66, 82, 112, 0.08);
@@ -1548,7 +1573,6 @@
 }
 
 .pricing-plan-name {
-  margin-bottom: 16px;
   color: #267df4;
   font-family: "Inter", sans-serif;
   font-size: 12px;
@@ -1565,7 +1589,6 @@
   display: flex;
   align-items: flex-end;
   gap: 5px;
-  margin-bottom: 8px;
 }
 
 .pricing-price {
@@ -1594,7 +1617,7 @@
 
 .pricing-description {
   min-height: 48px;
-  margin: 0 0 24px;
+  margin: 0;
   color: #71809e;
   font-family: "Inter", sans-serif;
   font-size: 15px;
@@ -1609,7 +1632,7 @@
   display: flex;
   flex-direction: column;
   gap: 13px;
-  margin: 0 0 32px;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -1678,7 +1701,7 @@
 }
 
 .pricing-note {
-  width: min(820px, 100%);
+  width: min(1141px, 100%);
   margin: 48px auto 0;
   color: #71809e;
   font-family: "Inter", sans-serif;
@@ -2234,44 +2257,6 @@ padding:70px 22px;
   opacity: 1;
 }
 
-/* =========================================================
-   PLATFORM OVERVIEW SECTION
-   ========================================================= */
-
-.platform-overview {
-  background: rgba(238, 246, 255, 1);
-  padding: 80px;
-  overflow: hidden;
-}
-
-.platform-overview-left {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 370px;
-  max-width: 100%;
-  height: auto;
-}
-
-.platform-overview-right {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 395px;
-  max-width: 100%;
-  height: auto;
-}
-
-.platform-overview-center {
-  display: block;
-  width: 140px;
-  height: 103px;
-  object-fit: contain;
-  margin: 0 auto 2px;
-  position: relative;
-  z-index: 2;
-}
-
 .section-title {
   text-align: center;
   margin-bottom: 48px;
@@ -2319,79 +2304,6 @@ padding:70px 22px;
 .section-title h2 span {
   color: var(--lp-blue);
 }
-.platform-grid {
-  display: grid;
-  gap: 26px;
-  justify-content: center;
-  grid-template-columns: repeat(auto-fit, minmax(188px, 1fr));
-}
-.platform-card {
-  width: 100%;
-  max-width: 260px;
-  min-height: 282px;
-  border: 1px solid #e8e8e8;
-  border-radius: 16px;
-  padding: 24px;
-  background: #fff;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.2s, transform 0.2s;
-  display: flex;
-  flex-direction: column;
-}
-
-.platform-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  transform: translateY(-4px);
-}
-
-.platform-card-illustration {
-  width: 100%;
-  max-width: 165px;
-  height: auto;
-  max-height: 67px;
-  object-fit: contain;
-  margin-top: auto;
-  align-self: center;
-}
-
-.platform-icon {
-  border-radius: 12px;
-  height: 36px;
-  width: 33px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.platform-icon img {
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-}
-
-.platform-card:nth-child(1) .platform-icon { background: #e0ecff; }
-.platform-card:nth-child(2) .platform-icon { background: #dff7f9; }
-.platform-card:nth-child(3) .platform-icon { background: #e7e4ff; }
-.platform-card:nth-child(4) .platform-icon { background: #fff2df; }
-.platform-card:nth-child(5) .platform-icon { background: #e0ecff; }
-.platform-card:nth-child(6) .platform-icon { background: #e2f8ea; }
-
-.platform-card h3 {
-  font-size: 17px;
-  margin: 0 0 8px;
-  font-family: "DM Sans", sans-serif;
-  color: #111;
-  font-weight: 700;
-}
-
-.platform-card p {
-  color: #6b7280;
-  font-size: 13px;
-  line-height: 1.5;
-  margin: 0;
-  font-family: "Inter", sans-serif;
-}
 
 /* =========================================================
    DASHBOARD SHOWCASE SECTION
@@ -2420,8 +2332,34 @@ padding:70px 22px;
 
 .dash-right {
   right: -36px;
-  top: -36px;
+  top: -60px;
   width: 429px;
+}
+
+.dash-bottom-left {
+  left: 24.59px;
+  bottom: 120px;
+  width: 809px;
+}
+
+.dash-bottom-right {
+  left: 1160.56px;
+  bottom: 120px;
+  width: 330px;
+}
+
+.dash-bottom-center {
+  left: 386.58px;
+  bottom: -20px;
+  width: 1137px;
+  height: 200px;
+  z-index: 2;
+  background: radial-gradient(
+    ellipse closest-side at center,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
 }
 
 .dashboard-grid {
@@ -2520,7 +2458,7 @@ padding:70px 22px;
   display: block;
   margin: 48px auto 0;
   position: relative;
-  z-index: 1;
+  z-index: 3;
 }
 
 
@@ -3212,15 +3150,15 @@ padding:70px 22px;
 }
 
 .final-cta-container {
-  width: min(1260px, 100%);
+  width: min(1184px, 100%);
   min-height: 260px;
   margin: 0 auto;
-  padding: 40px 30px 36px;
+  padding: 62.9px 208px 64px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 34px;
+  border-radius: 48px;
   text-align: center;
   background:
     linear-gradient(
@@ -3248,7 +3186,7 @@ padding:70px 22px;
 }
 
 .final-cta-container p {
-  max-width: 650px;
+  max-width: 768px;
   margin: 20px auto 26px;
   color: rgba(255, 255, 255, 0.75);
   font-family: "Inter", sans-serif;
@@ -3434,7 +3372,7 @@ padding:70px 22px;
 .footer-newsletter {
   min-width: 0;
   padding-left: clamp(26px, 3vw, 48px);
-  border-left: 1px solid rgba(255, 255, 255, 0.42);
+  border-left: 1px solid #bcbcbc;
 }
 
 .footer-newsletter h3 {
@@ -3649,20 +3587,17 @@ padding:70px 22px;
   }
 
   .trusted,
-.platform-overview,
 .dashboard-showcase,
 .how-it-works,
 .landing-footer {
     padding: 64px 40px;
   }
 
-  .trusted-left,
-.platform-overview-left {
+  .trusted-left {
     width: 260px;
   }
 
-  .trusted-right,
-.platform-overview-right {
+  .trusted-right {
     width: 280px;
   }
 
@@ -3700,13 +3635,11 @@ padding:70px 22px;
 }
 
 @media (max-width: 1024px) {
-  .trusted-left,
-.platform-overview-left {
+  .trusted-left {
     width: 180px;
   }
 
-  .trusted-right,
-.platform-overview-right {
+  .trusted-right {
     width: 190px;
   }
 
@@ -3774,7 +3707,6 @@ padding:70px 22px;
   }
 
   .trusted,
-.platform-overview,
 .dashboard-showcase,
 .how-it-works,
 .stats-strip,
@@ -3810,14 +3742,9 @@ padding:70px 22px;
     border-bottom: none;
   }
 
-  .platform-grid,
-.dashboard-grid,
+  .dashboard-grid,
 .stats-strip {
     grid-template-columns: 1fr;
-  }
-
-  .platform-card {
-    max-width: 100%;
   }
 
   .section-title small {
@@ -3832,8 +3759,6 @@ padding:70px 22px;
 
   .trusted-left,
 .trusted-right,
-.platform-overview-left,
-.platform-overview-right,
 .dash-left,
 .dash-right {
     display: none;

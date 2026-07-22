@@ -1,5 +1,5 @@
 import "./Landing-Page.css";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 // Hero Section Assets
@@ -21,23 +21,6 @@ import DmartLogo from "../../assets/landing-page/Dmart.png";
 import TataLogo from "../../assets/landing-page/tata.png";
 import DHLLogo from "../../assets/landing-page/dhl.png";
 
-// Platform Overview Assets
-import IconDataIntegration from "../../assets/landing-page/dbicon.png";
-import IconDataWarehouse from "../../assets/landing-page/home.png";
-import PlatformOverviewright from "../../assets/landing-page/dataimg.png";
-import PlatformOverviewleft from "../../assets/landing-page/graph6.png";
-import IconBusinessIntelligence from "../../assets/landing-page/barcomponent.png";
-import IconAIAnalytics from "../../assets/landing-page/ai.png";
-import IconSecurity from "../../assets/landing-page/gaurd.png";
-import IconBilling from "../../assets/landing-page/payment.png";
-import IllustrationDataIntegration from "../../assets/landing-page/dataimg4.png";
-import IllustrationDataWarehouse from "../../assets/landing-page/datamodel1.png";
-import IllustrationBI from "../../assets/landing-page/graph1.png";
-import IllustrationAI from "../../assets/landing-page/graph4.png";
-import IllustrationSecurity from "../../assets/landing-page/dataimg5.png";
-import IllustrationBilling from "../../assets/landing-page/bargraph1.png";
-import PlatformOverviewCenter from "../../assets/landing-page/barimg.png";
-
 // Why EDABIP Section Assets
 import WhyEdabipBg from "../../assets/landing-page/Why EDABIP 3rd section/bgg-1.jpg";
 import WhyIcon1 from "../../assets/landing-page/Why EDABIP 3rd section/Unified Data Ecosystem.svg";
@@ -57,6 +40,8 @@ import HeroCheck1 from "../../assets/landing-page/4th section/tick.svg";
 // Dashboard Showcase Assets
 import DashboardBGLeft from "../../assets/landing-page/dataimg3.png";
 import DashboardBGRight from "../../assets/landing-page/piegraph1.png";
+import DashboardBGBottomLeft from "../../assets/landing-page/dash.svg";
+import DashboardBGBottomRight from "../../assets/landing-page/dash1.svg";
 import Dashboard1 from "../../assets/landing-page/gradient3.png";
 import Dashboard2 from "../../assets/landing-page/gradient2.png";
 import Dashboard3 from "../../assets/landing-page/gradient1.png";
@@ -135,15 +120,6 @@ const trustedLogos = [
   { name: "DMart", img: DmartLogo },
   { name: "TATA MOTORS", img: TataLogo },
   { name: "DHL", img: DHLLogo },
-];
-
-const platformCards = [
-  { title: "Data Integration", desc: "Connect and ingest data from ERP, CRM, HRMS, APIs, Databases and cloud systems.", icon: IconDataIntegration, illustration: IllustrationDataIntegration },
-  { title: "Data Warehouse", desc: "Centralized, secure and scalable data storage with historical tracking and multi-tenant architecture.", icon: IconDataWarehouse, illustration: IllustrationDataWarehouse },
-  { title: "Business Intelligence", desc: "Power BI & Tableau dashboards for real-time reporting, KPI tracking and automated analytics.", icon: IconBusinessIntelligence, illustration: IllustrationBI },
-  { title: "AI Analytics", desc: "Leverage machine learning models for forecasting, churn prediction and demand planning.", icon: IconAIAnalytics, illustration: IllustrationAI },
-  { title: "Security & Governance", desc: "Role-based access control, data security, compliance and audit logging.", icon: IconSecurity, illustration: IllustrationSecurity },
-  { title: "Subscription & Billing", desc: "Flexible SaaS subscription plans with automated billing, invoicing and license management.", icon: IconBilling, illustration: IllustrationBilling },
 ];
 
 const whyEdabipCards = [
@@ -578,10 +554,88 @@ const stats = [
   { value: "24/7", label: "Monitoring & Support", icon: StatIconSupport },
 ];
 
+const navSectionIds = ["home", "features", "dashboard", "services", "pricing", "about", "contact"];
+
 export default function LandingPage() {
   const viewportAnchorRef = useRef({ element: null, top: 0 });
   const [openFaqIndex, setOpenFaqIndex] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeNavHref, setActiveNavHref] = useState("#home");
+  const navRef = useRef(null);
+  const navIndicatorRef = useRef(null);
+  const navClickLockRef = useRef(false);
+  const navClickLockTimeoutRef = useRef(null);
+
+  const handleNavClick = (href) => {
+    setIsMobileMenuOpen(false);
+    setActiveNavHref(href);
+
+    // Ignore scroll-spy updates while the click's smooth-scroll is still in
+    // flight, otherwise sections passed on the way to the target briefly
+    // steal the active state back before landing.
+    navClickLockRef.current = true;
+    clearTimeout(navClickLockTimeoutRef.current);
+    navClickLockTimeoutRef.current = setTimeout(() => {
+      navClickLockRef.current = false;
+    }, 900);
+  };
+
+  useLayoutEffect(() => {
+    const updateNavIndicator = () => {
+      const nav = navRef.current;
+      const indicator = navIndicatorRef.current;
+      if (!nav || !indicator) return;
+      const activeLink = nav.querySelector(".landing-nav-link--active");
+      if (!activeLink) return;
+      indicator.style.width = `${activeLink.offsetWidth}px`;
+      indicator.style.transform = `translateX(${activeLink.offsetLeft}px)`;
+    };
+
+    updateNavIndicator();
+    window.addEventListener("resize", updateNavIndicator);
+    document.fonts?.ready?.then(updateNavIndicator);
+    return () => window.removeEventListener("resize", updateNavIndicator);
+  }, [activeNavHref, isMobileMenuOpen]);
+
+  useEffect(() => {
+    const sections = navSectionIds
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
+    if (!sections.length) return;
+
+    const visibleIds = new Set();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (navClickLockRef.current) return;
+
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            visibleIds.add(entry.target.id);
+          } else {
+            visibleIds.delete(entry.target.id);
+          }
+        });
+
+        // Among the sections currently crossing the detection band, the
+        // one furthest down the page is the one the user has scrolled to.
+        const currentId = navSectionIds.filter((id) => visibleIds.has(id)).pop();
+        if (currentId) setActiveNavHref(`#${currentId}`);
+      },
+      {
+        root: null,
+        rootMargin: "-20% 0px -70% 0px",
+        threshold: 0,
+      }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(navClickLockTimeoutRef.current);
+    };
+  }, []);
 
   useLayoutEffect(() => {
     const getPageSections = () => Array.from(document.querySelectorAll(".landing-page > section, .landing-page > footer"));
@@ -738,6 +792,7 @@ const handleContactSubmit = async (event) => {
 
           <nav
             id="landing-navigation"
+            ref={navRef}
             className={`landing-nav ${
               isMobileMenuOpen ? "landing-nav--open" : ""
             }`}
@@ -745,53 +800,68 @@ const handleContactSubmit = async (event) => {
           >
             <a
               href="#home"
-              className="landing-nav-link landing-nav-link--active"
-              onClick={() => setIsMobileMenuOpen(false)}
+              className={`landing-nav-link ${
+                activeNavHref === "#home" ? "landing-nav-link--active" : ""
+              }`}
+              onClick={() => handleNavClick("#home")}
             >
               Home
             </a>
             <a
               href="#features"
-              className="landing-nav-link"
-              onClick={() => setIsMobileMenuOpen(false)}
+              className={`landing-nav-link ${
+                activeNavHref === "#features" ? "landing-nav-link--active" : ""
+              }`}
+              onClick={() => handleNavClick("#features")}
             >
               Features
             </a>
             <a
               href="#dashboard"
-              className="landing-nav-link"
-              onClick={() => setIsMobileMenuOpen(false)}
+              className={`landing-nav-link ${
+                activeNavHref === "#dashboard" ? "landing-nav-link--active" : ""
+              }`}
+              onClick={() => handleNavClick("#dashboard")}
             >
               Dashboard
             </a>
             <a
               href="#services"
-              className="landing-nav-link"
-              onClick={() => setIsMobileMenuOpen(false)}
+              className={`landing-nav-link ${
+                activeNavHref === "#services" ? "landing-nav-link--active" : ""
+              }`}
+              onClick={() => handleNavClick("#services")}
             >
               Services
             </a>
             <a
               href="#pricing"
-              className="landing-nav-link"
-              onClick={() => setIsMobileMenuOpen(false)}
+              className={`landing-nav-link ${
+                activeNavHref === "#pricing" ? "landing-nav-link--active" : ""
+              }`}
+              onClick={() => handleNavClick("#pricing")}
             >
               Pricing
             </a>
             <a
               href="#about"
-              className="landing-nav-link"
-              onClick={() => setIsMobileMenuOpen(false)}
+              className={`landing-nav-link ${
+                activeNavHref === "#about" ? "landing-nav-link--active" : ""
+              }`}
+              onClick={() => handleNavClick("#about")}
             >
               About Us
             </a>
             <a
               href="#contact"
-              className="landing-nav-link"
-              onClick={() => setIsMobileMenuOpen(false)}
+              className={`landing-nav-link ${
+                activeNavHref === "#contact" ? "landing-nav-link--active" : ""
+              }`}
+              onClick={() => handleNavClick("#contact")}
             >
               Contact Us
             </a>
+            <span className="landing-nav-indicator" ref={navIndicatorRef} aria-hidden="true" />
           </nav>
 
           <div className="landing-header-actions">
@@ -973,6 +1043,9 @@ const handleContactSubmit = async (event) => {
       <section className="dashboard-showcase" id="dashboard">
         <img className="dash-bg dash-left" src={DashboardBGLeft} alt="" />
         <img className="dash-bg dash-right" src={DashboardBGRight} alt="" />
+        <img className="dash-bg dash-bottom-left" src={DashboardBGBottomLeft} alt="" />
+        <img className="dash-bg dash-bottom-right" src={DashboardBGBottomRight} alt="" />
+        <div className="dash-bg dash-bottom-center" aria-hidden="true" />
         <div className="section-title">
           <small>DASHBOARD SHOWCASE</small>
           <h2>POWERFUL DASHBOARD FOR <span>EVERY DECISION</span></h2>
@@ -998,27 +1071,6 @@ const handleContactSubmit = async (event) => {
       </section>
 
       
-
-      <section className="platform-overview">
-        <img className="trusted-bg platform-overview-left" src={PlatformOverviewleft} alt="" />
-        <img className="trusted-bg platform-overview-right" src={PlatformOverviewright} alt="" />
-        <div className="section-title">
-          <small>PLATFORM OVERVIEW</small>
-          <h2>One Platform<span className="title-dot"></span> <span>Unlimited Insights<span className="title-dot"></span></span></h2>
-        </div>
-        <img className="platform-overview-center" src={PlatformOverviewCenter} alt="" />
-        <div className="platform-grid">
-          {platformCards.map((card, index) => (
-            <article key={index} className="platform-card">
-              <div className="platform-icon"><img src={card.icon} alt={card.title} /></div>
-              <h3>{card.title}</h3>
-              <p>{card.desc}</p>
-              <img className="platform-card-illustration" src={card.illustration} alt="" />
-            </article>
-          ))}
-        </div>
-      </section>
-
 
       <section
         className="services-section"
