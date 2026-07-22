@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import backgroundImg from '../../../assets/login/background.jpg';
 import logoImg from '../../../assets/login/logo.png';
@@ -16,6 +16,7 @@ import EyeIcon from '../../../assets/login/eye-off.svg';
 import VerifiedIcon from '../../../assets/login/tick.png';
 import MailVerificationIcon from '../../../assets/login/mail-verify.svg';
 import PhoneVerificationIcon from '../../../assets/login/phone-verify.svg';
+import OtpRefreshTimerIcon from '../../../assets/login/otp-refresh-timer.svg';
 import SSOButton from './SSOButton.jsx';
 import { useAuthContext } from '../../../context/AuthContext.jsx';
 import './SignupForm.css';
@@ -288,27 +289,12 @@ function OtpModal({
         <span className="su-otp-resend-label">Resend OTP</span>
 
         <span className="su-otp-timer">
-          <svg
+          <img
+            src={OtpRefreshTimerIcon}
+            alt=""
             className="su-otp-timer-icon"
-            viewBox="0 0 24 24"
-            fill="none"
             aria-hidden="true"
-          >
-            <path
-              d="M21 12A9 9 0 1 1 18.36 5.64"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-
-            <path
-              d="M18 2.75V6H21.25"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          />
 
           <span className="su-otp-timer-value">
             {formatOtpTimer(resendSeconds)}
@@ -378,11 +364,11 @@ function SignupForm() {
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Per-channel verification state — same shape reused for email + mobile.
+  // Per-channel verification state â€” same shape reused for email + mobile.
   const [emailVerification, setEmailVerification] = useState(createIdleVerification);
   const [mobileVerification, setMobileVerification] = useState(createIdleVerification);
 
-  // OTP modal state — one modal, reused for whichever channel is active.
+  // OTP modal state â€” one modal, reused for whichever channel is active.
   const [activeOtpChannel, setActiveOtpChannel] = useState(null); // 'email' | 'mobile' | null
   const [otpDestination, setOtpDestination] = useState('');
   const [otpDigits, setOtpDigits] = useState(() => Array(OTP_LENGTH).fill(''));
@@ -851,28 +837,26 @@ function SignupForm() {
         <img src={backgroundImg} alt="" className="su-background-image" />
       </div>
 
-      {showCreateErrorNotice && (
-        <div className="su-error-notification" role="alert">
+            {showCreateErrorNotice && (
+        <div className="su-error-notification" role="alert" aria-live="assertive">
           <div className="su-error-icon" aria-hidden="true">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
               <path d="M12 3L22 20H2L12 3Z" stroke="white" strokeWidth="2" strokeLinejoin="round" />
               <path d="M12 9V13" stroke="white" strokeWidth="2" strokeLinecap="round" />
-              <circle cx="12" cy="17" r="1" fill="white" />
+              <circle cx="12" cy="16" r="1" fill="white" />
             </svg>
           </div>
-
           <div className="su-error-message">
             <h4>Unable to create account</h4>
             <p>{createErrorMessage}</p>
           </div>
-
           <button
             type="button"
             className="su-error-close"
             onClick={() => setShowCreateErrorNotice(false)}
-            aria-label="Close notification"
+            aria-label="Dismiss message"
           >
-            ×
+            x
           </button>
         </div>
       )}
@@ -1135,3 +1119,4 @@ function SignupForm() {
 }
 
 export default SignupForm;
+
