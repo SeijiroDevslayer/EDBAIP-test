@@ -1179,8 +1179,8 @@
 }
 
 .services-icon-wrap {
-  width: 72px;
-  height: 72px;
+  width: 56px;
+  height: 56px;
   margin-bottom: 0px;
   display: flex;
   align-items: center;
@@ -1192,8 +1192,8 @@
 
 .services-icon {
   display: block;
-  width: 32px;
-  height: 32px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
 }
 
@@ -1589,7 +1589,7 @@
 
 .pricing-price {
   color: #111d31;
-  font-family: "DM Sans", "Inter", sans-serif;
+  font-family: "IBM Plex Sans", "Inter", sans-serif;
   font-size: clamp(44px, 4vw, 60px);
   line-height: 1;
   font-weight: 700;
@@ -2659,16 +2659,11 @@ padding:70px 22px;
 
 .how-it-works-line {
   position: absolute;
-
-  /* Center of the 80px icon */
   top: calc(40px + 1.5px);
-
   left: calc(10% + 40px);
   right: calc(10% + 40px);
-
   height: 2px;
   background: #D6DFEC;
-
   transform: translateY(-50%);
   z-index: 0;
 }
@@ -2698,8 +2693,8 @@ padding:70px 22px;
 
 .how-it-works-icon {
   display: block;
-  width: 36px;
-  height: 36px;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
 }
 
@@ -3011,7 +3006,7 @@ padding:70px 22px;
 }
 
 .contact-header h2 {
-  margin: 34px 0 12px;
+  margin: 32px 0 12px;
   color: #111d31;
   font-family: "DM Sans", "Inter", sans-serif;
   font-size: clamp(32px, 3vw, 45px);
