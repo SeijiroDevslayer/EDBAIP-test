@@ -783,7 +783,7 @@
 .why-edabip {
   position: relative;
   width: 100%;
-  padding: 66px clamp(24px, 7vw, 112px) 96px;
+  padding: 40px clamp(24px, 5.5vw, 80px) 96px;
   background: #f7f9ff;
   overflow: hidden;
   isolation: isolate;
@@ -823,7 +823,7 @@
   position: relative;
   z-index: 2;
 
-  width: min(1300px, 100%);
+  width: min(1150px, 100%);
   margin: 0 auto;
 }
 
@@ -876,25 +876,26 @@
 
 .why-edabip-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 36px 44px;
+  grid-template-columns: repeat(3, 350px);
+  justify-content: center;
+  gap: 32px 50px;
 }
 
 .why-edabip-card {
-  min-width: 0;
-  min-height: 205px;
-  padding: 38px 34px;
+  width: 350px;
+  min-height: 182px;
+  padding: 24px 28px;
   display: grid;
-  grid-template-columns: 76px minmax(0, 1fr);
+  grid-template-columns: 66px minmax(0, 1fr);
   align-items: start;
-  gap: 22px;
+  gap: 18px;
+  overflow: hidden;
   text-align: left;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(114, 91, 255, 0.48);
-  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #BCB9E8; 
+  border-radius: 10px;
   box-shadow:
-    0 7px 0 rgba(93, 93, 93, 0.25),
-    0 14px 26px rgba(57, 70, 112, 0.12);
+    0 4px 4px rgba(0, 0, 0, 0.25);
   transition:
     transform 220ms ease,
     box-shadow 220ms ease,
@@ -903,10 +904,9 @@
 
 .why-edabip-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(114, 91, 255, 0.7);
+  border-color: #9a95d1;
   box-shadow:
-    0 8px 0 rgba(93, 93, 93, 0.22),
-    0 18px 34px rgba(57, 70, 112, 0.16);
+    0 8px 10px rgba(0, 0, 0, 0.28);
 }
 
 .why-edabip-icon-wrap {
@@ -916,12 +916,6 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-}
-
-.why-edabip-card:first-child .why-edabip-icon {
-  width: 92px;
-  height: 92px;
-  transform: scale(1.18);
 }
 
 .why-edabip-icon {
@@ -1158,15 +1152,15 @@
 
 .services-card {
   min-width: 0;
-  min-height: 430px;
-  padding: 34px 32px 32px;
+  padding: 28px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  gap: 20px;
   text-align: left;
-  background: #f3f7fe;
-  border: 1px solid #cfd9ea;
-  border-radius: 18px;
+  background:#f6faff;
+  border: 1px solid #dde6f0;
+  border-radius: 16px;
   box-shadow:
     0 6px 0 rgba(78, 92, 114, 0.24),
     0 16px 24px rgba(66, 82, 112, 0.08);
@@ -1185,19 +1179,21 @@
 }
 
 .services-icon-wrap {
-  width: 56px;
-  height: 56px;
-  margin-bottom: 28px;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 0px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
+  background: #dceaff;
+  border-radius: 18px;
 }
 
 .services-icon {
   display: block;
-  width: 56px;
-  height: 56px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
 }
 
@@ -1225,7 +1221,7 @@
   flex-direction: column;
   gap: 12px;
   margin: auto 0 0;
-  padding: 28px 0 0;
+  padding: 0;
   list-style: none;
 }
 
@@ -2159,7 +2155,7 @@ padding:70px 22px;
 
 .trusted {
   background: rgba(255, 255, 255, 1);
-  padding: 80px;
+  padding: 80px 80px 50px;
   text-align: center;
   overflow: hidden;
 }
@@ -2386,20 +2382,6 @@ padding:70px 22px;
   width: clamp(290px, 29vw, 440px);
 }
 
-.dash-bottom-left {
-  bottom: 0;
-  left: 0;
-  width: clamp(430px, 53vw, 760px);
-  object-position: left bottom;
-}
-
-.dash-bottom-right {
-  right: 0;
-  bottom: 0;
-  width: clamp(300px, 34vw, 490px);
-  object-position: right bottom;
-}
-
 /*
   Keep this only if you genuinely need the white fade in the center.
   It should not sit above cards or the button.
@@ -2487,8 +2469,8 @@ padding:70px 22px;
 
 .dash-icon img {
   display: block;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
 }
 
@@ -2528,7 +2510,6 @@ padding:70px 22px;
   bottom: 32px;
   width: 730px;
   height: auto;
-  transform: rotate(-5deg);
   transform-origin: left bottom;
 }
 
@@ -2631,7 +2612,7 @@ padding:70px 22px;
 }
 
 .how-it-works-container {
-  width: min(1440px, 100%);
+  width: min(1280px, 100%);
   margin: 0 auto;
 }
 
@@ -2696,31 +2677,35 @@ padding:70px 22px;
   position: relative;
   z-index: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px; 
   text-align: center;
 }
 
 .how-it-works-icon-wrap {
   width: 80px;
   height: 80px;
-  margin: 0 auto 24px;
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  border: 3px solid #2a7fff;
-  border-radius: 32px;
+  border: 2px solid #2a7fff;
+  border-radius: 24px;
 }
 
 .how-it-works-icon {
   display: block;
-  width: 80px;
-  height: 80px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
 }
 
 .how-it-works-number {
   display: block;
-  margin-bottom: 14px;
+  margin-bottom: 0;
   color: #267df4;
   font-family: "Inter", sans-serif;
   font-size: 15px;
@@ -2730,7 +2715,7 @@ padding:70px 22px;
 }
 
 .how-it-works-step h3 {
-  margin: 0 0 14px;
+  margin: 0;
   color: #111d31;
   font-family: "DM Sans", "Inter", sans-serif;
   font-size: clamp(22px, 1.75vw, 28px);

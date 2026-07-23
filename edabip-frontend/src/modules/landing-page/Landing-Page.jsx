@@ -1048,7 +1048,7 @@ const handleContactSubmit = async (event) => {
         <div className="dash-bg dash-bottom-center" aria-hidden="true" />
         <div className="section-title">
           <small>DASHBOARD SHOWCASE</small>
-          <h2>POWERFUL DASHBOARD FOR <span>EVERY DECISION</span></h2>
+          <h2>POWERFUL DASHBOARDS FOR <span>EVERY DECISION</span></h2>
         </div>
         <div className="dashboard-grid">
           {dashboardCards.map((card, index) => (

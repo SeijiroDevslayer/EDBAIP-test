@@ -238,8 +238,8 @@
 }
 
 .su-input-wrapper input:focus {
-  border-color: #5ce1e6;
-  box-shadow: 0 0 0 3px rgba(92, 225, 230, 0.12);
+  border-color: rgba(255, 255, 255, 0.74);
+  box-shadow: none;
 }
 
 .su-input-wrapper input[readonly] {
@@ -247,8 +247,8 @@
 }
 
 .su-input-wrapper--verified input {
-  border-color: rgba(75, 222, 164, 0.9);
-  background: rgba(30, 151, 105, 0.12);
+  border-color: rgba(255, 255, 255, 0.74);
+  background: rgba(47, 47, 154, 0.5);
 }
 
 .su-input-wrapper--with-action input {
