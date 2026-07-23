@@ -1,6 +1,8 @@
 export const MOCK_USERS_STORAGE_KEY = "edabip_mock_users";
 export const DEFAULT_MOCK_USER_EMAIL = "test@gmail.com";
 
+export const MFA_MOCK_USER_EMAIL = "mfa@edabip.test";
+
 const DEFAULT_MOCK_USERS = [
   {
     id: "mock-user-001",
@@ -8,6 +10,18 @@ const DEFAULT_MOCK_USERS = [
     email: DEFAULT_MOCK_USER_EMAIL,
     mobileNumber: "+919876543210",
     password: "pass12345",
+    mfaEnabled: true,
+    createdAt: "2026-01-01T00:00:00.000Z",
+  },
+  // Login MFA mock account (separate from signup email verification).
+  // Password: Pass@123 — mock OTP is documented in loginMfaService.js
+  {
+    id: "mock-mfa-user-001",
+    fullName: "MFA Demo User",
+    email: MFA_MOCK_USER_EMAIL,
+    mobileNumber: "+919876543211",
+    password: "Pass@123",
+    mfaEnabled: true,
     createdAt: "2026-01-01T00:00:00.000Z",
   },
 ];
@@ -35,8 +49,40 @@ function isValidMockUser(user) {
       typeof user.email === "string" &&
       typeof user.mobileNumber === "string" &&
       typeof user.password === "string" &&
-      typeof user.createdAt === "string"
+      typeof user.createdAt === "string" &&
+      (typeof user.mfaEnabled === "undefined" ||
+        typeof user.mfaEnabled === "boolean")
   );
+}
+
+function ensureDefaultMockUsers(users) {
+  const byEmail = new Map(
+    users.map((user) => [normalizeMockUserEmail(user.email), user])
+  );
+
+  let changed = false;
+
+  DEFAULT_MOCK_USERS.forEach((seedUser) => {
+    const key = normalizeMockUserEmail(seedUser.email);
+    const existing = byEmail.get(key);
+
+    if (!existing) {
+      byEmail.set(key, { ...seedUser });
+      changed = true;
+      return;
+    }
+
+    if (
+      typeof seedUser.mfaEnabled === "boolean" &&
+      existing.mfaEnabled !== seedUser.mfaEnabled
+    ) {
+      byEmail.set(key, { ...existing, mfaEnabled: seedUser.mfaEnabled });
+      changed = true;
+    }
+  });
+
+  const merged = Array.from(byEmail.values());
+  return { users: merged, changed };
 }
 
 function persistMockUsers(users) {
@@ -69,8 +115,16 @@ export function getMockUsers() {
       storedUsers.length > 0 &&
       storedUsers.every(isValidMockUser)
     ) {
-      inMemoryUsers = cloneUsers(storedUsers);
-      return cloneUsers(storedUsers);
+      const { users: mergedUsers, changed } =
+        ensureDefaultMockUsers(storedUsers);
+
+      if (changed) {
+        persistMockUsers(mergedUsers);
+      } else {
+        inMemoryUsers = cloneUsers(mergedUsers);
+      }
+
+      return cloneUsers(mergedUsers);
     }
   } catch {
     // Invalid mock data is replaced with the known development seed below.

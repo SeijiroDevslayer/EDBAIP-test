@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import backgroundImg from "../../../assets/login/background.jpg";
 import logoImg from '../../../assets/login/logo.png';
@@ -11,8 +11,15 @@ import featureAi from '../../../assets/login/feature-ai.png';
 import featureSecurity from '../../../assets/login/feature-security.png';
 import featureScalable from '../../../assets/login/feature-scalable.png';
 import { useAuthContext } from '../../../context/AuthContext.jsx';
+import { AUTH_STATUS } from '../utils/authConfig.js';
+import { getSafeAuthErrorMessage } from '../utils/authErrors.js';
+import { MOCK_LOGIN_MFA_OTP_LENGTH } from '../services/loginMfaService.js';
 import './LoginForm.css';
 import SSOButton from "./SSOButton";
+import MicrosoftSSOButton from "./MicrosoftSSOButton";
+import MfaVerificationModal from "./MfaVerificationModal";
+
+const MfaVerificationSuccess = lazy(() => import("./MfaVerificationSuccess"));
 
 const FEATURES = [
   {
@@ -37,6 +44,91 @@ const FEATURES = [
   },
 ];
 
+const LOGIN_FLOW = {
+  IDLE: 'idle',
+  SUBMITTING_CREDENTIALS: 'submittingCredentials',
+  CREDENTIALS_REJECTED: 'credentialsRejected',
+  MFA_REQUIRED: 'mfaRequired',
+  VERIFYING_MFA: 'verifyingMfa',
+  MFA_REJECTED: 'mfaRejected',
+  MFA_VERIFIED: 'mfaVerified',
+  AUTHENTICATED: 'authenticated',
+};
+
+const initialLoginFlowState = {
+  status: LOGIN_FLOW.IDLE,
+  mfaError: '',
+  isResendingMfa: false,
+};
+
+function loginFlowReducer(state, action) {
+  switch (action.type) {
+    case 'SUBMIT_CREDENTIALS':
+      return {
+        ...state,
+        status: LOGIN_FLOW.SUBMITTING_CREDENTIALS,
+        mfaError: '',
+      };
+    case 'CREDENTIALS_REJECTED':
+      return {
+        ...state,
+        status: LOGIN_FLOW.CREDENTIALS_REJECTED,
+        mfaError: '',
+      };
+    case 'MFA_REQUIRED':
+      return {
+        ...state,
+        status: LOGIN_FLOW.MFA_REQUIRED,
+        mfaError: '',
+        isResendingMfa: false,
+      };
+    case 'VERIFYING_MFA':
+      return {
+        ...state,
+        status: LOGIN_FLOW.VERIFYING_MFA,
+        mfaError: '',
+      };
+    case 'MFA_REJECTED':
+      return {
+        ...state,
+        status: LOGIN_FLOW.MFA_REJECTED,
+        mfaError: action.error || 'The verification code is incorrect.',
+      };
+    case 'RESENDING_MFA':
+      return {
+        ...state,
+        isResendingMfa: true,
+      };
+    case 'RESEND_DONE':
+      return {
+        ...state,
+        isResendingMfa: false,
+        mfaError: action.error || '',
+        status: action.error ? LOGIN_FLOW.MFA_REJECTED : LOGIN_FLOW.MFA_REQUIRED,
+      };
+    case 'MFA_VERIFIED':
+      return {
+        ...state,
+        status: LOGIN_FLOW.MFA_VERIFIED,
+        mfaError: '',
+        isResendingMfa: false,
+      };
+    case 'AUTHENTICATED':
+      return {
+        ...state,
+        status: LOGIN_FLOW.AUTHENTICATED,
+        mfaError: '',
+        isResendingMfa: false,
+      };
+    case 'RESET_MFA':
+      return {
+        ...initialLoginFlowState,
+      };
+    default:
+      return state;
+  }
+}
+
 function CardLogo() {
   return (
     <div className="card-logo">
@@ -52,27 +144,45 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-const [errors, setErrors] = useState({
-  email: '',
-  password: '',
-});
+  const [errors, setErrors] = useState({
+    email: '',
+    password: '',
+  });
 
-const [showLoginFailed, setShowLoginFailed] = useState(false);
-const [attemptsRemaining, setAttemptsRemaining] = useState(null);
-const [isLocked, setIsLocked] = useState(false);
+  const [showLoginFailed, setShowLoginFailed] = useState(false);
+  const [attemptsRemaining, setAttemptsRemaining] = useState(null);
+  const [isLocked, setIsLocked] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [flow, dispatchFlow] = useReducer(loginFlowReducer, initialLoginFlowState);
 
-//  Account Locked logic
-const [loginError, setLoginError] = useState('');
-const [failedAttempts, setFailedAttempts] = useState(0);
-const { login } = useAuthContext();
-
+  const submitButtonRef = useRef(null);
+  const {
+    login,
+    verifyMfa,
+    resendMfa,
+    clearPendingAuthentication,
+    pendingChallenge,
+    authStatus,
+  } = useAuthContext();
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isMfaOpen =
+    Boolean(pendingChallenge) &&
+    (authStatus === AUTH_STATUS.MFA_PENDING ||
+      flow.status === LOGIN_FLOW.MFA_REQUIRED ||
+      flow.status === LOGIN_FLOW.VERIFYING_MFA ||
+      flow.status === LOGIN_FLOW.MFA_REJECTED);
+
+  useEffect(() => {
+    if (authStatus === AUTH_STATUS.MFA_PENDING && pendingChallenge) {
+      dispatchFlow({ type: 'MFA_REQUIRED' });
+    }
+  }, [authStatus, pendingChallenge]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-  
     let emailError = '';
     let passwordError = '';
 
@@ -92,15 +202,26 @@ const { login } = useAuthContext();
       return;
     }
 
+    dispatchFlow({ type: 'SUBMIT_CREDENTIALS' });
+
     try {
       const result = await login({ email, password }, rememberMe);
+
+      if (result.mfaRequired) {
+        dispatchFlow({ type: 'MFA_REQUIRED' });
+        return;
+      }
 
       if (result.success) {
         setFailedAttempts(0);
         setLoginError('');
+        dispatchFlow({ type: 'AUTHENTICATED' });
         navigate('/dashboard');
         return;
       }
+
+      dispatchFlow({ type: 'CREDENTIALS_REJECTED' });
+
       const updatedAttempts = failedAttempts + 1;
       setFailedAttempts(updatedAttempts);
 
@@ -110,7 +231,6 @@ const { login } = useAuthContext();
       }
 
       setLoginError(`Invalid credentials. Attempt ${updatedAttempts} of 5`);
-
       setIsLocked(!!result.locked);
       setAttemptsRemaining(result.attemptsRemaining ?? null);
       setErrors({ email: '', password: '' });
@@ -118,8 +238,8 @@ const { login } = useAuthContext();
       setPassword('');
       setShowLoginFailed(true);
       setTimeout(() => setShowLoginFailed(false), 5000);
-    } catch (error) {
-      // only for genuine network/unexpected errors now
+    } catch {
+      dispatchFlow({ type: 'CREDENTIALS_REJECTED' });
       setErrors({ email: '', password: '' });
       setIsLocked(false);
       setAttemptsRemaining(null);
@@ -128,9 +248,66 @@ const { login } = useAuthContext();
     }
   };
 
+  const handleVerifyMfa = async (code) => {
+    dispatchFlow({ type: 'VERIFYING_MFA' });
+
+    const result = await verifyMfa(code);
+
+    if (result.success) {
+      dispatchFlow({ type: 'MFA_VERIFIED' });
+      return;
+    }
+
+    dispatchFlow({
+      type: 'MFA_REJECTED',
+      error: getSafeAuthErrorMessage(result.code, result.message),
+    });
+  };
+
+  const handleMfaSuccessRedirect = useCallback(() => {
+    dispatchFlow({ type: 'AUTHENTICATED' });
+    navigate('/dashboard', { replace: true });
+  }, [navigate]);
+
+  const handleResendMfa = async () => {
+    dispatchFlow({ type: 'RESENDING_MFA' });
+    const result = await resendMfa();
+
+    if (!result.success) {
+      dispatchFlow({
+        type: 'RESEND_DONE',
+        error: getSafeAuthErrorMessage(result.code, result.message),
+      });
+      return {
+        resendAvailableInSeconds: result.resendAvailableInSeconds,
+      };
+    }
+
+    dispatchFlow({ type: 'RESEND_DONE' });
+    return {
+      resendAvailableInSeconds: result.resendAvailableInSeconds ?? 30,
+    };
+  };
+
+  const handleCloseMfa = async () => {
+    await clearPendingAuthentication();
+    dispatchFlow({ type: 'RESET_MFA' });
+  };
+
   const closeLoginFailed = () => {
     setShowLoginFailed(false);
   };
+
+  const resendAvailableInSeconds = pendingChallenge?.resendAvailableAt
+    ? Math.max(
+        0,
+        Math.ceil((pendingChallenge.resendAvailableAt - Date.now()) / 1000)
+      )
+    : 30;
+
+  const expiresInSeconds = pendingChallenge?.expiresAt
+    ? Math.max(0, Math.ceil((pendingChallenge.expiresAt - Date.now()) / 1000))
+    : 300;
 
   return (
     <div className="login-container">
@@ -165,7 +342,7 @@ const { login } = useAuthContext();
               )}
 
             </div>
- 
+
             <button
               className="notification-close"
               onClick={closeLoginFailed}
@@ -271,6 +448,7 @@ const { login } = useAuthContext();
                     placeholder="Enter your email address"
                     aria-invalid={errors.email ? 'true' : 'false'}
                     aria-describedby={errors.email ? 'email-error' : undefined}
+                    disabled={flow.status === LOGIN_FLOW.SUBMITTING_CREDENTIALS}
                   />
 
                   {errors.email && (
@@ -295,9 +473,9 @@ const { login } = useAuthContext();
                 </label>
 
                 <div className={`input-wrapper ${errors.password ? 'error' : ''}`}>
-                  
+
                     <img src={lockIcon} alt="" className="input-icon lock-icon" />
-                  
+
 
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -312,6 +490,7 @@ const { login } = useAuthContext();
                     placeholder="Enter your password"
                     aria-invalid={errors.password ? 'true' : 'false'}
                     aria-describedby={errors.password ? 'password-error' : undefined}
+                    disabled={flow.status === LOGIN_FLOW.SUBMITTING_CREDENTIALS}
                   />
 
                   <button
@@ -324,10 +503,8 @@ const { login } = useAuthContext();
                         : 'Show password'
                     }
                   >
-                    
-                    {showPassword ? (
-                  // 👁 OPEN EYE (password is visible)
 
+                    {showPassword ? (
                   <svg
                     width="18"
                     height="18"
@@ -349,11 +526,7 @@ const { login } = useAuthContext();
                     />
                   </svg>
                 ) : (
-                  // 🚫 EYE-OFF (password is hidden)
-
-                 
                   <img src={EyeIcon} alt="Hide password" width="18" height="18" />
-
                 )}
                   </button>
 
@@ -377,7 +550,7 @@ const { login } = useAuthContext();
                 <label className="remember-me">
                   <input type="checkbox"
                   checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)} 
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   />
                   <span>Remember me</span>
                 </label>
@@ -389,13 +562,18 @@ const { login } = useAuthContext();
                   Forgot Password?
                 </a>
               </div>
-      
-      
+
+
               <button
+                ref={submitButtonRef}
                 type="submit"
                 className="login-btn"
+                disabled={flow.status === LOGIN_FLOW.SUBMITTING_CREDENTIALS}
+                aria-busy={flow.status === LOGIN_FLOW.SUBMITTING_CREDENTIALS}
               >
-                Sign In
+                {flow.status === LOGIN_FLOW.SUBMITTING_CREDENTIALS
+                  ? 'Signing in...'
+                  : 'Sign In'}
               </button>
             </form>
 
@@ -403,13 +581,10 @@ const { login } = useAuthContext();
               <span>OR</span>
             </div>
 
-            {/* <button
-              type="button"
-              className="sso-btn google-btn"
-              
-            > */}
-            <SSOButton provider="google" />
-            
+            <div className="sso-stack">
+              <SSOButton provider="google" />
+              <MicrosoftSSOButton />
+            </div>
 
             <p className="signup-text">
               Don&apos;t have an account?{' '}
@@ -424,6 +599,42 @@ const { login } = useAuthContext();
           </div>
         </div>
       </div>
+
+      <MfaVerificationModal
+        open={isMfaOpen}
+        title="Verify your identity"
+        description={
+          pendingChallenge?.maskedDestination
+            ? `We've sent a ${MOCK_LOGIN_MFA_OTP_LENGTH}-digit verification code to ${pendingChallenge.maskedDestination}.`
+            : `Enter the ${MOCK_LOGIN_MFA_OTP_LENGTH}-digit verification code sent to your email.`
+        }
+        method={pendingChallenge?.method || 'EMAIL_OTP'}
+        maskedDestination={pendingChallenge?.maskedDestination || ''}
+        expiresInSeconds={expiresInSeconds}
+        resendAvailableInSeconds={resendAvailableInSeconds}
+        otpLength={MOCK_LOGIN_MFA_OTP_LENGTH}
+        isSubmitting={flow.status === LOGIN_FLOW.VERIFYING_MFA}
+        isResending={flow.isResendingMfa}
+        error={flow.mfaError}
+        onVerify={handleVerifyMfa}
+        onResend={handleResendMfa}
+        onClose={handleCloseMfa}
+        returnFocusRef={submitButtonRef}
+      />
+
+      {flow.status === LOGIN_FLOW.MFA_VERIFIED ? (
+        <Suspense fallback={null}>
+          <MfaVerificationSuccess
+            open
+            onRedirect={handleMfaSuccessRedirect}
+          />
+        </Suspense>
+      ) : null}
+
+      {/* Keep loginError referenced for lockout messaging parity */}
+      <span className="visually-hidden" aria-hidden="true">
+        {loginError}
+      </span>
     </div>
   );
 }

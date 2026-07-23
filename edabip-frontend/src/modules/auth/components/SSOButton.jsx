@@ -39,7 +39,7 @@ function GoogleIcon() {
 
 function SSOButton({ provider, className, icon }) {
   const navigate = useNavigate();
-  const { loginWithGoogleMock } = useAuthContext();
+  const { loginWithGoogleMock, clearPendingAuthentication } = useAuthContext();
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const processingRef = useRef(false);
@@ -118,6 +118,9 @@ function SSOButton({ provider, className, icon }) {
       setErrorMessage(MOCK_AUTH_UNAVAILABLE_MESSAGE);
       return;
     }
+
+    // Switching providers must clear any incomplete email MFA challenge.
+    clearPendingAuthentication?.();
 
     processingRef.current = true;
     setIsProcessing(true);
