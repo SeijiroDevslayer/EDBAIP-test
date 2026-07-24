@@ -721,6 +721,22 @@
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.02em;
+
+}
+
+/* For mobile otp how email look like */
+.su-otp-modal-title-mobile {
+  font-size: 20px;
+  line-height: 1.15;
+  margin-bottom: 18px;
+}
+
+.su-otp-modal-title-mobile{
+  margin-bottom: 6px;
+}
+
+.su-otp-modal-destination{
+  margin-bottom: 14px;
 }
 
 .su-otp-modal-message {

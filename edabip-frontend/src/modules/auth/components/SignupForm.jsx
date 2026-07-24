@@ -223,11 +223,17 @@ function OtpModal({
     <OtpSecurityIllustration channel={channel} />
 
     <div className="su-otp-copy">
-      <h2 id="su-otp-modal-title" className="su-otp-modal-title">
-        {channel === 'email'
-          ? 'Verify Your Email'
-          : 'Verify Your Mobile Number'}
-      </h2>
+     
+
+        <h2
+        className={`su-otp-modal-title ${
+        channel === "mobile" ? "su-otp-modal-title-mobile" : ""
+        }`}
+      >
+        {channel === "email"
+        ? "Verify Your Email"
+        : "Verify Your Mobile Number"}
+        </h2>
 
       <p className="su-otp-modal-message">
         We have sent {OTP_LENGTH}-digit verification code
