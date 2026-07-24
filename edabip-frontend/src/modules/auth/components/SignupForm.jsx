@@ -16,7 +16,7 @@ import EyeIcon from '../../../assets/login/eye-off.svg';
 import VerifiedIcon from '../../../assets/login/tick.png';
 import MailVerificationIcon from '../../../assets/login/mail-verify.svg';
 import PhoneVerificationIcon from '../../../assets/login/phone-verify.svg';
-import OtpRefreshTimerIcon from '../../../assets/login/otp-refresh-timer.svg';
+import OtpRefreshTimerIcon from '../../../assets/login/otp-refresh-timer.png';
 import SSOButton from './SSOButton.jsx';
 import MicrosoftSSOButton from './MicrosoftSSOButton.jsx';
 import { useAuthContext } from '../../../context/AuthContext.jsx';

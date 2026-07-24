@@ -1,21 +1,18 @@
 import { useEffect } from "react";
 import "./MfaVerificationSuccess.css";
+import successCheckIconImg from "../../../assets/login/successcheckicon.png";
+
 
 const DEFAULT_REDIRECT_MS = 2500;
 
 function SuccessCheckIcon() {
   return (
     <div className="mfa-success-check" aria-hidden="true">
-      <svg viewBox="0 0 72 72" fill="none">
-        <circle cx="36" cy="36" r="36" fill="#22C55E" />
-        <path
-          d="M21 37.5L30.5 47L51 26.5"
-          stroke="#ffffff"
-          strokeWidth="5.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <img 
+        src={successCheckIconImg} 
+        alt="Success" 
+        style={{ width: '100%', height: '100%', display: 'block' }} 
+      />
     </div>
   );
 }
