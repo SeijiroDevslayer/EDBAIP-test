@@ -22,8 +22,8 @@ import TataLogo from "../../assets/landing-page/tata.png";
 import DHLLogo from "../../assets/landing-page/dhl.png";
 
 // Why EDABIP Section Assets
-import WhyEdabipBg from "../../assets/landing-page/Why EDABIP 3rd section/bgg-1.jpg";
-import WhyIcon1 from "../../assets/landing-page/Why EDABIP 3rd section/Unified Data Ecosystem.svg";
+import WhyEdabipBg from "../../assets/landing-page/Why EDABIP 3rd section/bgg-1.png";
+import WhyIcon1 from "../../assets/landing-page/Why EDABIP 3rd section/Unified Data Ecosystem.png";
 import WhyIcon2 from "../../assets/landing-page/Why EDABIP 3rd section/Scalable Architecture.svg";
 import WhyIcon3 from "../../assets/landing-page/Why EDABIP 3rd section/Enterprise-Grade Security.svg";
 import WhyIcon4 from "../../assets/landing-page/Why EDABIP 3rd section/Faster Decision Making.svg";
@@ -35,7 +35,7 @@ import FourthSectionDataIntegration from "../../assets/landing-page/4th section/
 import FourthSectionDataWarehouse from "../../assets/landing-page/4th section/Data Warehouse.svg";
 import FourthSectionBI from "../../assets/landing-page/4th section/Business Intelligence.svg";
 import FourthSectionAIAnalytics from "../../assets/landing-page/4th section/AI Analytics.svg";
-import HeroCheck1 from "../../assets/landing-page/4th section/tick.svg";
+import HeroCheck1 from "../../assets/landing-page/4th section/tick-1.png";
 
 // Dashboard Showcase Assets
 import DashboardBGLeft from "../../assets/landing-page/dataimg3.png";
@@ -56,7 +56,10 @@ import ServicesDataEngineering from "../../assets/landing-page/Services section/
 import ServicesBIDevelopment from "../../assets/landing-page/Services section/BI Development.svg";
 import ServicesAIConsulting from "../../assets/landing-page/Services section/AI Consulting.svg";
 import ServicesManagedAnalytics from "../../assets/landing-page/Services section/Managed Analytics.svg";
-import ServiceCheck from "../../assets/landing-page/Services section/serviceTick.svg";
+import ServiceCheck from "../../assets/landing-page/tick.png";
+
+//pricing section//
+import PricingCheck from "../../assets/landing-page/4th section/tick-1.png";
 
 // How It Works Assets
 import HowBGBottom from "../../assets/landing-page/subbg21.png";
@@ -946,8 +949,7 @@ const handleContactSubmit = async (event) => {
             <span className="why-edabip-eyebrow">WHY EDABIP</span>
 
             <h2 id="why-edabip-title">
-              Built for Enterprises That Can't Afford
-              <span>Guesswork</span>
+              Built for Enterprises <span>That Can't Afford Guesswork</span>
             </h2>
 
             <p>
@@ -989,7 +991,7 @@ const handleContactSubmit = async (event) => {
             </span>
 
             <h2 id="platform-features-title">
-              Everything You Need to Govern, Analyze &amp; Act on Data
+              Everything You Need to <span>Govern, Analyze &amp; Act on Data</span>
             </h2>
           </header>
 
@@ -1055,9 +1057,13 @@ const handleContactSubmit = async (event) => {
             <article key={index} className="dashboard-card">
               <div className="dash-thumb"><img src={card.thumb} alt={card.title} /></div>
               <div className="dashboard-copy">
-                <div className="dash-icon"><img src={card.icon} alt="" /></div>
-                <h3>{card.title}</h3>
-                <p>{card.text}</p>
+                <div className="dashboard-copy-row">
+                  <div className="dash-icon"><img src={card.icon} alt="" /></div>
+                  <div className="dashboard-copy-text">
+                    <h3>{card.title}</h3>
+                    <p>{card.text}</p>
+                  </div>
+                </div>
                 <a href="#!" className="dash-view-link">
                   View Dashboard <img src={ArrowIcon} alt="" className="dash-view-arrow" />
                 </a>
@@ -1082,7 +1088,7 @@ const handleContactSubmit = async (event) => {
             <span className="services-badge">SERVICES</span>
 
             <h2 id="services-title">
-              Expert Support From Day One to Scale
+              Expert Support From <span> Day One to Scale </span>
             </h2>
 
             <p>
@@ -1277,7 +1283,7 @@ const handleContactSubmit = async (event) => {
                   {plan.features.map((feature) => (
                     <li key={feature}>
                       <img
-                        src={ServiceCheck}
+                        src={PricingCheck}
                         alt=""
                         aria-hidden="true"
                         className="pricing-check"
