@@ -1,4 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
+import verifyLockImg from "../../../assets/login/verify-lock.svg";
+import otpTimerImg from "../../../assets/login/otp-refresh-timer.svg";
 import OtpInput from "./OtpInput.jsx";
 import "./MfaVerificationModal.css";
 
@@ -13,12 +15,12 @@ function formatTimer(totalSeconds) {
 
 function MfaVerificationModal({
   open = false,
-  title = "Verify your identity",
+  title = "Verify Your Email",
   description,
   method = "EMAIL_OTP",
   maskedDestination = "",
   expiresInSeconds = 300,
-  resendAvailableInSeconds = 30,
+  resendAvailableInSeconds = 120,
   isSubmitting = false,
   isResending = false,
   error = "",
@@ -32,7 +34,6 @@ function MfaVerificationModal({
   const [resendSeconds, setResendSeconds] = useState(resendAvailableInSeconds);
   const titleId = useId();
   const descriptionId = useId();
-  const closeButtonRef = useRef(null);
   const previouslyFocusedRef = useRef(null);
 
   useEffect(() => {
@@ -108,9 +109,10 @@ function MfaVerificationModal({
     otp.every((digit) => digit !== "") &&
     !isSubmitting;
 
+  const destinationLabel = maskedDestination || "your email";
   const resolvedDescription =
     description ||
-    `We've sent a ${otpLength}-digit verification code to ${maskedDestination || "your email"}.`;
+    `We have send ${otpLength}-digit verification code to ${destinationLabel}`;
 
   const handleOverlayClick = (event) => {
     if (!isSubmitting && event.target === event.currentTarget) {
@@ -155,51 +157,13 @@ function MfaVerificationModal({
         data-method={method}
         onClick={(event) => event.stopPropagation()}
       >
-        <button
-          ref={closeButtonRef}
-          type="button"
-          className="mfa-otp-modal-close"
-          onClick={onClose}
-          disabled={isSubmitting}
-          aria-label="Close verification dialog"
-        >
-          <svg
-            className="mfa-otp-modal-close-icon"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M6 6L18 18M18 6L6 18"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
-
         <div className="mfa-otp-modal-content">
           <div className="mfa-otp-illustration" aria-hidden="true">
-            <svg width="68" height="68" viewBox="0 0 68 68" fill="none">
-              <circle cx="34" cy="34" r="34" fill="#E8EEF8" />
-              <rect
-                x="18"
-                y="24"
-                width="32"
-                height="24"
-                rx="4"
-                stroke="#3734A5"
-                strokeWidth="2"
-                fill="#fff"
-              />
-              <path
-                d="M18 28l16 10 16-10"
-                stroke="#3734A5"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <img
+              src={verifyLockImg}
+              alt=""
+              className="mfa-otp-illustration-img"
+            />
           </div>
 
           <div className="mfa-otp-copy">
@@ -207,14 +171,15 @@ function MfaVerificationModal({
               {title}
             </h2>
             <p id={descriptionId} className="mfa-otp-modal-message">
-              {resolvedDescription}
+              {description ? (
+                resolvedDescription
+              ) : (
+                <>
+                  We have send {otpLength}-digit verification code to{" "}
+                  <strong>{destinationLabel}</strong>
+                </>
+              )}
             </p>
-            {maskedDestination ? (
-              <p className="mfa-otp-modal-destination">
-                <span>Code sent to </span>
-                <strong>{maskedDestination}</strong>
-              </p>
-            ) : null}
           </div>
 
           <div className="mfa-otp-input-section">
@@ -239,10 +204,16 @@ function MfaVerificationModal({
             </p>
 
             <div className="mfa-otp-meta-row">
-              <span className="mfa-otp-resend-label">
-                {resendSeconds > 0
-                  ? `Resend code in ${formatTimer(resendSeconds)}`
-                  : "You can resend a new code"}
+              <span className="mfa-otp-resend-label">Resend OTP</span>
+              <span className="mfa-otp-timer" aria-live="polite">
+                <img
+                  src={otpTimerImg}
+                  alt=""
+                  className="mfa-otp-timer-icon"
+                />
+                <span className="mfa-otp-timer-value">
+                  {formatTimer(resendSeconds)}
+                </span>
               </span>
               {Number.isFinite(expiresInSeconds) ? (
                 <span className="mfa-otp-expiry visually-hidden">
@@ -259,7 +230,7 @@ function MfaVerificationModal({
               onClick={handleVerify}
               disabled={!canVerify}
             >
-              {isSubmitting ? "Verifying..." : "Verify Code"}
+              {isSubmitting ? "Verifying..." : "Verify & Continue"}
             </button>
 
             <button
@@ -268,7 +239,7 @@ function MfaVerificationModal({
               onClick={handleResend}
               disabled={resendSeconds > 0 || isSubmitting || isResending}
             >
-              {isResending ? "Sending..." : "Resend code"}
+              {isResending ? "Sending..." : "Resend OTP"}
             </button>
           </div>
         </div>

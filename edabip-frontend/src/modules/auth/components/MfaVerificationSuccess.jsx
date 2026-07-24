@@ -1,14 +1,29 @@
 import { useEffect } from "react";
-import logoImgc from "../../../assets/login/logoc.png";
-import successIconImg from "../../../assets/login/success-icon.png";
 import "./MfaVerificationSuccess.css";
 
 const DEFAULT_REDIRECT_MS = 2500;
 
+function SuccessCheckIcon() {
+  return (
+    <div className="mfa-success-check" aria-hidden="true">
+      <svg viewBox="0 0 72 72" fill="none">
+        <circle cx="36" cy="36" r="36" fill="#22C55E" />
+        <path
+          d="M21 37.5L30.5 47L51 26.5"
+          stroke="#ffffff"
+          strokeWidth="5.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </div>
+  );
+}
+
 function RedirectSpinner() {
   return (
     <div className="mfa-success-spinner" aria-hidden="true">
-      {Array.from({ length: 8 }, (_, index) => (
+      {Array.from({ length: 12 }, (_, index) => (
         <span
           key={index}
           className="mfa-success-spinner-dot"
@@ -23,15 +38,9 @@ function MfaVerificationSuccess({
   open = false,
   redirectDelayMs = DEFAULT_REDIRECT_MS,
   onRedirect,
-  title = "Email Verified Successfully!",
-  subtitle = (
-    <>
-      Your email has been successfully verified.
-      <br />
-      You can now access all features of your EDABIP account.
-    </>
-  ),
-  ariaLabel = "Email verified successfully. Redirecting to your dashboard.",
+  title = "Verification successful !",
+  subtitle = "Your account has been securely verified and you will redirected shortly",
+  ariaLabel = "Verification successful. Redirecting to your dashboard.",
 }) {
   useEffect(() => {
     if (!open) {
@@ -63,18 +72,7 @@ function MfaVerificationSuccess({
         aria-live="polite"
         aria-label={ariaLabel}
       >
-        <div className="mfa-success-logo">
-          <img src={logoImgc} alt="" className="mfa-success-logo-icon" />
-          <span className="mfa-success-logo-text">EDABIP</span>
-        </div>
-
-        <div className="mfa-success-icon-wrap" aria-hidden="true">
-          <img
-            src={successIconImg}
-            alt=""
-            className="mfa-success-icon-img"
-          />
-        </div>
+        <SuccessCheckIcon />
 
         <h2 className="mfa-success-title">{title}</h2>
 
@@ -82,9 +80,6 @@ function MfaVerificationSuccess({
 
         <div className="mfa-success-redirect">
           <RedirectSpinner />
-          <p className="mfa-success-redirect-text">
-            Redirecting you to your dashboard...
-          </p>
         </div>
       </div>
     </div>

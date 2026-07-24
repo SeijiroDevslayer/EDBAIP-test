@@ -29,7 +29,7 @@ export const MOCK_LOGIN_MFA_OTP = "1234";
 export const MOCK_LOGIN_MFA_OTP_LENGTH = MOCK_LOGIN_MFA_OTP.length;
 const MOCK_MAX_VERIFY_ATTEMPTS = 5;
 const MOCK_CHALLENGE_TTL_MS = 5 * 60 * 1000;
-const MOCK_RESEND_COOLDOWN_SECONDS = 30;
+const MOCK_RESEND_COOLDOWN_SECONDS = 120;
 
 /** In-memory mock challenges keyed by challengeId (not persisted as auth). */
 const mockChallenges = new Map();
@@ -38,16 +38,8 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function maskEmail(email) {
-  const normalized = normalizeMockUserEmail(email);
-  const [local, domain] = normalized.split("@");
-
-  if (!local || !domain) {
-    return "***";
-  }
-
-  const visible = local.slice(0, 1);
-  return `${visible}***@${domain}`;
+function toDestinationLabel(email) {
+  return normalizeMockUserEmail(email) || "your email";
 }
 
 function createChallengeId() {
@@ -171,7 +163,7 @@ export async function loginWithEmail(credentials = {}) {
     const challenge = {
       challengeId,
       method: MFA_METHOD.EMAIL_OTP,
-      maskedDestination: maskEmail(authenticatedUser.email),
+      maskedDestination: toDestinationLabel(authenticatedUser.email),
       email: authenticatedUser.email,
       user: authenticatedUser,
       otp: MOCK_LOGIN_MFA_OTP,

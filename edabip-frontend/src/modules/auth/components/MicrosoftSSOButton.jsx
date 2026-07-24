@@ -179,7 +179,7 @@ function MicrosoftSSOButton({ className }) {
         <span className="sso-btn-label">
           {isProcessing
             ? "Signing in with Microsoft..."
-            : "Continue with Microsoft"}
+            : "Sign In with Microsoft"}
         </span>
       </button>
 
@@ -200,14 +200,6 @@ function MicrosoftSSOButton({ className }) {
           <MfaVerificationSuccess
             open
             onRedirect={handleSuccessRedirect}
-            title="Signed in Successfully!"
-            subtitle={
-              <>
-                Your Microsoft account has been verified.
-                <br />
-                You can now access all features of your EDABIP account.
-              </>
-            }
             ariaLabel="Microsoft sign-in successful. Redirecting to your dashboard."
           />
         </Suspense>

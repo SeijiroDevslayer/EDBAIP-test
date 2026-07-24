@@ -62,7 +62,7 @@ export function toPersistedChallenge(challenge) {
       Number.isFinite(challenge.resendAvailableAt)
         ? challenge.resendAvailableAt
         : Date.now() +
-          (Number(challenge.resendAvailableInSeconds) || 30) * 1000,
+          (Number(challenge.resendAvailableInSeconds) || 120) * 1000,
     rememberMe: Boolean(challenge.rememberMe),
     ...(userSnapshot ? { userSnapshot } : {}),
   };

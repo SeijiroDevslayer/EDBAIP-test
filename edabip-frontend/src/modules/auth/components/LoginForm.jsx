@@ -285,7 +285,7 @@ function LoginForm() {
 
     dispatchFlow({ type: 'RESEND_DONE' });
     return {
-      resendAvailableInSeconds: result.resendAvailableInSeconds ?? 30,
+      resendAvailableInSeconds: result.resendAvailableInSeconds ?? 120,
     };
   };
 
@@ -303,7 +303,7 @@ function LoginForm() {
         0,
         Math.ceil((pendingChallenge.resendAvailableAt - Date.now()) / 1000)
       )
-    : 30;
+    : 120;
 
   const expiresInSeconds = pendingChallenge?.expiresAt
     ? Math.max(0, Math.ceil((pendingChallenge.expiresAt - Date.now()) / 1000))
@@ -602,16 +602,11 @@ function LoginForm() {
 
       <MfaVerificationModal
         open={isMfaOpen}
-        title="Verify your identity"
-        description={
-          pendingChallenge?.maskedDestination
-            ? `We've sent a ${MOCK_LOGIN_MFA_OTP_LENGTH}-digit verification code to ${pendingChallenge.maskedDestination}.`
-            : `Enter the ${MOCK_LOGIN_MFA_OTP_LENGTH}-digit verification code sent to your email.`
-        }
+        title="Verify Your Email"
         method={pendingChallenge?.method || 'EMAIL_OTP'}
         maskedDestination={pendingChallenge?.maskedDestination || ''}
         expiresInSeconds={expiresInSeconds}
-        resendAvailableInSeconds={resendAvailableInSeconds}
+        resendAvailableInSeconds={resendAvailableInSeconds || 120}
         otpLength={MOCK_LOGIN_MFA_OTP_LENGTH}
         isSubmitting={flow.status === LOGIN_FLOW.VERIFYING_MFA}
         isResending={flow.isResendingMfa}
