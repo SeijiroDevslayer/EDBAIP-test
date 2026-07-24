@@ -18,6 +18,7 @@ import MailVerificationIcon from '../../../assets/login/mail-verify.svg';
 import PhoneVerificationIcon from '../../../assets/login/phone-verify.svg';
 import OtpRefreshTimerIcon from '../../../assets/login/otp-refresh-timer.svg';
 import SSOButton from './SSOButton.jsx';
+import MicrosoftSSOButton from './MicrosoftSSOButton.jsx';
 import { useAuthContext } from '../../../context/AuthContext.jsx';
 import './SignupForm.css';
 
@@ -1078,11 +1079,15 @@ function SignupForm() {
               <span>OR</span>
             </div>
 
-            <SSOButton
-              provider="google"
-              className="su-sso-btn"
-              icon={<img src={googleicon} alt="" className="su-sso-icon" />}
-            />
+            <div className="su-sso-stack">
+              <SSOButton
+               provider="google"
+               className="su-sso-btn"
+               icon={<img src={googleicon} alt="" className="su-sso-icon" />}
+              />
+              <MicrosoftSSOButton className="su-sso-btn" />
+            </div>
+
 
             <p className="su-signin-text">
               Already have an account?{' '}
