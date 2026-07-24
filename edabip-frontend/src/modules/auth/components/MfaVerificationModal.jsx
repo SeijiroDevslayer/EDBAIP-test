@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
-import verifyLockImg from "../../../assets/login/verify-lock.svg";
-import otpTimerImg from "../../../assets/login/otp-refresh-timer.svg";
+import verifyLockImg from "../../../assets/login/verify-lock.png";
+import otpTimerImg from "../../../assets/login/otp-refresh-timer.png";
 import OtpInput from "./OtpInput.jsx";
 import "./MfaVerificationModal.css";
 
